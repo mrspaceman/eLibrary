@@ -1,0 +1,29 @@
+@startuml
+
+skinparam titleBorderRoundCorner 15
+skinparam titleBorderThickness 2
+skinparam titleBorderColor red
+skinparam titleBackgroundColor Aqua-CadetBlue
+
+header eLibrary Project
+footer 15 February 2019
+
+
+package uk.co.droidinactu.elibrary.filesystem {
+    class scannerService
+}
+
+
+package uk.co.droidinactu.elibrary.database {
+	
+}
+
+
+package uk.co.droidinactu.elibrary. {
+	
+}
+
+
+
+
+@enduml

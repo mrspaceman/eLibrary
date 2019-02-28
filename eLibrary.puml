@@ -1,0 +1,29 @@
+@startuml
+
+!include eLibrary.iuml
+
+title Component Overview
+
+
+[Filesystem Scanner]
+component  [Filesystem Scanner] #Yellow
+
+[Filesystem Scanner] -up-> [Database]
+
+[UI] -up-> [Databse]
+
+component [Profile Reader]
+[Profile Reader] --> DataHelixConstraintLanguage
+
+
+DataHelixConstraintLanguage -down-> [Data Generator]
+component [Data Generator]
+[Data Generator] --> DataHelixOutputLanguage
+
+DataHelixOutputLanguage -down-> [Data Writer]
+component [Data Writer]
+[Data Writer] -down-> CSV
+[Data Writer] -down-> JSON
+
+
+@enduml

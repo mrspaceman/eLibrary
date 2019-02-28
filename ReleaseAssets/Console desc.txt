@@ -1,0 +1,4 @@
+Title (30 chars) : E-Book Library
+Short Description (80 chars) : manage your ebook collection directly on your android device.
+Full Description (4000 chars) :
+Application Type : Applications/Games
