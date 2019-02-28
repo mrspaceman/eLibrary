@@ -1,19 +1,35 @@
 package uk.co.droidinactu.elibrary.library
 
+import android.app.Application
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.AsyncTask
 import android.os.Handler
+import androidx.core.app.NotificationCompat
 import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.debug
+import org.jetbrains.anko.error
 import uk.co.droidinactu.elibrary.BookLibApplication
-import uk.co.droidinactu.elibrary.room.Author
-import uk.co.droidinactu.elibrary.room.BookTag
-import uk.co.droidinactu.elibrary.room.EBook
-import uk.co.droidinactu.elibrary.room.FileType
+import uk.co.droidinactu.elibrary.BookLibrary
+import uk.co.droidinactu.elibrary.MyDebug
+import uk.co.droidinactu.elibrary.R
+import uk.co.droidinactu.elibrary.room.*
 import java.io.File
 
 
-class LibraryManager: AnkoLogger{
+class LibraryManager : AnkoLogger {
+    constructor(bookLibApplication: Application)
+
+    private var scanLibTask: LibraryScanTask? = null
+    private var scanningInProgress = false
+    private var mNotificationManager: NotificationManager? = null
+    private var mNotificationBuilder: NotificationCompat.Builder? = null
+    private val mNotificationId = 1
+    private var ctx: Context
+
 
     /** EBook CRUB */
 
@@ -41,7 +57,7 @@ class LibraryManager: AnkoLogger{
                 intent.setDataAndType(ebkURI, "application/pdf")
             } else {
                 error(LOG_TAG + "EBook FileTreeNode Not Found so remove from library [" + pEbk.fullFileDirName + "]")
-              //FIXME:  BookLibApplication.getInstance().getLibManager().removeBook(pEbk)
+                //FIXME:  BookLibApplication.getInstance().getLibManager().removeBook(pEbk)
             }
         }
         return intent
@@ -67,6 +83,10 @@ class LibraryManager: AnkoLogger{
 
     }
 
+    fun reReadEBookMetadata(ebkPath: String) {
+        //FIXME :
+    }
+
 
     /** Author CRUD */
 
@@ -78,19 +98,125 @@ class LibraryManager: AnkoLogger{
         return ArrayList<Author>()
     }
 
+    fun open() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    fun close() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+
+    fun clear() {
+        debug(LOG_TAG + "clear() ()")
+        for (libname in getLibraryList()) {
+            val intent = Intent(
+                (ctx.getApplicationContext() as BookLibApplication).applicationContext,
+                FileObserverService::class.java
+            )
+            intent.putExtra("file_obs_action", "del")
+            intent.putExtra("libname", libname)
+            (ctx.getApplicationContext() as BookLibApplication).applicationContext.startService(intent)
+        }
+    }
+
+    fun getLibraryList(): List<String> {
+        val aList = getLibraries()
+        val strLst = java.util.ArrayList<String>()
+        for (t in aList) {
+            strLst.add(t.libraryTitle)
+        }
+        return strLst
+    }
+
+    fun getLibraries(): List<Library> {
+        var result: List<Library> = java.util.ArrayList<Library>()
+        try {
+            result = dbHelper.getLibraryDao().queryForAll()
+        } catch (pE: java.sql.SQLException) {
+            error("Exception reading libraries", pE)
+        }
+
+        return result
+    }
+
+    fun refreshLibraries(prgBrHandler: Handler, handler: Handler) {
+        if (!scanningInProgress) {
+            scanningInProgress = true
+            val aList = getLibraries()
+            for (lib in aList) {
+                if (MyDebug.DEBUGGING) {
+                    //                    BookLibApplication.d(LOG_TAG + "Scanning library [" + lib.getLibrary_title()
+                    //                            + "] before has [" + getBooksForLibrary(lib.getLibrary_title()).size() + "] ebooks");
+                }
+                initiateScan(prgBrHandler, handler, lib)
+            }
+        }
+    }
+
+    fun initiateScan(prgBrHandler: Handler, handler: Handler, lib: Library) {
+        if (MyDebug.DEBUGGING) {
+            debug(LOG_TAG + "Scanning library [" + lib.libraryTitle + "]")
+        }
+        if (scanLibTask == null || scanLibTask.taskComplete) {
+            scanLibTask = LibraryScanTask()
+            scanLibTask?.execute(prgBrHandler, handler, lib.libraryRootDir, lib.libraryTitle)
+        }
+    }
+
+    fun isScanningInProgress(): Boolean {
+        return scanningInProgress
+    }
+
+    fun setScanningInProgress(scanningInProgress: Boolean) {
+        this.scanningInProgress = scanningInProgress
+    }
+
+    fun addLibrary(prgBrHandler: Handler, handler: Handler, libname: String, rootDir: String) {
+        val l = Library()
+        l.libraryTitle = libname.trim { it <= ' ' }
+        l.libraryRootDir = rootDir.trim { it <= ' ' }
+        try {
+            dbHelper.getLibraryDao().create(l)
+        } catch (pE: java.sql.SQLException) {
+            error("Exception adding library", pE)
+        }
+
+        initiateScan(prgBrHandler, handler, l)
+    }
+
+    fun addBookToLibrary(libname: String, ebk: EBook) {
+        ebk.inLibrary = libname
+        try {
+            dbHelper.getEBookDao().createOrUpdate(ebk)
+            for (t in ebk.getBookTags()) {
+                // FIXME : add bookTags
+                t = this.getTag(t.getTag())
+            }
+            // FIXME : add authors
+            // FIXME : add link objects
+        } catch (pE: java.sql.SQLException) {
+            error("Exception adding book to library", pE)
+        }
+
+    }
+
 
     companion object {
-        private val LOG_TAG = LibraryManager::class.java.simpleName + ":"
+        val LOG_TAG = LibraryManager::class.java.simpleName + ":"
+        val DB_NAME = "books-db"
+        val DB_NAME_ENC = "books-db-encrypted"
+        val CHANNEL_ID = "ScanningChannel"
     }
 
 
     private inner class LibraryScanTask : AsyncTask<Any, Void, Void>() {
-        private var prgBrHandler: Handler? = null
-        private var msgHndlr: Handler? = null
-        private var libTitle: String? = null
-        private var libRootDir: String? = null
+        private lateinit var prgBrHandler: Handler
+        private lateinit var msgHndlr: Handler
+        private lateinit var libTitle: String
+        private lateinit var libRootDir: String
         private val m_libraryScanner = LibraryScanner()
-        private var taskComplete: Boolean = false
+        var taskComplete: Boolean = false
 
         override fun doInBackground(vararg params: Any): Void? {
             taskComplete = false
@@ -114,7 +240,7 @@ class LibraryManager: AnkoLogger{
                 val completeMessage = msgHndlr!!.obtainMessage(64, libTitle)
                 completeMessage.sendToTarget()
             }
-            BookLibApplication.getInstance().copyDbFileToSd(LibraryManager.DB_NAME)
+            BookLibApplication.copyDbFileToSd(LibraryManager.DB_NAME)
             taskComplete = true
             LibraryCheckLinksTask().execute(msgHndlr, libRootDir)
         }
@@ -136,12 +262,12 @@ class LibraryManager: AnkoLogger{
             val result = getBooks()
 
             for (ebk in result) {
-                for (ft in ebk.getFileTypes()) {
-                    val selectedFileType = ft.getFileType()
-                    if (File(ebk.getFull_file_dir_name() + "." + selectedFileType).exists()) {
+                for (ft in ebk.filetypes) {
+                    val selectedFileType = ft
+                    if (File(ebk.fullFileDirName + "." + selectedFileType).exists()) {
                         // file exists so we leave it in the library
                     } else {
-                        error(LOG_TAG + "EBook FileTreeNode Not Found so remove from library [" + ebk.getFull_file_dir_name() + "]")
+                        error(LOG_TAG + "EBook FileTreeNode Not Found so remove from library [" + ebk.fullFileDirName + "]")
                         //FIXME : delete book from db
                     }
                 }
@@ -167,6 +293,28 @@ class LibraryManager: AnkoLogger{
         override fun onProgressUpdate(vararg values: Void) {
             super.onProgressUpdate(*values)
         }
+    }
+
+
+    private fun displayScanningNotification(libname: String) {
+        val resultIntent = Intent(ctx, BookLibrary::class.java)
+        val resultPendingIntent = PendingIntent.getActivity(ctx, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+
+        mNotificationBuilder = NotificationCompat.Builder(ctx, CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_notification)
+            .setContentTitle("Scanning Library")
+            .setContentText("Scan library $libname for pdf and epub books")
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setContentIntent(resultPendingIntent)
+            .setProgress(0, 0, true)
+        val notification = mNotificationBuilder?.build()
+
+        mNotificationManager = ctx.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        mNotificationManager?.notify(mNotificationId, notification)
+    }
+
+    private fun removeScanningNotification(libname: String) {
+        mNotificationManager.cancel(mNotificationId)
     }
 
 

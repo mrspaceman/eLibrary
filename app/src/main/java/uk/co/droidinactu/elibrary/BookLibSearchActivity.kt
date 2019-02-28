@@ -30,7 +30,6 @@ class BookLibSearchActivity : AppCompatActivity(), AnkoLogger {
             value = b.getInt("key")
         }
 
-
         txtSearchText = findViewById<View>(R.id.book_lib_search_text) as EditText
         btnSearch = findViewById<View>(R.id.book_lib_search_button) as Button
         cbTags = findViewById<View>(R.id.book_lib_search_checkBoxTags) as CheckBox
