@@ -98,6 +98,95 @@ class LibraryManager : AnkoLogger {
         return ArrayList<Author>()
     }
 
+
+    /** Tag CRUD */
+
+
+    public void addEbookTag(final EBookTags ebktag) {
+        try {
+            dbHelper.getEBookTagsDao().create(ebktag);
+        } catch (java.sql.SQLException pE) {
+            BookLibApplication.getInstance().e("Exception adding ebooktag " + ebktag, pE);
+        }
+    }
+
+    public BookTag addTag(final String tagstr) {
+        BookTag t = getTag(tagstr);
+        if (t == null) {
+            try {
+                dbHelper.getTagDao().create(new BookTag(tagstr));
+            } catch (java.sql.SQLException pE) {
+                BookLibApplication.getInstance().e("Exception adding [" + tagstr + "] tag to db", pE);
+            }
+        }
+        return getTag(tagstr);
+    }
+
+    public List<String> getTagList() {
+        List<BookTag> bookTags = getTags();
+        List<String> tagStrs = new ArrayList<String>();
+        String[] tgLst = new String[bookTags.size()];
+        for (BookTag t : bookTags) {
+            tagStrs.add(t.getTag());
+        }
+        return tagStrs;
+    }
+
+    public TagTree getTagTree() {
+        List<BookTag> bookTags = getTags();
+        TagTree tagTree = new TagTree();
+        String[] tgLst = new String[bookTags.size()];
+        for (BookTag t : bookTags) {
+            tagTree.add(t);
+        }
+        return tagTree;
+    }
+
+    public List<BookTag> getTags() {
+        List<BookTag> result = new ArrayList<>();
+        try {
+            result = dbHelper.getTagDao().query(
+                    dbHelper.getTagDao()
+                            .queryBuilder()
+                            .orderByRaw("tag COLLATE NOCASE")
+                            .prepare());
+        } catch (java.sql.SQLException pE) {
+            BookLibApplication.getInstance().e("Exception reading bookTags", pE);
+        }
+        return result;
+    }
+
+    public List<BookTag> getTagsForBook(final EBook ebk) {
+        List<BookTag> result = new ArrayList<>();
+        try {
+            result = lookupTagsForEBook(ebk);
+        } catch (SQLException pE) {
+            pE.printStackTrace();
+        }
+        return result;
+    }
+
+    private List<BookTag> lookupTagsForEBook(final EBook ebk) throws SQLException {
+        if (tagsForEBookQuery == null) {
+            QueryBuilder<EBookTags, Long> dbQryBld = dbHelper.getEBookTagsDao().queryBuilder();
+
+            // this time selecting for the user-id field
+            dbQryBld.selectColumns(EBookTags.COLUMN_NAME_TAG_ID);
+            SelectArg postSelectArg = new SelectArg();
+            dbQryBld.where().eq(EBookTags.COLUMN_NAME_BOOK_ID, postSelectArg);
+
+            // build our outer query
+            QueryBuilder<BookTag, Long> userQb = dbHelper.getTagDao().queryBuilder();
+            // where the user-id matches the inner query's user-id field
+            userQb.where().in(BookTag.COLUMN_NAME_ID, dbQryBld);
+            tagsForEBookQuery = userQb.prepare();
+        }
+        tagsForEBookQuery.setArgumentHolderValue(0, ebk);
+        return dbHelper.getTagDao().query(tagsForEBookQuery);
+    }
+
+
+
     fun open() {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
