@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <RadioGroup
+        android:id="@+id/filetype_picker_dialog_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="15dp">
+
+        <RadioButton
+            android:id="@+id/filetype_picker_dialog_epub"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="15dp"
+            android:text="@string/filetype_picker_dialog_epub"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <RadioButton
+            android:id="@+id/filetype_picker_dialog_pdf"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="15dp"
+            android:text="@string/filetype_picker_dialog_pdf"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+    </RadioGroup>
+
+    <Button
+        android:id="@+id/filetype_picker_dialog_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/filetype_picker_dialog_group"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="12dp"
+        android:padding="15dp"
+        android:text="@string/filetype_picker_dialog_btn" />
+
+</RelativeLayout>
