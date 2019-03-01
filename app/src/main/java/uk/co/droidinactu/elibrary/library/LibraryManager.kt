@@ -95,20 +95,20 @@ class LibraryManager : AnkoLogger {
         return intent
     }
 
-    fun getBooks(): List<EBook> {
+    fun getBooks(): MutableList<EBook> {
         return ebookDao.getAll()
     }
 
-    private fun getBooksForLibrary(lib: Library): List<EBook> {
+    private fun getBooksForLibrary(lib: Library): MutableList<EBook> {
         return ebookDao.getAllInLibrary(lib.id)
     }
 
-    fun getBooksForTag(tagStr: String, subtags: Boolean): List<EBook> {
+    fun getBooksForTag(tagStr: String, subtags: Boolean): MutableList<EBook> {
         return ebookDao.getAllForTag(tagStr)
     }
 
 
-    fun searchBooksMatching(titleStr: String): List<EBook> {
+    fun searchBooksMatching(titleStr: String): MutableList<EBook> {
         return ebookDao.getAllWithTitle(titleStr)
     }
 

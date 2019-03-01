@@ -14,7 +14,6 @@ import org.jetbrains.anko.debug
 import uk.co.droidinactu.elibrary.BookLibApplication
 import uk.co.droidinactu.elibrary.R
 import uk.co.droidinactu.elibrary.room.Author
-import uk.co.droidinactu.elibrary.room.BookTag
 import uk.co.droidinactu.elibrary.room.EBook
 import uk.co.droidinactu.elibrary.room.FileType
 import java.io.File

@@ -49,10 +49,6 @@ object BookLibApplication : Application(), AnkoLogger {
     val ONE_MINUTE = 60000
     val BLE_DEVICE_SCAN_PERIOD: Long = 10000
 
-    fun getLibManager(): LibraryManager? {
-        return libMgr
-    }
-
     fun addFileWatcher(libname: String?, rootdir: String?) {
         if (libname != null && rootdir != null) {
             if (!libraryWatcher.containsKey(libname)) {
@@ -74,7 +70,7 @@ object BookLibApplication : Application(), AnkoLogger {
 
     private var wakeLock: PowerManager.WakeLock? = null
 
-    private var libMgr: LibraryManager? = null
+    private lateinit var libMgr: LibraryManager
 
     private val libraryWatcher = HashMap<String, RecursiveFileObserver>()
 
@@ -92,13 +88,18 @@ object BookLibApplication : Application(), AnkoLogger {
 
         copyDbFileToSd(LibraryManager.DB_NAME)
 
-        libMgr = LibraryManager(this)
+        libMgr = LibraryManager()
         try {
-            libMgr?.open()
+            libMgr.open()
         } catch (pE: SQLException) {
             pE.printStackTrace()
         }
     }
+
+    fun getLibManager(): LibraryManager {
+        return libMgr
+    }
+
 
     /*
      * (non-Javadoc)
@@ -107,7 +108,7 @@ object BookLibApplication : Application(), AnkoLogger {
      */
     override fun onTerminate() {
         super.onTerminate()
-        libMgr?.close()
+        libMgr.close()
     }
 
     @SuppressLint("InvalidWakeLockTag")

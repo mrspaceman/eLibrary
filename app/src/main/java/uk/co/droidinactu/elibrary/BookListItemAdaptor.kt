@@ -14,7 +14,6 @@ import android.widget.*
 import androidx.recyclerview.widget.RecyclerView
 import uk.co.droidinactu.elibrary.badgedimageview.BadgedImageView
 import uk.co.droidinactu.elibrary.library.LibraryManager
-import uk.co.droidinactu.elibrary.room.BookTag
 import uk.co.droidinactu.elibrary.room.EBook
 import uk.co.droidinactu.elibrary.room.FileType
 

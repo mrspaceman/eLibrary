@@ -12,8 +12,8 @@ interface AuthorDao {
     fun getAll(): List<Author>
 
     @Query(
-        "SELECT * FROM authors WHERE first_name LIKE :first AND " +
-                "last_name LIKE :last LIMIT 1"
+        "SELECT * FROM authors WHERE firstname LIKE :first AND " +
+                "lastname LIKE :last LIMIT 1"
     )
     fun getByName(first: String, last: String): Author
 

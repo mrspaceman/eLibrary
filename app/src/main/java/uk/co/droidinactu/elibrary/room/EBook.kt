@@ -4,6 +4,8 @@ import android.graphics.*
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import androidx.room.Relation
+import org.jetbrains.annotations.NotNull
 import java.io.ByteArrayOutputStream
 import java.util.*
 
@@ -11,12 +13,19 @@ import java.util.*
  * Created by aspela on 31/08/16.
  */
 @Entity(tableName = "ebooks")
-class EBook {
-    var bookTags: MutableList<BookTag> = ArrayList()
+class EBook() {
+
     var filetypes: MutableList<FileType> = ArrayList()
 
-    var authors: List<Author> = ArrayList()
-    var tags: List<Tag> = ArrayList()
+    @Relation(
+        parentColumn = "id", entityColumn = "id", entity = Author::class
+    )
+    var authors: MutableList<Author> = ArrayList()
+
+    @Relation(
+        parentColumn = "id", entityColumn = "id", entity = Tag::class
+    )
+    var tags: MutableList<Tag> = ArrayList()
 
     @PrimaryKey(autoGenerate = true)
     var id: Int = 0
@@ -25,6 +34,7 @@ class EBook {
     var inLibraryId = -1
 
     @ColumnInfo
+    @NotNull
     var fullFileDirName = ""
 
     @ColumnInfo
@@ -89,7 +99,7 @@ class EBook {
     /**
      * Copy constructor.
      */
-    constructor(rhs: EBook) {
+    constructor(rhs: EBook) : this() {
         inLibraryId = rhs.inLibraryId
         fullFileDirName = rhs.fullFileDirName
         fileDir = rhs.fileDir
@@ -135,21 +145,19 @@ class EBook {
         return background
     }
 
-    fun addTag(pTag: BookTag) {
-        bookTags.add(pTag)
+    fun addTag(pTag: Tag) {
+        this.tags.add(pTag)
     }
 
-    fun addTag(pTag: String) {
-        bookTags.add(BookTag(pTag))
-    }
-
-    fun addFileType(pFiletype: FileType) {
+    fun addFileType(pFiletype: String) {
         filetypes.add(pFiletype)
     }
 
     fun addAuthors(pAuthors: List<nl.siegmann.epublib.domain.Author>) {}
 
-    fun addAuthor(pAuthor: Author) {}
+    fun addAuthor(pAuthor: Author) {
+        authors.add(pAuthor)
+    }
 
     companion object {
         private val LOG_TAG = EBook::class.java.simpleName + ":"

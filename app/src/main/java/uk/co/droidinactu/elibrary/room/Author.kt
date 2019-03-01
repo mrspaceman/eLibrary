@@ -2,18 +2,20 @@ package uk.co.droidinactu.elibrary.room
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
-import androidx.room.PrimaryKey
+import org.jetbrains.annotations.NotNull
 
-@Entity(tableName = "authors", primaryKeys = arrayOf("firstname", "lastname", "website"))
+@Entity(tableName = "authors", primaryKeys = arrayOf("firstname", "lastname"))
 class Author(firstname: String, lastname: String) {
 
-    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo
     var id: Int = 0
 
     @ColumnInfo
+    @NotNull
     var firstname: String? = null
 
     @ColumnInfo
+    @NotNull
     var lastname: String? = null
 
     @ColumnInfo

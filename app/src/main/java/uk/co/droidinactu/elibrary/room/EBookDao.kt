@@ -8,13 +8,16 @@ import androidx.room.Query
 @Dao
 interface EBookDao {
     @Query("SELECT * FROM ebooks")
-    fun getAll(): List<EBook>
+    fun getAll(): MutableList<EBook>
 
     @Query("SELECT * FROM ebooks WHERE inLibraryId IN (:inLibraryId)")
-    fun getAllInLibrary(inLibraryId: Int): List<EBook>
+    fun getAllInLibrary(inLibraryId: Int): MutableList<EBook>
 
     @Query("SELECT * FROM ebooks WHERE bookTitle like '%' || :titleStr  || '%'")
-    fun getAllWithTitle(titleStr: String): List<EBook>
+    fun getAllWithTitle(titleStr: String): MutableList<EBook>
+
+    @Query("SELECT * FROM ebooks WHERE bookTitle like '%' || :titleStr  || '%'")
+    fun getAllForTag(titleStr: String): MutableList<EBook>
 
     @Insert
     fun insert(obj: EBook)

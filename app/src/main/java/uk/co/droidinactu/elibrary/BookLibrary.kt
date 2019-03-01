@@ -2,6 +2,7 @@ package uk.co.droidinactu.elibrary
 
 import android.annotation.SuppressLint
 import android.app.AlarmManager
+import android.app.Dialog
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -29,8 +30,6 @@ import org.jetbrains.anko.debug
 import uk.co.droidinactu.elibrary.library.FileObserverService
 import uk.co.droidinactu.elibrary.library.RecursiveFileObserver.Companion.INTENT_EBOOK_MODIFIED
 import uk.co.droidinactu.elibrary.library.RecursiveFileObserver.Companion.INTENT_EBOOK_MODIFIED_PATH
-import uk.co.droidinactu.elibrary.room.BookTag
-import uk.co.droidinactu.elibrary.room.EBook
 import java.io.File
 import java.util.*
 
@@ -118,7 +117,7 @@ class BookLibrary : AppCompatActivity(), AnkoLogger {
 
         if (BuildConfig.DEBUG) {
             supportActionBar!!.setTitle(
-                getString(R.string.app_title) + " (" +  BookLibApplication.getAppVersionName(
+                getString(R.string.app_title) + " (" + BookLibApplication.getAppVersionName(
                     "uk.co.droidinactu.booklib"
                 ) + ")"
             )
@@ -153,6 +152,39 @@ class BookLibrary : AppCompatActivity(), AnkoLogger {
         fab?.setOnClickListener(View.OnClickListener { browseForLibrary() })
     }
 
+    private fun pickTag(tagToSet: Int) {
+        val tglist = (applicationContext as BookLibApplication).getLibManager().getTagList()
+        // val tgTree = (applicationContext as BookLibApplication).getLibManager().getTagTree()
+        //    tglist.remove(BookTag.CURRENTLY_READING)
+
+        val dialog = Dialog(this)
+        dialog.setContentView(R.layout.tag_list_picker_dialog)
+        dialog.setTitle("Pick an EBook tag")
+
+        // set the custom dialog components - text, image and button
+        val tagLstIncludeSubTags = dialog.findViewById<View>(R.id.tag_list_picker_include_subtags) as CheckBox
+        tagLstIncludeSubTags.isChecked = true
+        val tagLstPickerList = dialog.findViewById<View>(R.id.tag_list_picker_list) as ListView
+        val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, android.R.id.text1, tglist)
+        tagLstPickerList.adapter = adapter
+
+        tagLstPickerList.onItemClickListener =
+            AdapterView.OnItemClickListener { parent, view, position, id ->
+                val selectedFromList = tglist[position]
+                when (tagToSet) {
+                    1 -> {
+                        bookListTag1Title?.setText(selectedFromList)
+                        bookListTag1IncludeSubTags = tagLstIncludeSubTags.isChecked
+                        savePreferences()
+                        updateBookListTag1(bookListTag1IncludeSubTags)
+                    }
+                    2 -> {
+                    }
+                }
+                dialog.dismiss()
+            }
+        dialog.show()
+    }
 
     private fun browseForLibrary() {
         debug(LOG_TAG + "browseForLibrary()")
@@ -171,10 +203,10 @@ class BookLibrary : AppCompatActivity(), AnkoLogger {
             if (files.size > 0) {
                 val fileBits = files[0].split("/".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
                 val libraryName = fileBits[fileBits.size - 1]
-                progressBar.setMax(2500)
-                progressBar.setProgress(0)
-                progressBar.setVisibility(View.VISIBLE)
-                progressBarContainer.setVisibility(View.VISIBLE)
+                progressBar?.setMax(2500)
+                progressBar?.setProgress(0)
+                progressBar?.setVisibility(View.VISIBLE)
+                progressBarContainer?.setVisibility(View.VISIBLE)
                 (applicationContext as BookLibApplication).getLibManager()!!
                     .addLibrary(prgBrHandler, mHandler, libraryName, files[0])
             }
@@ -185,24 +217,24 @@ class BookLibrary : AppCompatActivity(), AnkoLogger {
     private fun savePreferences() {
         val settings = getSharedPreferences(BookLibApplication.LOG_TAG, 0)
         val editor = settings.edit()
-        editor.putString("bookListTag1Title", bookListTag1Title.getText().toString())
+        editor.putString("bookListTag1Title", bookListTag1Title?.getText().toString())
         editor.putBoolean("bookListTag1IncludeSubTags", bookListTag1IncludeSubTags)
         editor.apply()
     }
 
     private fun updateBookListTag1(includeSubTags: Boolean) {
-        if (bookListTag1Title.getText().toString().compareTo(NO_TAG_SELECTED) != 0) {
+        if (bookListTag1Title?.getText().toString().compareTo(NO_TAG_SELECTED) != 0) {
             val bklist = (applicationContext as BookLibApplication).getLibManager()
-                .getBooksForTag(bookListTag1Title.getText().toString(), includeSubTags)
+                .getBooksForTag(bookListTag1Title?.getText().toString(), includeSubTags)
             bookListAdaptorTag1 = BookListItemAdaptor(bklist)
-            bookListTag1.setAdapter(bookListAdaptorTag1)
+            bookListTag1?.setAdapter(bookListAdaptorTag1)
         }
     }
 
     override fun onStart() {
         super.onStart()
         debug(LOG_TAG + "onStart()")
-        if ((applicationContext as BookLibApplication).getLibManager().getLibraries().size() === 0) {
+        if (BookLibApplication.getLibManager().getLibraries().size === 0) {
             browseForLibrary()
         }
         (applicationContext as BookLibApplication).registerReceiver(
@@ -270,7 +302,7 @@ class BookLibrary : AppCompatActivity(), AnkoLogger {
 
     private fun rescanLibraries() {
         fab?.setEnabled(false)
-        progressBar?.setMax((applicationContext as BookLibApplication).getLibManager().getBooks().size())
+        progressBar?.setMax(BookLibApplication.getLibManager().getBooks().size)
         progressBar?.setProgress(0)
         progressBar?.setVisibility(View.VISIBLE)
         progressBarContainer?.setVisibility(View.VISIBLE)
@@ -319,9 +351,12 @@ class BookLibrary : AppCompatActivity(), AnkoLogger {
 
     private fun updateBookListCurrReading() {
         val bklist =
-            (applicationContext as BookLibApplication).getLibManager()!!.getBooksForTag(BookTag.CURRENTLY_READING, false)
+            (applicationContext as BookLibApplication).getLibManager().getBooksForTag(
+                BookTag.CURRENTLY_READING,
+                false
+            )
         bookListAdaptorCurrReading = BookListItemAdaptor(bklist)
-        bookListCurrentReading.setAdapter(bookListAdaptorCurrReading)
+        bookListCurrentReading?.setAdapter(bookListAdaptorCurrReading)
         setupShortcuts()
     }
 
