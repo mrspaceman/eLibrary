@@ -24,4 +24,5 @@ interface EBookDao {
 
     @Delete
     fun delete(obj: EBook)
+
 }
