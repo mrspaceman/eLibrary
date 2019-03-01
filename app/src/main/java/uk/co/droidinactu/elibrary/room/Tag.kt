@@ -3,10 +3,9 @@ package uk.co.droidinactu.elibrary.room
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import java.util.*
 
-@Entity(tableName = "booktags")
-class BookTag(tag: String) {
+@Entity(tableName = "tags")
+class Tag(tag: String) {
 
     @PrimaryKey(autoGenerate = true)
     var id: Int = 0
@@ -15,10 +14,5 @@ class BookTag(tag: String) {
     var tag: String = ""
 
     @ColumnInfo
-    var children: List<BookTag> = ArrayList()
-
-    companion object {
-        public val CURRENTLY_READING = "currently_reading"
-    }
-
+    var parentTagId: Long? = null
 }

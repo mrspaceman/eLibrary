@@ -21,7 +21,6 @@ import uk.co.droidinactu.elibrary.library.FileObserverService
 import uk.co.droidinactu.elibrary.library.LibraryManager
 import uk.co.droidinactu.elibrary.library.RecursiveFileObserver
 import uk.co.droidinactu.elibrary.library.RecursiveFileObserver.Companion.CHANGES_ONLY
-import uk.co.droidinactu.elibrary.library.RecursiveFileObserver.Companion.LOG_TAG
 import java.io.File
 import java.io.IOException
 import java.sql.SQLException
@@ -29,6 +28,8 @@ import java.text.DecimalFormat
 import java.util.*
 
 object BookLibApplication : Application(), AnkoLogger {
+
+    val LOG_TAG = BookLibApplication::class.java.simpleName + ":"
 
     val IS_DEBUGGING = true
 
@@ -246,4 +247,6 @@ object BookLibApplication : Application(), AnkoLogger {
         fileObserverService = FileObserverService("booklib file observer")
         return fileObserverService
     }
+
+
 }

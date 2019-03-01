@@ -7,30 +7,23 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Handler
 import android.os.ParcelFileDescriptor
-
 import com.shockwave.pdfium.PdfiumCore
-
-import java.io.File
-import java.io.FileInputStream
-import java.io.FileNotFoundException
-import java.io.IOException
-import java.util.ArrayList
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
-
 import nl.siegmann.epublib.epub.EpubReader
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.debug
-import uk.co.droidinactu.booklib.BookLibApplication
-import uk.co.droidinactu.booklib.FileObserverService
-import uk.co.droidinactu.booklib.MyDebug
-import uk.co.droidinactu.booklib.R
 import uk.co.droidinactu.elibrary.BookLibApplication
 import uk.co.droidinactu.elibrary.R
 import uk.co.droidinactu.elibrary.room.Author
 import uk.co.droidinactu.elibrary.room.BookTag
 import uk.co.droidinactu.elibrary.room.EBook
 import uk.co.droidinactu.elibrary.room.FileType
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileNotFoundException
+import java.io.IOException
+import java.util.*
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 /**
  * Created by aspela on 31/08/16.

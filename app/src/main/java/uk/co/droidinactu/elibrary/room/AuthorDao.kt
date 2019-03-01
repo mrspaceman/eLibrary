@@ -8,15 +8,14 @@ import androidx.room.Query
 
 @Dao
 interface AuthorDao {
-    @Query("SELECT * FROM author")
+    @Query("SELECT * FROM authors")
     fun getAll(): List<Author>
 
-//    @Query("SELECT * FROM ebooks WHERE  IN (:userIds)")
-//    fun getAllByTag(tags: IntArray): List<EBook>
-
-//    @Query("SELECT * FROM  WHERE first_name LIKE :first AND " +
-//            "last_name LIKE :last LIMIT 1")
-//    fun findByName(first: String, last: String): EBook
+    @Query(
+        "SELECT * FROM authors WHERE first_name LIKE :first AND " +
+                "last_name LIKE :last LIMIT 1"
+    )
+    fun getByName(first: String, last: String): Author
 
     @Insert
     fun insert(obj: Author)

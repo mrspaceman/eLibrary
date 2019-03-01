@@ -1,6 +1,5 @@
 package uk.co.droidinactu.elibrary.library
 
-import android.app.Application
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
@@ -9,6 +8,7 @@ import android.net.Uri
 import android.os.AsyncTask
 import android.os.Handler
 import androidx.core.app.NotificationCompat
+import androidx.room.Room
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.debug
 import org.jetbrains.anko.error
@@ -19,17 +19,49 @@ import uk.co.droidinactu.elibrary.R
 import uk.co.droidinactu.elibrary.room.*
 import java.io.File
 
-
 class LibraryManager : AnkoLogger {
-    constructor(bookLibApplication: Application)
 
     private var scanLibTask: LibraryScanTask? = null
     private var scanningInProgress = false
     private var mNotificationManager: NotificationManager? = null
     private var mNotificationBuilder: NotificationCompat.Builder? = null
     private val mNotificationId = 1
-    private var ctx: Context
 
+    private lateinit var db: EBookRoomDatabase
+
+    private lateinit var ebookDao: EBookDao
+    private lateinit var authorDao: AuthorDao
+    private lateinit var tagDao: TagDao
+    private lateinit var libraryDao: LibraryDao
+
+
+    fun open() {
+        db = Room.databaseBuilder(
+            BookLibApplication.applicationContext,
+            EBookRoomDatabase::class.java, "ebooks-db"
+        ).build()
+        ebookDao = db.ebookDao()
+        authorDao = db.authorDao()
+        tagDao = db.tagDao()
+        libraryDao = db.libraryDao()
+    }
+
+    fun close() {
+        db.close()
+    }
+
+    fun clear() {
+        debug(LOG_TAG + "clear()")
+        for (libname in getLibraryList()) {
+            val intent = Intent(
+                BookLibApplication.applicationContext,
+                FileObserverService::class.java
+            )
+            intent.putExtra("file_obs_action", "del")
+            intent.putExtra("libname", libname)
+            BookLibApplication.applicationContext.startService(intent)
+        }
+    }
 
     /** EBook CRUB */
 
@@ -38,19 +70,19 @@ class LibraryManager : AnkoLogger {
         if (pSelectedFileType == "epub") {
             if (File(pEbk.fullFileDirName + ".epub").exists()) {
                 val ebkURI = Uri.parse("file://" + pEbk.fullFileDirName + ".epub")
-                //final Uri ebkURI = FileProvider.getUriForFile(ctx, ctx.getApplicationContext().getPackageName() + ".provider", new FileTreeNode(pEbk.getFull_file_dir_name() + ".epub"));
+                //final Uri ebkURI = FileProvider.getUriForFile(BookLibApplication.applicationContext, BookLibApplication.applicationContext.getApplicationContext().getPackageName() + ".provider", new FileTreeNode(pEbk.getFull_file_dir_name() + ".epub"));
                 intent = Intent()
                 intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
                 intent.action = Intent.ACTION_VIEW
                 intent.setDataAndType(ebkURI, "application/epub+zip")
             } else {
                 error(LOG_TAG + "EBook FileTreeNode Not Found so remove from library [" + pEbk.fullFileDirName + "]")
-                //FIXME:     BookLibApplication.getInstance().getLibManager().removeBook(pEbk)
+                //FIXME:     BookLibApplication.getLibManager().removeBook(pEbk)
             }
         } else {
             if (File(pEbk.fullFileDirName + ".pdf").exists()) {
                 val ebkURI = Uri.parse("file://" + pEbk.fullFileDirName + ".pdf")
-                //final Uri ebkURI = FileProvider.getUriForFile(ctx, ctx.getApplicationContext().getPackageName() + ".provider", new FileTreeNode(pEbk.getFull_file_dir_name() + ".pdf"));
+                //final Uri ebkURI = FileProvider.getUriForFile(BookLibApplication.applicationContext, BookLibApplication.applicationContext.getApplicationContext().getPackageName() + ".provider", new FileTreeNode(pEbk.getFull_file_dir_name() + ".pdf"));
                 intent = Intent()
                 intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
                 intent.action = Intent.ACTION_VIEW
@@ -64,23 +96,20 @@ class LibraryManager : AnkoLogger {
     }
 
     fun getBooks(): List<EBook> {
-        return ArrayList<EBook>()
+        return ebookDao.getAll()
     }
 
-    fun getBookTags(): List<BookTag> {
-        return ArrayList<BookTag>()
+    private fun getBooksForLibrary(lib: Library): List<EBook> {
+        return ebookDao.getAllInLibrary(lib.id)
     }
 
-    fun addTagToBook(currentlY_READING: String, ebk: EBook?) {
-
+    fun getBooksForTag(tagStr: String, subtags: Boolean): List<EBook> {
+        return ebookDao.getAllForTag(tagStr)
     }
 
-    fun getFileTypesForBook(ebk: EBook?): List<FileType> {
 
-    }
-
-    fun searchBooksMatching(toString: String): MutableList<EBook> {
-
+    fun searchBooksMatching(titleStr: String): List<EBook> {
+        return ebookDao.getAllWithTitle(titleStr)
     }
 
     fun reReadEBookMetadata(ebkPath: String) {
@@ -91,123 +120,80 @@ class LibraryManager : AnkoLogger {
     /** Author CRUD */
 
     fun addAuthor(pFirstname: String, pLastname: String): Author? {
-        return null
+        var t = authorDao.getByName(pFirstname, pLastname)
+        if (t == null) {
+            authorDao.insert(Author(pFirstname, pLastname))
+        }
+        return authorDao.getByName(pFirstname, pLastname)
     }
 
     fun getAuthors(): List<Author> {
-        return ArrayList<Author>()
+        return authorDao.getAll()
     }
 
 
     /** Tag CRUD */
 
-
-    public void addEbookTag(final EBookTags ebktag) {
-        try {
-            dbHelper.getEBookTagsDao().create(ebktag);
-        } catch (java.sql.SQLException pE) {
-            BookLibApplication.getInstance().e("Exception adding ebooktag " + ebktag, pE);
-        }
-    }
-
-    public BookTag addTag(final String tagstr) {
-        BookTag t = getTag(tagstr);
+    fun addTag(tagstr: String): Tag {
+        var t = tagDao.getTag(tagstr)
         if (t == null) {
-            try {
-                dbHelper.getTagDao().create(new BookTag(tagstr));
-            } catch (java.sql.SQLException pE) {
-                BookLibApplication.getInstance().e("Exception adding [" + tagstr + "] tag to db", pE);
-            }
+            tagDao.insert(Tag(tagstr))
         }
-        return getTag(tagstr);
+        return tagDao.getTag(tagstr)
     }
 
-    public List<String> getTagList() {
-        List<BookTag> bookTags = getTags();
-        List<String> tagStrs = new ArrayList<String>();
-        String[] tgLst = new String[bookTags.size()];
-        for (BookTag t : bookTags) {
-            tagStrs.add(t.getTag());
+    fun getTagList(): List<String> {
+        var bookTags = getTags()
+        var tagStrs = ArrayList<String>()
+        for (t in bookTags) {
+            tagStrs.add(t.tag)
         }
-        return tagStrs;
+        return tagStrs
     }
 
-    public TagTree getTagTree() {
-        List<BookTag> bookTags = getTags();
-        TagTree tagTree = new TagTree();
-        String[] tgLst = new String[bookTags.size()];
-        for (BookTag t : bookTags) {
-            tagTree.add(t);
-        }
-        return tagTree;
+//    fun getTagTree(): TagTree {
+//        var bookTags = getTags()
+//        var tagTree = TagTree()
+//        String[] tgLst = new String[bookTags.size()]
+//        for (BookTag t : bookTags) {
+//            tagTree.add(t)
+//        }
+//        return tagTree
+//    }
+
+    fun getTags(): List<Tag> {
+        return tagDao.getAll()
     }
 
-    public List<BookTag> getTags() {
-        List<BookTag> result = new ArrayList<>();
-        try {
-            result = dbHelper.getTagDao().query(
-                    dbHelper.getTagDao()
-                            .queryBuilder()
-                            .orderByRaw("tag COLLATE NOCASE")
-                            .prepare());
-        } catch (java.sql.SQLException pE) {
-            BookLibApplication.getInstance().e("Exception reading bookTags", pE);
-        }
-        return result;
+    fun getTagsForBook(ebk: EBook): List<Tag> {
+        var result = lookupTagsForEBook(ebk)
+        return result
     }
 
-    public List<BookTag> getTagsForBook(final EBook ebk) {
-        List<BookTag> result = new ArrayList<>();
-        try {
-            result = lookupTagsForEBook(ebk);
-        } catch (SQLException pE) {
-            pE.printStackTrace();
-        }
-        return result;
+    fun lookupTagsForEBook(ebk: EBook): List<Tag> {
+        var result = ArrayList<Tag>();
+
+//        if (tagsForEBookQuery == null) {
+//            QueryBuilder<EBookTags, Long> dbQryBld = dbHelper . getEBookTagsDao ().queryBuilder();
+//
+//            // this time selecting for the user-id field
+//            dbQryBld.selectColumns(EBookTags.COLUMN_NAME_TAG_ID)
+//            var postSelectArg = new SelectArg ()
+//            dbQryBld.where().eq(EBookTags.COLUMN_NAME_BOOK_ID, postSelectArg)
+//
+//            // build our outer query
+//            QueryBuilder<BookTag, Long> userQb = dbHelper . getTagDao ().queryBuilder()
+//            // where the user-id matches the inner query's user-id field
+//            userQb.where().in(BookTag.COLUMN_NAME_ID, dbQryBld)
+//            tagsForEBookQuery = userQb.prepare()
+//        }
+//        tagsForEBookQuery.setArgumentHolderValue(0, ebk);
+//        return dbHelper.getTagDao().query(tagsForEBookQuery)
+
+        return result
     }
 
-    private List<BookTag> lookupTagsForEBook(final EBook ebk) throws SQLException {
-        if (tagsForEBookQuery == null) {
-            QueryBuilder<EBookTags, Long> dbQryBld = dbHelper.getEBookTagsDao().queryBuilder();
-
-            // this time selecting for the user-id field
-            dbQryBld.selectColumns(EBookTags.COLUMN_NAME_TAG_ID);
-            SelectArg postSelectArg = new SelectArg();
-            dbQryBld.where().eq(EBookTags.COLUMN_NAME_BOOK_ID, postSelectArg);
-
-            // build our outer query
-            QueryBuilder<BookTag, Long> userQb = dbHelper.getTagDao().queryBuilder();
-            // where the user-id matches the inner query's user-id field
-            userQb.where().in(BookTag.COLUMN_NAME_ID, dbQryBld);
-            tagsForEBookQuery = userQb.prepare();
-        }
-        tagsForEBookQuery.setArgumentHolderValue(0, ebk);
-        return dbHelper.getTagDao().query(tagsForEBookQuery);
-    }
-
-
-
-    fun open() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    fun close() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-
-    fun clear() {
-        debug(LOG_TAG + "clear() ()")
-        for (libname in getLibraryList()) {
-            val intent = Intent(
-                (ctx.getApplicationContext() as BookLibApplication).applicationContext,
-                FileObserverService::class.java
-            )
-            intent.putExtra("file_obs_action", "del")
-            intent.putExtra("libname", libname)
-            (ctx.getApplicationContext() as BookLibApplication).applicationContext.startService(intent)
-        }
-    }
+    /** Library CRUD */
 
     fun getLibraryList(): List<String> {
         val aList = getLibraries()
@@ -219,14 +205,7 @@ class LibraryManager : AnkoLogger {
     }
 
     fun getLibraries(): List<Library> {
-        var result: List<Library> = java.util.ArrayList<Library>()
-        try {
-            result = dbHelper.getLibraryDao().queryForAll()
-        } catch (pE: java.sql.SQLException) {
-            error("Exception reading libraries", pE)
-        }
-
-        return result
+        return libraryDao.getAll()
     }
 
     fun refreshLibraries(prgBrHandler: Handler, handler: Handler) {
@@ -235,8 +214,12 @@ class LibraryManager : AnkoLogger {
             val aList = getLibraries()
             for (lib in aList) {
                 if (MyDebug.DEBUGGING) {
-                    //                    BookLibApplication.d(LOG_TAG + "Scanning library [" + lib.getLibrary_title()
-                    //                            + "] before has [" + getBooksForLibrary(lib.getLibrary_title()).size() + "] ebooks");
+                    debug(
+                        LOG_TAG + "Scanning library [" + lib.libraryTitle
+                                + "] before has ["
+                                + getBooksForLibrary(lib).size
+                                + "] ebooks"
+                    )
                 }
                 initiateScan(prgBrHandler, handler, lib)
             }
@@ -247,7 +230,7 @@ class LibraryManager : AnkoLogger {
         if (MyDebug.DEBUGGING) {
             debug(LOG_TAG + "Scanning library [" + lib.libraryTitle + "]")
         }
-        if (scanLibTask == null || scanLibTask.taskComplete) {
+        if (scanLibTask == null || scanLibTask?.taskComplete == true) {
             scanLibTask = LibraryScanTask()
             scanLibTask?.execute(prgBrHandler, handler, lib.libraryRootDir, lib.libraryTitle)
         }
@@ -266,28 +249,23 @@ class LibraryManager : AnkoLogger {
         l.libraryTitle = libname.trim { it <= ' ' }
         l.libraryRootDir = rootDir.trim { it <= ' ' }
         try {
-            dbHelper.getLibraryDao().create(l)
+            libraryDao.insert(l)
         } catch (pE: java.sql.SQLException) {
             error("Exception adding library", pE)
         }
-
         initiateScan(prgBrHandler, handler, l)
     }
 
     fun addBookToLibrary(libname: String, ebk: EBook) {
-        ebk.inLibrary = libname
+        ebk.inLibraryId = libraryDao.getByName(libname).id
         try {
-            dbHelper.getEBookDao().createOrUpdate(ebk)
-            for (t in ebk.getBookTags()) {
-                // FIXME : add bookTags
-                t = this.getTag(t.getTag())
-            }
+            ebookDao.insert(ebk)
+            // FIXME : add bookTags
             // FIXME : add authors
             // FIXME : add link objects
         } catch (pE: java.sql.SQLException) {
             error("Exception adding book to library", pE)
         }
-
     }
 
 
@@ -315,7 +293,7 @@ class LibraryManager : AnkoLogger {
             libTitle = params[3] as String
             displayScanningNotification(libTitle)
             Thread.currentThread().name = "LibraryScanTask:" + libTitle!!
-            m_libraryScanner.readFiles(ctx, prgBrHandler, libTitle, libRootDir)
+            m_libraryScanner.readFiles(BookLibApplication.applicationContext, prgBrHandler, libTitle, libRootDir)
             return null
         }
 
@@ -386,10 +364,15 @@ class LibraryManager : AnkoLogger {
 
 
     private fun displayScanningNotification(libname: String) {
-        val resultIntent = Intent(ctx, BookLibrary::class.java)
-        val resultPendingIntent = PendingIntent.getActivity(ctx, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+        val resultIntent = Intent(BookLibApplication.applicationContext, BookLibrary::class.java)
+        val resultPendingIntent = PendingIntent.getActivity(
+            BookLibApplication.applicationContext,
+            0,
+            resultIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT
+        )
 
-        mNotificationBuilder = NotificationCompat.Builder(ctx, CHANNEL_ID)
+        mNotificationBuilder = NotificationCompat.Builder(BookLibApplication.applicationContext, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle("Scanning Library")
             .setContentText("Scan library $libname for pdf and epub books")
@@ -398,13 +381,13 @@ class LibraryManager : AnkoLogger {
             .setProgress(0, 0, true)
         val notification = mNotificationBuilder?.build()
 
-        mNotificationManager = ctx.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        mNotificationManager =
+            BookLibApplication.applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         mNotificationManager?.notify(mNotificationId, notification)
     }
 
     private fun removeScanningNotification(libname: String) {
-        mNotificationManager.cancel(mNotificationId)
+        mNotificationManager?.cancel(mNotificationId)
     }
-
 
 }

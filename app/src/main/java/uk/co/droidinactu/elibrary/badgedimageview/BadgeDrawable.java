@@ -42,7 +42,7 @@ class BadgeDrawable extends Drawable {
             final Canvas canvas = new Canvas(bitmap);
             final Paint backgroundPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
             backgroundPaint.setColor(badgeColor);
-                canvas.drawRoundRect(0, 0, width, height, cornerRadius, cornerRadius, backgroundPaint);
+            canvas.drawRoundRect(0, 0, width, height, cornerRadius, cornerRadius, backgroundPaint);
             // punch out the word ,leaving transparency
             textPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
             canvas.drawText(text, padding, height - padding, textPaint);

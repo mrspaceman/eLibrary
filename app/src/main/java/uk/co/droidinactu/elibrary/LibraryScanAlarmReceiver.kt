@@ -5,8 +5,7 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-
-import java.util.GregorianCalendar
+import java.util.*
 
 class LibraryScanAlarmReceiver : BroadcastReceiver() {
 

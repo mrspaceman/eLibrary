@@ -16,22 +16,22 @@ class EBook {
     var filetypes: MutableList<FileType> = ArrayList()
 
     var authors: List<Author> = ArrayList()
-    var tags: List<BookTag> = ArrayList()
+    var tags: List<Tag> = ArrayList()
 
     @PrimaryKey(autoGenerate = true)
     var id: Int = 0
 
     @ColumnInfo
-     var inLibrary = ""
+    var inLibraryId = -1
 
     @ColumnInfo
-     var fullFileDirName = ""
+    var fullFileDirName = ""
 
     @ColumnInfo
-     var fileDir = ""
+    var fileDir = ""
 
     @ColumnInfo
-     var fileName = ""
+    var fileName = ""
 
     @ColumnInfo
     var rating = 0
@@ -40,7 +40,7 @@ class EBook {
     var addedToLibrary: Long = 0
 
     @ColumnInfo
-     var lastModified: Long = 0
+    var lastModified: Long = 0
 
     @ColumnInfo
     var lastRefreshed: Long = 0
@@ -67,7 +67,7 @@ class EBook {
     var bookSeriesIdx = -1
 
     @ColumnInfo
-     var coverImage: ByteArray? = null
+    var coverImage: ByteArray? = null
 
 
     val coverImageAsBitmap: Bitmap?
@@ -90,7 +90,7 @@ class EBook {
      * Copy constructor.
      */
     constructor(rhs: EBook) {
-        inLibrary = rhs.inLibrary
+        inLibraryId = rhs.inLibraryId
         fullFileDirName = rhs.fullFileDirName
         fileDir = rhs.fileDir
         fileName = rhs.fileName

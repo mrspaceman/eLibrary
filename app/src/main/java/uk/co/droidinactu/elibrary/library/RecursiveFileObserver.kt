@@ -17,7 +17,7 @@ import java.util.*
 class RecursiveFileObserver @JvmOverloads constructor(
     private val mPath: String,
     private val mMask: Int = FileObserver.ALL_EVENTS
-) : FileObserver(mPath, mMask),AnkoLogger {
+) : FileObserver(mPath, mMask), AnkoLogger {
 
     private var mObservers: MutableList<SingleFileObserver>? = null
 
@@ -107,7 +107,8 @@ class RecursiveFileObserver @JvmOverloads constructor(
      */
     internal inner class SingleFileObserver(var mPath: String, mask: Int) : FileObserver(mPath, mask) {
 
-        constructor(path: String) : this(path,
+        constructor(path: String) : this(
+            path,
             CHANGES_ONLY
         ) {
             mPath = path

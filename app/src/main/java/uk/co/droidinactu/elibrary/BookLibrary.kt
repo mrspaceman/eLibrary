@@ -1,5 +1,6 @@
 package uk.co.droidinactu.elibrary
 
+import android.annotation.SuppressLint
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
@@ -10,7 +11,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.Message
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -20,13 +20,10 @@ import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.github.angads25.filepicker.controller.DialogSelectionListener
 import com.github.angads25.filepicker.model.DialogConfigs
 import com.github.angads25.filepicker.model.DialogProperties
 import com.github.angads25.filepicker.view.FilePickerDialog
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.snackbar.Snackbar
-import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.debug
 import uk.co.droidinactu.elibrary.library.FileObserverService
@@ -55,12 +52,13 @@ class BookLibrary : AppCompatActivity(), AnkoLogger {
     private var progressBarLabel: TextView? = null
     private var progressBarContainer: RelativeLayout? = null
 
-    private var ctx: Context?=null
+    private var ctx: Context? = null
 
     /**
      *
      */
-    private val prgBrHandler = object : Handler() {
+    private val prgBrHandler = @SuppressLint("HandlerLeak")
+    object : Handler() {
         override fun handleMessage(msg: Message) {
             val prgrsMsg = (msg.obj as String).split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
             val libName = prgrsMsg[0]
@@ -68,9 +66,9 @@ class BookLibrary : AppCompatActivity(), AnkoLogger {
             val max = Integer.valueOf(prgrsMsg[2])
             val res = resources
             val prgMsg = String.format(res.getString(R.string.rescan_progress_msg), libName, curr, max)
-            progressBar.setProgress(curr)
-            progressBar.setMax(max)
-            progressBarLabel.setText(prgMsg)
+            progressBar?.setProgress(curr)
+            progressBar?.setMax(max)
+            progressBarLabel?.setText(prgMsg)
         }
     }
 
@@ -83,18 +81,18 @@ class BookLibrary : AppCompatActivity(), AnkoLogger {
          */
         override fun handleMessage(inputMessage: Message) {
             val libTitle = inputMessage.obj as String
-            val bklist: List<EBook>
-            bklist = (applicationContext as BookLibApplication).getLibManager().getBooks()
-          debug(LOG_TAG + "Library [" + libTitle + "] Updated. Now contains [" + bklist.size + "] ebooks")
-            progressBarContainer.setVisibility(View.GONE)
+            val bklist = BookLibApplication.getLibManager()!!.getBooks()
+            debug(LOG_TAG + "Library [" + libTitle + "] Updated. Now contains [" + bklist.size + "] ebooks")
+            progressBarContainer?.setVisibility(View.GONE)
             updateLists()
-            fab.setEnabled(true)
+            fab?.setEnabled(true)
         }
     }
     private val ebkChngdListener = EBookChangedReceiver()
+
     inner class EBookChangedReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-          debug(LOG_TAG + "EBookChangedReceiver::onReceive()")
+            debug(LOG_TAG + "EBookChangedReceiver::onReceive()")
             MyDebug.debugIntent(intent)
 
             var ebkPath: String? = ""
@@ -103,7 +101,7 @@ class BookLibrary : AppCompatActivity(), AnkoLogger {
                 ebkPath = b.getString(INTENT_EBOOK_MODIFIED_PATH, "")
             }
             if (ebkPath != null && ebkPath.length > 0) {
-                (applicationContext as BookLibApplication).getLibManager().reReadEBookMetadata(ebkPath)
+                (applicationContext as BookLibApplication).getLibManager()!!.reReadEBookMetadata(ebkPath)
             }
         }
     }
@@ -118,64 +116,47 @@ class BookLibrary : AppCompatActivity(), AnkoLogger {
             setSupportActionBar(toolBarBookLibrary)
         }
 
-
         if (BuildConfig.DEBUG) {
             supportActionBar!!.setTitle(
-                getString(R.string.app_title) + " (" + (applicationContext as BookLibApplication).getAppVersionName(
+                getString(R.string.app_title) + " (" +  BookLibApplication.getAppVersionName(
                     "uk.co.droidinactu.booklib"
                 ) + ")"
             )
         } else {
             supportActionBar!!.setTitle(getString(R.string.app_title))
         }
-        toolBarBookLibrary.setSubtitle(R.string.app_subtitle)
-        toolBarBookLibrary.setLogo(R.mipmap.ic_launcher)
+        toolBarBookLibrary?.setSubtitle(R.string.app_subtitle)
+        toolBarBookLibrary?.setLogo(R.mipmap.ic_launcher)
 
         bookListCurrentReading = findViewById(R.id.dashboard_books_list_reading) as RecyclerView
         val horizontalLayoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        bookListCurrentReading.setLayoutManager(horizontalLayoutManager)
-        bookListCurrentReading.setHasFixedSize(true)
+        bookListCurrentReading?.setLayoutManager(horizontalLayoutManager)
+        bookListCurrentReading?.setHasFixedSize(true)
 
         val gridLayoutManager = GridLayoutManager(this, 4)
         bookListTag1Title = findViewById(R.id.dashboard_books_list_tag1_title) as Button
         bookListTag1 = findViewById(R.id.dashboard_books_list_tag1) as RecyclerView
-        bookListTag1.setLayoutManager(gridLayoutManager)
-        bookListTag1.setHasFixedSize(true)
-        bookListTag1Title.setOnClickListener(View.OnClickListener { pickTag(1) })
+        bookListTag1?.setLayoutManager(gridLayoutManager)
+        bookListTag1?.setHasFixedSize(true)
+        bookListTag1Title?.setOnClickListener(View.OnClickListener { pickTag(1) })
 
         progressBarContainer = findViewById(R.id.dashboard_books_list_progressbar_container) as RelativeLayout
-        progressBarContainer.setVisibility(View.GONE)
+        progressBarContainer?.setVisibility(View.GONE)
 
         progressBar = findViewById(R.id.dashboard_books_list_progressbar) as ProgressBar
-        progressBar.setVisibility(View.INVISIBLE)
-        progressBar.setScaleY(3f)
+        progressBar?.setVisibility(View.INVISIBLE)
+        progressBar?.setScaleY(3f)
         progressBarLabel = findViewById(R.id.dashboard_books_list_progressbar_label) as TextView
-        progressBarLabel.setText("")
+        progressBarLabel?.setText("")
 
         fab = findViewById(R.id.fab) as FloatingActionButton
-        fab.setOnClickListener(View.OnClickListener { browseForLibrary() })
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        menuInflater.inflate(R.menu.menu_main, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        return when (item.itemId) {
-            R.id.action_settings -> true
-            else -> super.onOptionsItemSelected(item)
-        }
+        fab?.setOnClickListener(View.OnClickListener { browseForLibrary() })
     }
 
 
     private fun browseForLibrary() {
-        BookLibApplication.logMessage(Log.DEBUG, LOG_TAG + "browseForLibrary()")
-        fab.setEnabled(false)
+        debug(LOG_TAG + "browseForLibrary()")
+        fab?.setEnabled(false)
         val rootdir = "/storage/"
 
         val properties = DialogProperties()
@@ -194,7 +175,7 @@ class BookLibrary : AppCompatActivity(), AnkoLogger {
                 progressBar.setProgress(0)
                 progressBar.setVisibility(View.VISIBLE)
                 progressBarContainer.setVisibility(View.VISIBLE)
-                (applicationContext as BookLibApplication).getLibManager()
+                (applicationContext as BookLibApplication).getLibManager()!!
                     .addLibrary(prgBrHandler, mHandler, libraryName, files[0])
             }
         }
@@ -220,7 +201,7 @@ class BookLibrary : AppCompatActivity(), AnkoLogger {
 
     override fun onStart() {
         super.onStart()
-        BookLibApplication.logMessage(Log.DEBUG, LOG_TAG + "onStart()")
+        debug(LOG_TAG + "onStart()")
         if ((applicationContext as BookLibApplication).getLibManager().getLibraries().size() === 0) {
             browseForLibrary()
         }
@@ -245,7 +226,7 @@ class BookLibrary : AppCompatActivity(), AnkoLogger {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        BookLibApplication.logMessage(Log.DEBUG, LOG_TAG + "onOptionsItemSelected()")
+        debug(LOG_TAG + "onOptionsItemSelected()")
         // Handle item selection
         when (item.itemId) {
             R.id.action_search -> {
@@ -265,7 +246,7 @@ class BookLibrary : AppCompatActivity(), AnkoLogger {
                 return true
             }
             R.id.action_clear_db -> {
-                (applicationContext as BookLibApplication).getLibManager().clear()
+                (applicationContext as BookLibApplication).getLibManager()!!.clear()
                 Toast.makeText(this, "Database cleared", Toast.LENGTH_LONG).show()
                 return true
             }
@@ -275,34 +256,34 @@ class BookLibrary : AppCompatActivity(), AnkoLogger {
 
     override fun onPause() {
         super.onPause()
-        BookLibApplication.logMessage(Log.DEBUG, LOG_TAG + "onPause()")
+        debug(LOG_TAG + "onPause()")
     }
 
     override fun onResume() {
         super.onResume()
-        BookLibApplication.logMessage(Log.DEBUG, LOG_TAG + "onResume()")
+        debug(LOG_TAG + "onResume()")
         val settings = getSharedPreferences(BookLibApplication.LOG_TAG, 0)
-        bookListTag1Title.setText(settings.getString("bookListTag1Title", NO_TAG_SELECTED))
+        bookListTag1Title?.setText(settings.getString("bookListTag1Title", NO_TAG_SELECTED))
         bookListTag1IncludeSubTags = settings.getBoolean("bookListTag1IncludeSubTags", true)
         updateLists()
     }
 
     private fun rescanLibraries() {
-        fab.setEnabled(false)
-        progressBar.setMax((applicationContext as BookLibApplication).getLibManager().getBooks().size())
-        progressBar.setProgress(0)
-        progressBar.setVisibility(View.VISIBLE)
-        progressBarContainer.setVisibility(View.VISIBLE)
+        fab?.setEnabled(false)
+        progressBar?.setMax((applicationContext as BookLibApplication).getLibManager().getBooks().size())
+        progressBar?.setProgress(0)
+        progressBar?.setVisibility(View.VISIBLE)
+        progressBarContainer?.setVisibility(View.VISIBLE)
         (applicationContext as BookLibApplication).getLibManager().refreshLibraries(prgBrHandler, mHandler)
         scheduleNextLibraryScan()
     }
 
     private fun showSettings() {
-        val i = Intent(this, SettingsActivity::class.java)
-        val b = Bundle()
-        b.putInt("key", 1) //Your id
-        i.putExtras(b) //Put your id to your next Intent
-        startActivity(i)
+//        val i = Intent(this, SettingsActivity::class.java)
+//        val b = Bundle()
+//        b.putInt("key", 1) //Your id
+//        i.putExtras(b) //Put your id to your next Intent
+//        startActivity(i)
     }
 
     private fun scheduleNextLibraryScan() {
@@ -338,7 +319,7 @@ class BookLibrary : AppCompatActivity(), AnkoLogger {
 
     private fun updateBookListCurrReading() {
         val bklist =
-            (applicationContext as BookLibApplication).getLibManager().getBooksForTag(BookTag.CURRENTLY_READING, false)
+            (applicationContext as BookLibApplication).getLibManager()!!.getBooksForTag(BookTag.CURRENTLY_READING, false)
         bookListAdaptorCurrReading = BookListItemAdaptor(bklist)
         bookListCurrentReading.setAdapter(bookListAdaptorCurrReading)
         setupShortcuts()
@@ -362,8 +343,8 @@ class BookLibrary : AppCompatActivity(), AnkoLogger {
 
     inner class LibraryScanFinishedReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            fab.setEnabled(true)
-            progressBarContainer.setVisibility(View.INVISIBLE)
+            fab?.setEnabled(true)
+            progressBarContainer?.setVisibility(View.INVISIBLE)
         }
     }
 
