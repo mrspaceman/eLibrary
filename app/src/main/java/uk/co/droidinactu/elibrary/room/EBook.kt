@@ -3,8 +3,8 @@ package uk.co.droidinactu.elibrary.room
 import android.graphics.*
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Ignore
 import androidx.room.PrimaryKey
-import androidx.room.Relation
 import org.jetbrains.annotations.NotNull
 import java.io.ByteArrayOutputStream
 import java.util.*
@@ -17,14 +17,10 @@ class EBook() {
 
     var filetypes: MutableList<FileType> = ArrayList()
 
-    @Relation(
-        parentColumn = "id", entityColumn = "id", entity = Author::class
-    )
+    @Ignore
     var authors: MutableList<Author> = ArrayList()
 
-    @Relation(
-        parentColumn = "id", entityColumn = "id", entity = Tag::class
-    )
+    @Ignore
     var tags: MutableList<Tag> = ArrayList()
 
     @PrimaryKey(autoGenerate = true)
@@ -85,16 +81,6 @@ class EBook() {
             BitmapFactory.decodeByteArray(coverImage, 0, coverImage!!.size)
         } else null
 
-    val authorString: String
-        get() {
-            var authorString = ""
-            for (a in authors) {
-                authorString += " " + a.firstname + " " + a.lastname + " "
-                authorString.trim { it <= ' ' }
-            }
-            return authorString
-        }
-
 
     /**
      * Copy constructor.
@@ -145,19 +131,19 @@ class EBook() {
         return background
     }
 
-    fun addTag(pTag: Tag) {
-        this.tags.add(pTag)
-    }
+//    fun addTag(pTag: Tag) {
+//        this.tags.add(pTag)
+//    }
 
     fun addFileType(pFiletype: String) {
-        filetypes.add(pFiletype)
+        filetypes.add(FileType.valueOf(pFiletype))
     }
 
     fun addAuthors(pAuthors: List<nl.siegmann.epublib.domain.Author>) {}
 
-    fun addAuthor(pAuthor: Author) {
-        authors.add(pAuthor)
-    }
+//    fun addAuthor(pAuthor: Author) {
+//        authors.add(pAuthor)
+//    }
 
     companion object {
         private val LOG_TAG = EBook::class.java.simpleName + ":"

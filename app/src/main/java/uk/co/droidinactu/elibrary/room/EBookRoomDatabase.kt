@@ -10,5 +10,7 @@ abstract class EBookRoomDatabase : RoomDatabase() {
     abstract fun ebookDao(): EBookDao
     abstract fun authorDao(): AuthorDao
     abstract fun tagDao(): TagDao
+    abstract fun bookAuthorLinkDao(): EBookAuthorLinkDao
+    abstract fun bookTagLinkDao(): EBookTagLinkDao
     abstract fun libraryDao(): LibraryDao
 }

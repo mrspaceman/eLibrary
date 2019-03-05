@@ -2,12 +2,13 @@ package uk.co.droidinactu.elibrary.room
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.PrimaryKey
 import org.jetbrains.annotations.NotNull
 
-@Entity(tableName = "authors", primaryKeys = arrayOf("firstname", "lastname"))
+@Entity(tableName = "authors")
 class Author(firstname: String, lastname: String) {
 
-    @ColumnInfo
+    @PrimaryKey(autoGenerate = true)
     var id: Int = 0
 
     @ColumnInfo
@@ -26,5 +27,14 @@ class Author(firstname: String, lastname: String) {
 
     @ColumnInfo
     var twitterId: String? = null
+
+    //@Ignore
+    val fullName: String
+        get() {
+            var authorString = ""
+            authorString += " " + firstname + " " + lastname + " "
+            authorString.trim { it <= ' ' }
+            return authorString
+        }
 
 }
