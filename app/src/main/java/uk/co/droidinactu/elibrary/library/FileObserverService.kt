@@ -7,6 +7,7 @@ import android.os.IBinder
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.info
 import uk.co.droidinactu.elibrary.BookLibApplication
+import uk.co.droidinactu.elibrary.BookLibApplication.Companion.LOG_TAG
 
 class FileObserverService : IntentService, AnkoLogger {
 
@@ -40,12 +41,12 @@ class FileObserverService : IntentService, AnkoLogger {
 
             if (file_obs_action != null) {
                 when {
-                    file_obs_action.equals("ADD", ignoreCase = true) -> BookLibApplication.addFileWatcher(
+                    file_obs_action.equals("ADD", ignoreCase = true) -> BookLibApplication.instance.addFileWatcher(
                         libname,
                         rootdir
                     )
                     //BookLibApplication.getInstance().addFileWatcher(libname, rootdir);
-                    file_obs_action.equals("DEL", ignoreCase = true) -> BookLibApplication.delFileWatcher(
+                    file_obs_action.equals("DEL", ignoreCase = true) -> BookLibApplication.instance.delFileWatcher(
                         libname
                     )
                     //BookLibApplication.getInstance().delFileWatcher(libname);
@@ -55,9 +56,6 @@ class FileObserverService : IntentService, AnkoLogger {
         }
     }
 
-    companion object {
-        private val LOG_TAG = FileObserverService::class.java.simpleName + ":"
-    }
 }
 
 

@@ -12,6 +12,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.Message
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -25,15 +26,16 @@ import com.github.angads25.filepicker.model.DialogConfigs
 import com.github.angads25.filepicker.model.DialogProperties
 import com.github.angads25.filepicker.view.FilePickerDialog
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import org.jetbrains.anko.AnkoLogger
-import org.jetbrains.anko.debug
+import uk.co.droidinactu.elibrary.BookLibApplication.Companion.LOG_TAG
 import uk.co.droidinactu.elibrary.library.FileObserverService
+import uk.co.droidinactu.elibrary.library.LibraryManager
 import uk.co.droidinactu.elibrary.library.RecursiveFileObserver.Companion.INTENT_EBOOK_MODIFIED
 import uk.co.droidinactu.elibrary.library.RecursiveFileObserver.Companion.INTENT_EBOOK_MODIFIED_PATH
+import uk.co.droidinactu.elibrary.room.Tag
 import java.io.File
 import java.util.*
 
-class BookLibrary : AppCompatActivity(), AnkoLogger {
+class BookLibrary() : AppCompatActivity() {
 
     private val NO_TAG_SELECTED = "<none selected>"
     private var libraryScanPndingIntnt: PendingIntent? = null
@@ -80,8 +82,8 @@ class BookLibrary : AppCompatActivity(), AnkoLogger {
          */
         override fun handleMessage(inputMessage: Message) {
             val libTitle = inputMessage.obj as String
-            val bklist = BookLibApplication.getLibManager()!!.getBooks()
-            debug(LOG_TAG + "Library [" + libTitle + "] Updated. Now contains [" + bklist.size + "] ebooks")
+            val bklist = BookLibApplication.instance.getLibManager()!!.getBooks()
+            Log.d(LOG_TAG, "Library [" + libTitle + "] Updated. Now contains [" + bklist.size + "] ebooks")
             progressBarContainer?.setVisibility(View.GONE)
             updateLists()
             fab?.setEnabled(true)
@@ -91,7 +93,7 @@ class BookLibrary : AppCompatActivity(), AnkoLogger {
 
     inner class EBookChangedReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            debug(LOG_TAG + "EBookChangedReceiver::onReceive()")
+            Log.d(LOG_TAG, "EBookChangedReceiver::onReceive()")
             MyDebug.debugIntent(intent)
 
             var ebkPath: String? = ""
@@ -100,7 +102,7 @@ class BookLibrary : AppCompatActivity(), AnkoLogger {
                 ebkPath = b.getString(INTENT_EBOOK_MODIFIED_PATH, "")
             }
             if (ebkPath != null && ebkPath.length > 0) {
-                (applicationContext as BookLibApplication).getLibManager()!!.reReadEBookMetadata(ebkPath)
+                BookLibApplication.instance.getLibManager()!!.reReadEBookMetadata(ebkPath)
             }
         }
     }
@@ -116,10 +118,17 @@ class BookLibrary : AppCompatActivity(), AnkoLogger {
         }
 
         if (BuildConfig.DEBUG) {
+            val appTitle = getString(R.string.app_title)
+            val appVerName=""
+            try {
+                val appVerName = BookLibApplication.instance.getAppVersionName(
+                    "uk.co.droidinactu.elibrary"
+                )
+            }catch(e:Exception ){
+                error(LOG_TAG+"Exception getting app vername")
+            }
             supportActionBar!!.setTitle(
-                getString(R.string.app_title) + " (" + BookLibApplication.getAppVersionName(
-                    "uk.co.droidinactu.booklib"
-                ) + ")"
+                appTitle + " (" + appVerName + ")"
             )
         } else {
             supportActionBar!!.setTitle(getString(R.string.app_title))
@@ -153,8 +162,8 @@ class BookLibrary : AppCompatActivity(), AnkoLogger {
     }
 
     private fun pickTag(tagToSet: Int) {
-        val tglist = (applicationContext as BookLibApplication).getLibManager().getTagList()
-        // val tgTree = (applicationContext as BookLibApplication).getLibManager().getTagTree()
+        val tglist = BookLibApplication.instance.getLibManager().getTagList()
+        // val tgTree = BookLibApplication.getLibManager().getTagTree()
         //    tglist.remove(BookTag.CURRENTLY_READING)
 
         val dialog = Dialog(this)
@@ -187,7 +196,7 @@ class BookLibrary : AppCompatActivity(), AnkoLogger {
     }
 
     private fun browseForLibrary() {
-        debug(LOG_TAG + "browseForLibrary()")
+        Log.d(LOG_TAG, "browseForLibrary()")
         fab?.setEnabled(false)
         val rootdir = "/storage/"
 
@@ -207,7 +216,7 @@ class BookLibrary : AppCompatActivity(), AnkoLogger {
                 progressBar?.setProgress(0)
                 progressBar?.setVisibility(View.VISIBLE)
                 progressBarContainer?.setVisibility(View.VISIBLE)
-                (applicationContext as BookLibApplication).getLibManager()!!
+                BookLibApplication.instance.getLibManager()!!
                     .addLibrary(prgBrHandler, mHandler, libraryName, files[0])
             }
         }
@@ -224,7 +233,7 @@ class BookLibrary : AppCompatActivity(), AnkoLogger {
 
     private fun updateBookListTag1(includeSubTags: Boolean) {
         if (bookListTag1Title?.getText().toString().compareTo(NO_TAG_SELECTED) != 0) {
-            val bklist = (applicationContext as BookLibApplication).getLibManager()
+            val bklist = BookLibApplication.instance.getLibManager()
                 .getBooksForTag(bookListTag1Title?.getText().toString(), includeSubTags)
             bookListAdaptorTag1 = BookListItemAdaptor(bklist)
             bookListTag1?.setAdapter(bookListAdaptorTag1)
@@ -233,18 +242,18 @@ class BookLibrary : AppCompatActivity(), AnkoLogger {
 
     override fun onStart() {
         super.onStart()
-        debug(LOG_TAG + "onStart()")
-        if (BookLibApplication.getLibManager().getLibraries().size === 0) {
+        Log.d(LOG_TAG, "onStart()")
+        if (BookLibApplication.instance.getLibManager().getLibraries().size === 0) {
             browseForLibrary()
         }
-        (applicationContext as BookLibApplication).registerReceiver(
+        BookLibApplication.instance.registerReceiver(
             ebkChngdListener,
             IntentFilter(INTENT_EBOOK_MODIFIED)
         )
 
         val intent =
-            Intent((applicationContext as BookLibApplication).applicationContext, FileObserverService::class.java)
-        (applicationContext as BookLibApplication).applicationContext.startService(intent)
+            Intent(BookLibApplication.instance.applicationContext, FileObserverService::class.java)
+        BookLibApplication.instance.applicationContext.startService(intent)
     }
 
     override fun onStop() {
@@ -257,8 +266,9 @@ class BookLibrary : AppCompatActivity(), AnkoLogger {
         return true
     }
 
+    private lateinit var libMgr: LibraryManager
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        debug(LOG_TAG + "onOptionsItemSelected()")
+        Log.d(LOG_TAG, "onOptionsItemSelected()")
         // Handle item selection
         when (item.itemId) {
             R.id.action_search -> {
@@ -278,7 +288,7 @@ class BookLibrary : AppCompatActivity(), AnkoLogger {
                 return true
             }
             R.id.action_clear_db -> {
-                (applicationContext as BookLibApplication).getLibManager()!!.clear()
+                BookLibApplication.instance.getLibManager()!!.clear()
                 Toast.makeText(this, "Database cleared", Toast.LENGTH_LONG).show()
                 return true
             }
@@ -288,12 +298,12 @@ class BookLibrary : AppCompatActivity(), AnkoLogger {
 
     override fun onPause() {
         super.onPause()
-        debug(LOG_TAG + "onPause()")
+        Log.d(LOG_TAG, "onPause()")
     }
 
     override fun onResume() {
         super.onResume()
-        debug(LOG_TAG + "onResume()")
+        Log.d(LOG_TAG, "onResume()")
         val settings = getSharedPreferences(BookLibApplication.LOG_TAG, 0)
         bookListTag1Title?.setText(settings.getString("bookListTag1Title", NO_TAG_SELECTED))
         bookListTag1IncludeSubTags = settings.getBoolean("bookListTag1IncludeSubTags", true)
@@ -302,11 +312,11 @@ class BookLibrary : AppCompatActivity(), AnkoLogger {
 
     private fun rescanLibraries() {
         fab?.setEnabled(false)
-        progressBar?.setMax(BookLibApplication.getLibManager().getBooks().size)
+        progressBar?.setMax(BookLibApplication.instance.getLibManager().getBooks().size)
         progressBar?.setProgress(0)
         progressBar?.setVisibility(View.VISIBLE)
         progressBarContainer?.setVisibility(View.VISIBLE)
-        (applicationContext as BookLibApplication).getLibManager().refreshLibraries(prgBrHandler, mHandler)
+        BookLibApplication.instance.getLibManager().refreshLibraries(prgBrHandler, mHandler)
         scheduleNextLibraryScan()
     }
 
@@ -351,8 +361,8 @@ class BookLibrary : AppCompatActivity(), AnkoLogger {
 
     private fun updateBookListCurrReading() {
         val bklist =
-            (applicationContext as BookLibApplication).getLibManager().getBooksForTag(
-                BookTag.CURRENTLY_READING,
+            BookLibApplication.instance.getLibManager().getBooksForTag(
+                Tag.CURRENTLY_READING,
                 false
             )
         bookListAdaptorCurrReading = BookListItemAdaptor(bklist)
@@ -383,7 +393,4 @@ class BookLibrary : AppCompatActivity(), AnkoLogger {
         }
     }
 
-    companion object {
-        private val LOG_TAG = BookLibrary::class.java.simpleName + ":"
-    }
 }

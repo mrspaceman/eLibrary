@@ -16,6 +16,7 @@ import uk.co.droidinactu.elibrary.badgedimageview.BadgedImageView
 import uk.co.droidinactu.elibrary.library.LibraryManager
 import uk.co.droidinactu.elibrary.room.EBook
 import uk.co.droidinactu.elibrary.room.FileType
+import uk.co.droidinactu.elibrary.room.Tag
 
 
 /**
@@ -31,7 +32,7 @@ class BookListItemAdaptor(private val mBooks: MutableList<EBook>) :
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val v = LayoutInflater.from(parent.context)
             .inflate(R.layout.book_list_item, parent, false)
-        libMgr = (parent.context.applicationContext as BookLibApplication).getLibManager()
+        libMgr = BookLibApplication.instance.getLibManager()
         return ViewHolder(v)
     }
 
@@ -46,10 +47,9 @@ class BookListItemAdaptor(private val mBooks: MutableList<EBook>) :
         val tmpStr = book.bookTitle
         viewHolder.mTitle.text = tmpStr
         viewHolder.mCover.setImageBitmap(cvrBmp)
-        val ftypes = libMgr!!.getFileTypesForBook(book)
-        if (ftypes.size == 1) {
+        if (book.filetypes.size == 1) {
             viewHolder.mCover.showBadge(true)
-            viewHolder.mCover.setBadgeText(ftypes.get(0).toString())
+            viewHolder.mCover.setBadgeText(book.filetypes.get(0).toString())
         } else {
             viewHolder.mCover.showBadge(true)
             viewHolder.mCover.setBadgeText(FileType.EPUB.toString() + "/" + FileType.PDF)
@@ -107,12 +107,11 @@ class BookListItemAdaptor(private val mBooks: MutableList<EBook>) :
                 popup.setOnMenuItemClickListener(this)
                 popup.show()
             } else {
-                val ftypes =
-                    (view.context.applicationContext as BookLibApplication).getLibManager()!!.getFileTypesForBook(ebk)
-                if (ftypes.size > 1) {
+                val ftypes = ebk?.filetypes
+                if (ftypes != null && ftypes.size > 1) {
                     showFileTypePickerDialog(view.context)
                 } else {
-                    openBook(view.context, ftypes.get(0).toString().toLowerCase())
+                    openBook(view.context, ftypes?.get(0).toString().toLowerCase())
                 }
             }
         }
@@ -136,10 +135,10 @@ class BookListItemAdaptor(private val mBooks: MutableList<EBook>) :
 
         private fun openBook(ctx: Context, selectedFileType: String) {
             (ctx.applicationContext as BookLibApplication).getLibManager()!!.addTagToBook(
-                BookTag.CURRENTLY_READING,
+                Tag.CURRENTLY_READING,
                 ebk
             )
-            val i = (ctx.applicationContext as BookLibApplication).getLibManager()!!.getOpenIntentForBook(
+            val i = BookLibApplication.instance.getLibManager()!!.getOpenIntentForBook(
                 ebk!!,
                 selectedFileType
             )

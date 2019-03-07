@@ -30,6 +30,13 @@ class BookLibSearchActivity : AppCompatActivity(), AnkoLogger {
             value = b.getInt("key")
         }
 
+//        libMgr = LibraryManager()
+//        try {
+//            libMgr.open()
+//        } catch (pE: SQLException) {
+//            pE.printStackTrace()
+//        }
+
         txtSearchText = findViewById<View>(R.id.book_lib_search_text) as EditText
         btnSearch = findViewById<View>(R.id.book_lib_search_button) as Button
         cbTags = findViewById<View>(R.id.book_lib_search_checkBoxTags) as CheckBox
@@ -38,24 +45,19 @@ class BookLibSearchActivity : AppCompatActivity(), AnkoLogger {
         bkListSearch = findViewById<View>(R.id.book_lib_search_results) as RecyclerView
 
         val gridLayoutManager = GridLayoutManager(this, 4)
-        bkListSearch.setLayoutManager(gridLayoutManager)
-        bkListSearch.setHasFixedSize(true)
+        bkListSearch?.setLayoutManager(gridLayoutManager)
+        bkListSearch?.setHasFixedSize(true)
 
-        cbTags.setSelected(true)
-        cbTitle.setSelected(true)
-        cbDirs.setSelected(true)
+        cbTags?.setSelected(true)
+        cbTitle?.setSelected(true)
+        cbDirs?.setSelected(true)
 
-        btnSearch.setOnClickListener(View.OnClickListener {
-            val bklist = (applicationContext as BookLibApplication).getLibManager()
-                .searchBooksMatching(txtSearchText.getText().toString())
+        btnSearch?.setOnClickListener(View.OnClickListener {
+            val bklist = BookLibApplication.instance.getLibManager()
+                .searchBooksMatching(txtSearchText?.getText().toString())
             bkListSearchAdaptor = BookListItemAdaptor(bklist)
-            bkListSearch.setAdapter(bkListSearchAdaptor)
+            bkListSearch?.setAdapter(bkListSearchAdaptor)
         })
-    }
-
-    companion object {
-        private val LOG_TAG = BookLibSearchActivity::class.java.simpleName + ":"
-
     }
 
 }

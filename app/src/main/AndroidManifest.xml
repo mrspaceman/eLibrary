@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:dist="http://schemas.android.com/apk/distribution"
+    xmlns:tools="http://schemas.android.com/tools"
     package="uk.co.droidinactu.elibrary"
     android:installLocation="preferExternal">
 
@@ -22,11 +23,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        dist:ignore="AllowBackup,GoogleAppIndexingWarning">
+        dist:ignore="AllowBackup,GoogleAppIndexingWarning"
+        tools:ignore="GoogleAppIndexingWarning">
         <activity
             android:name=".BookLibBookDetailsActivity"
             android:label="@string/title_activity_book_lib_book_details"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity
             android:name=".BookLibrary"
             android:label="@string/app_name"
@@ -61,9 +63,9 @@
                 <action android:name="android.intent.action.QUICKBOOT_POWERON" />
             </intent-filter>
         </service>
-        <service
+        <!-- service
             android:name=".library.LibraryScannerService"
-            android:exported="false" />
+            android:exported="false" / -->
     </application>
 
 </manifest>

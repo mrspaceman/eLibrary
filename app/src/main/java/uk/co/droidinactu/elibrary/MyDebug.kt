@@ -2,9 +2,7 @@ package uk.co.droidinactu.elibrary
 
 import android.content.Intent
 import android.os.Debug
-import org.jetbrains.anko.AnkoLogger
-import org.jetbrains.anko.debug
-
+import android.util.Log
 import java.io.File
 
 /**
@@ -50,8 +48,7 @@ import java.io.File
  *
  * @author aspela
  */
-object MyDebug : AnkoLogger {
-    private val LOG_TAG = MyDebug::class.java.simpleName + ":"
+object MyDebug  {
 
     var DEBUGGING = true
     var TRACE = false
@@ -70,15 +67,15 @@ object MyDebug : AnkoLogger {
     }
 
     fun debugIntent(intent: Intent) {
-        debug("MyDebug::debugIntent action: " + intent.action!!)
-        debug("MyDebug::debugIntent component: " + intent.component!!)
+        Log.d(BookLibApplication.LOG_TAG,"MyDebug::debugIntent action: " + intent.action!!)
+        Log.d(BookLibApplication.LOG_TAG,"MyDebug::debugIntent component: " + intent.component!!)
         val connChgBndle = intent.extras
         if (connChgBndle != null) {
             for (key in connChgBndle.keySet()) {
-                debug("MyDebug::debugIntent key [" + key + "]: " + connChgBndle.get(key))
+                Log.d(BookLibApplication.LOG_TAG,"MyDebug::debugIntent key [" + key + "]: " + connChgBndle.get(key))
             }
         } else {
-            debug("MyDebug::debugIntent no extras")
+            Log.d(BookLibApplication.LOG_TAG,"MyDebug::debugIntent no extras")
         }
     }
 

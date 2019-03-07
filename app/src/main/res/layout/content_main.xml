@@ -1,112 +1,89 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:showIn="@layout/activity_main"
-        tools:context=".BookLibrary">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context=".BookLibrary"
+    tools:showIn="@layout/activity_main">
 
-    <RelativeLayout
-        android:id="@+id/activity_book_library"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingBottom="@dimen/activity_vertical_margin"
-        android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin"
-        android:paddingTop="@dimen/activity_vertical_margin"
-        tools:context="uk.co.droidinactu.booklib.BookLibrary">
+    <include layout="@layout/toolbar_main" />
 
-        <include layout="@layout/toolbar_main"/>
-
-        <TextView
-            android:id="@+id/dashboard_books_list_reading_title"
-            style="@style/tag_button_style"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_below="@+id/toolbar"
-            android:layout_marginTop="2dp"
-            android:text="Recently Read"/>
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/dashboard_books_list_reading"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentStart="true"
-            android:layout_below="@+id/dashboard_books_list_reading_title"
-            android:minHeight="225dp"/>
-
-        <Button
-            android:id="@+id/dashboard_books_list_tag1_title"
-            style="@style/tag_button_style"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_below="@+id/dashboard_books_list_reading"
-            android:layout_marginTop="5dp"
-            android:text="Tag"/>
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/dashboard_books_list_tag1"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_above="@+id/dashboard_books_list_progressbar_container"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentStart="true"
-            android:layout_below="@+id/dashboard_books_list_tag1_title"
-            android:minHeight="275dp"/>
-
-        <RelativeLayout
-            android:id="@+id/dashboard_books_list_progressbar_container"
-            android:layout_width="match_parent"
-            android:layout_height="50dip"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentStart="true"
-            android:layout_marginLeft="50dp"
-            android:layout_marginRight="50dp"
-            android:maxHeight="50dp"
-            android:minHeight="50dp"
-            >
-
-            <ProgressBar
-                android:id="@+id/dashboard_books_list_progressbar"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_alignBottom="@id/dashboard_books_list_progressbar"
-                android:layout_alignLeft="@id/dashboard_books_list_progressbar"
-                android:layout_alignRight="@id/dashboard_books_list_progressbar"
-                android:layout_alignTop="@id/dashboard_books_list_progressbar"/>
-
-            <TextView
-                android:id="@+id/dashboard_books_list_progressbar_label"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_alignBottom="@id/dashboard_books_list_progressbar"
-                android:layout_alignLeft="@id/dashboard_books_list_progressbar"
-                android:layout_alignRight="@id/dashboard_books_list_progressbar"
-                android:layout_alignTop="@id/dashboard_books_list_progressbar"
-                android:background="#00000000"
-                />
-        </RelativeLayout>
-
-    </RelativeLayout>
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab"
+    <TextView
+        android:id="@+id/dashboard_books_list_reading_title"
+        style="@style/tag_button_style"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:clickable="true"
-        android:src="@android:drawable/ic_input_add"
-        app:backgroundTint="@color/accent"
-        app:layout_anchor="@id/activity_book_library"
-        app:layout_anchorGravity="bottom|right|end"/>
+        android:layout_below="@+id/toolbar"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="2dp"
+        android:text="Recently Read" />
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/dashboard_books_list_reading"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/dashboard_books_list_reading_title"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:minHeight="225dp" />
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+    <Button
+        android:id="@+id/dashboard_books_list_tag1_title"
+        style="@style/tag_button_style"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/dashboard_books_list_reading"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="5dp"
+        android:text="Tag" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/dashboard_books_list_tag1"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_above="@+id/dashboard_books_list_progressbar_container"
+        android:layout_below="@+id/dashboard_books_list_tag1_title"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:minHeight="275dp" />
+
+    <RelativeLayout
+        android:id="@+id/dashboard_books_list_progressbar_container"
+        android:layout_width="match_parent"
+        android:layout_height="50dip"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="50dp"
+        android:maxHeight="50dp"
+        android:minHeight="50dp">
+
+        <ProgressBar
+            android:id="@+id/dashboard_books_list_progressbar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignLeft="@id/dashboard_books_list_progressbar"
+            android:layout_alignTop="@id/dashboard_books_list_progressbar"
+            android:layout_alignRight="@id/dashboard_books_list_progressbar"
+            android:layout_alignBottom="@id/dashboard_books_list_progressbar" />
+
+        <TextView
+            android:id="@+id/dashboard_books_list_progressbar_label"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignLeft="@id/dashboard_books_list_progressbar"
+            android:layout_alignTop="@id/dashboard_books_list_progressbar"
+            android:layout_alignRight="@id/dashboard_books_list_progressbar"
+            android:layout_alignBottom="@id/dashboard_books_list_progressbar"
+            android:background="#00000000" />
+    </RelativeLayout>
+
+</RelativeLayout>

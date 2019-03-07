@@ -10,8 +10,8 @@ import uk.co.droidinactu.elibrary.room.EBook
 
 class BookLibBookDetailsActivity : AppCompatActivity() {
 
-    internal var dateAddedToLib: TextView
-    internal var dateLibEntryMod: TextView
+    internal var dateAddedToLib: TextView? = null
+    internal var dateLibEntryMod: TextView? = null
     private var mCover: BadgedImageView? = null
     private var mTitle: EditText? = null
     private var mFilename: EditText? = null
@@ -25,10 +25,12 @@ class BookLibBookDetailsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_book_lib_book_details)
 
-    }
-
-    companion object {
-        private val LOG_TAG = BookLibBookDetailsActivity::class.java.simpleName + ":"
+//        libMgr = LibraryManager()
+//        try {
+//            libMgr.open()
+//        } catch (pE: SQLException) {
+//            pE.printStackTrace()
+//        }
 
     }
 

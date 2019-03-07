@@ -12,10 +12,11 @@ import nl.siegmann.epublib.epub.EpubReader
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.debug
 import uk.co.droidinactu.elibrary.BookLibApplication
+import uk.co.droidinactu.elibrary.BookLibApplication.Companion.LOG_TAG
 import uk.co.droidinactu.elibrary.R
-import uk.co.droidinactu.elibrary.room.Author
 import uk.co.droidinactu.elibrary.room.EBook
 import uk.co.droidinactu.elibrary.room.FileType
+import uk.co.droidinactu.elibrary.room.Tag
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
@@ -45,7 +46,7 @@ class LibraryScanner : AnkoLogger {
     private var libMgr: LibraryManager? = null
 
     fun readFiles(ctx: Context, prgBrHandler: Handler, libname: String, rootdir: String) {
-        libMgr = (ctx.applicationContext as BookLibApplication).getLibManager()
+        libMgr = BookLibApplication.instance.getLibManager()
         this.prgBrHandler = prgBrHandler
         librootdir = rootdir
         findDirs(rootdir)
@@ -154,7 +155,7 @@ class LibraryScanner : AnkoLogger {
             if (pdfTitle.length > 0 && pdfTitle.toLowerCase() != "untitled") {
                 ebk.bookTitle = pdfTitle
             }
-            ebk.addAuthor(Author(meta.getAuthor()))
+            //   ebk.addAuthor(Author(meta.getAuthor()))
             pdfiumCore!!.closeDocument(pdfDocument)
 
         } catch (e: FileNotFoundException) {
@@ -239,40 +240,39 @@ class LibraryScanner : AnkoLogger {
     @Synchronized
     private fun addEBookToLibraryStorage(ctx: Context, libName: String, ebk: EBook) {
         libMgr!!.addBookToLibrary(libName, ebk)
-        for (t in ebk.bookTags) {
-            libMgr!!.addTagToBook(t.getTag(), ebk)
-        }
-        for (ft in ebk.filetypes) {
-            libMgr!!.addFileTypeToBook(ft, ebk)
-        }
+//        for (t in ebk.tags) {
+//            libMgr!!.addTagToBook(t.getTag(), ebk)
+//        }
+//        for (ft in ebk.filetypes) {
+//            libMgr!!.addFileTypeToBook(ft, ebk)
+//        }
     }
 
-    fun readFile(ctx: Context, libname: String, filename: String) {
+    private fun readFile(ctx: Context, libname: String, filename: String) {
         val f = File(filename)
 
-        var tagStrs = arrayOfNulls<String>(0)
         val ebk = EBook()
-        ebk.inLibrary = libname
+        ebk.inLibraryId = libMgr!!.getLibrary(libname).id
         ebk.fileDir = f.parent
-        ebk.fileName = filename.substring(ebk.fileDir.length() + 1)
+        ebk.fileName = filename.substring(ebk.fileDir.length + 1)
         ebk.lastModified = f.lastModified()
         ebk.setCoverImageFromBitmap(BitmapFactory.decodeResource(ctx.resources, R.drawable.generic_book_cover))
 
         try {
-            tagStrs =
+            var tagStrs =
                 f.parent.substring(librootdir.length + 1).split(File.separator.toRegex()).dropLastWhile { it.isEmpty() }
                     .toTypedArray()
-            var prevBookTag: BookTag? = null
+            var prevBookTag: Tag? = null
             for (s in tagStrs) {
-                val t = libMgr!!.addTag(s)
+                val t = libMgr!!.getTag(s)
                 if (prevBookTag != null) {
-                    t.setParentTagId(prevBookTag.getId())
+                    t.parentTagId = prevBookTag.id
                 }
                 prevBookTag = t
                 ebk.addTag(t)
             }
         } catch (oob: StringIndexOutOfBoundsException) {
-            ebk.addTag("unclassified")
+            ebk.addTag(libMgr!!.getTag(Tag.UNCLASSIFIED))
         }
         debug(LOG_TAG + "parsing file [filename: " + filename + ", size: " + f.length() + "]");
 
@@ -301,7 +301,4 @@ class LibraryScanner : AnkoLogger {
         debug(LOG_TAG + "modDate = " + meta.getModDate())
     }
 
-    companion object {
-        private val LOG_TAG = LibraryScanner::class.java.simpleName + ":"
-    }
 }

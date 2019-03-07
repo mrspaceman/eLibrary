@@ -14,5 +14,10 @@ class Tag(tag: String) {
     var tag: String = ""
 
     @ColumnInfo
-    var parentTagId: Long? = null
+    var parentTagId: Int? = null
+
+    companion object {
+        val UNCLASSIFIED = "Unclassified"
+        val CURRENTLY_READING = "Currently Reading"
+    }
 }

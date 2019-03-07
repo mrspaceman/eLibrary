@@ -19,4 +19,5 @@ interface LibraryDao {
 
     @Delete
     fun delete(obj: Library)
+
 }

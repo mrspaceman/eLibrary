@@ -10,11 +10,9 @@ import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
 import android.os.Environment
 import android.os.PowerManager
+import android.util.Log
 import android.util.Patterns
 import org.apache.commons.io.FileUtils
-import org.jetbrains.anko.AnkoLogger
-import org.jetbrains.anko.debug
-import org.jetbrains.anko.info
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import uk.co.droidinactu.elibrary.library.FileObserverService
@@ -27,15 +25,15 @@ import java.sql.SQLException
 import java.text.DecimalFormat
 import java.util.*
 
-object BookLibApplication : Application(), AnkoLogger {
+val Context.myApp: BookLibApplication
+    get() = applicationContext as BookLibApplication
 
-    val LOG_TAG = BookLibApplication::class.java.simpleName + ":"
+class BookLibApplication : Application() {
 
     val IS_DEBUGGING = true
 
     val LINE_SEPARATOR = System.getProperty("line.separator")
     val sdf = DateTimeFormat.forPattern("yyyy-MM-dd")
-    val sdf_file = DateTimeFormat.forPattern("yyyy-MM-dd")
     val logDataFmt = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS")
     val simpleDateFmtStrView = "dd-MMM-yyyy"
     val simpleDateFmtStrDb = "yyyyMMdd"
@@ -52,13 +50,13 @@ object BookLibApplication : Application(), AnkoLogger {
     fun addFileWatcher(libname: String?, rootdir: String?) {
         if (libname != null && rootdir != null) {
             if (!libraryWatcher.containsKey(libname)) {
-                info(LOG_TAG + "Adding file observer for [" + libname + "] @ [" + rootdir + "]")
+                Log.d(LOG_TAG , "Adding file observer for [" + libname + "] @ [" + rootdir + "]")
                 val fileOb = RecursiveFileObserver(rootdir, CHANGES_ONLY)
                 libraryWatcher[libname] = fileOb
                 fileOb.startWatching()
             }
         } else {
-            info(LOG_TAG + "Already watching for [" + libname + "] @ [" + rootdir + "]")
+            Log.d(LOG_TAG , "Already watching for [" + libname + "] @ [" + rootdir + "]")
         }
     }
 
@@ -76,15 +74,22 @@ object BookLibApplication : Application(), AnkoLogger {
 
     private lateinit var fileObserverService: FileObserverService
 
+    companion object {
+        val LOG_TAG = BookLibApplication::class.java.simpleName
+
+        lateinit var instance: BookLibApplication
+            private set
+    }
 
     /*
-     * (non-Javadoc)
-     *
-     * @see android.app.Application#onCreate()
-     */
+         * (non-Javadoc)
+         *
+         * @see android.app.Application#onCreate()
+         */
     override fun onCreate() {
         super.onCreate()
-        debug("onCreate(); application being created.")
+        instance = this
+        Log.d(LOG_TAG ,"onCreate(); application being created.")
 
         copyDbFileToSd(LibraryManager.DB_NAME)
 
@@ -132,20 +137,21 @@ object BookLibApplication : Application(), AnkoLogger {
             if (isExternalStorageWritable()) {
                 val someDate = DateTime()
                 val currentDBPath = "//data//$packageName//databases//$dbName"
+                val sdf_file = DateTimeFormat.forPattern("yyyy-MM-dd")
                 val backupDBPath =
-                    sd.path + File.separator + dbName + "-" + someDate.toString(BookLibApplication.sdf_file)
+                    sd.path + File.separator + dbName + "-" + someDate.toString(sdf_file)
                 val currentDB = File(data, currentDBPath)
                 val backupDB = File(sd, backupDBPath)
 
                 if (currentDB.exists()) {
                     copyFileUsingApacheCommonsIO(currentDB.absolutePath, backupDBPath)
-                    debug("Database file backed up to sdcard")
+                    Log.d(LOG_TAG ,"Database file backed up to sdcard")
                 }
             } else {
-                debug("External Storage not writable")
+                Log.d(LOG_TAG ,"External Storage not writable")
             }
         } catch (e: Exception) {
-            error("Exception backing up database")
+            Log.e(LOG_TAG ,"Exception backing up database")
         }
     }
 

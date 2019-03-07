@@ -5,6 +5,7 @@ import android.os.FileObserver
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.debug
 import uk.co.droidinactu.elibrary.BookLibApplication
+import uk.co.droidinactu.elibrary.BookLibApplication.Companion.LOG_TAG
 import java.io.File
 import java.util.*
 
@@ -67,31 +68,31 @@ class RecursiveFileObserver @JvmOverloads constructor(
             FileObserver.CLOSE_WRITE -> debug(LOG_TAG + "onEvent() CLOSE_WRITE: " + path)
             FileObserver.CREATE -> {
                 debug(LOG_TAG + "onEvent() CREATE: " + path)
-                BookLibApplication.sendBroadcast(localIntent)
+                BookLibApplication.instance.sendBroadcast(localIntent)
             }
             FileObserver.DELETE -> {
                 debug(LOG_TAG + "onEvent() DELETE: " + path)
-                BookLibApplication.sendBroadcast(localIntent)
+                BookLibApplication.instance.sendBroadcast(localIntent)
             }
             FileObserver.DELETE_SELF -> {
                 debug(LOG_TAG + "onEvent() DELETE_SELF: " + path)
-                BookLibApplication.sendBroadcast(localIntent)
+                BookLibApplication.instance.sendBroadcast(localIntent)
             }
             FileObserver.MODIFY -> {
                 debug(LOG_TAG + "onEvent() MODIFY: " + path)
-                BookLibApplication.sendBroadcast(localIntent)
+                BookLibApplication.instance.sendBroadcast(localIntent)
             }
             FileObserver.MOVE_SELF -> {
                 debug(LOG_TAG + "onEvent() MOVE_SELF: " + path)
-                BookLibApplication.sendBroadcast(localIntent)
+                BookLibApplication.instance.sendBroadcast(localIntent)
             }
             FileObserver.MOVED_FROM -> {
                 debug(LOG_TAG + "onEvent() MOVED_FROM: " + path)
-                BookLibApplication.sendBroadcast(localIntent)
+                BookLibApplication.instance.sendBroadcast(localIntent)
             }
             FileObserver.MOVED_TO -> {
                 debug(LOG_TAG + "onEvent() MOVED_TO: " + path)
-                BookLibApplication.sendBroadcast(localIntent)
+                BookLibApplication.instance.sendBroadcast(localIntent)
             }
             FileObserver.OPEN -> debug(LOG_TAG + "onEvent() OPEN: " + path)
             else -> {
@@ -121,7 +122,6 @@ class RecursiveFileObserver @JvmOverloads constructor(
     }
 
     companion object {
-        val LOG_TAG = RecursiveFileObserver::class.java.simpleName + ":"
         val INTENT_EBOOK_MODIFIED = "uk.co.droidinactu.booklib.library.INTENT_EBOOK_MODIFIED"
         val INTENT_EBOOK_MODIFIED_PATH = "uk.co.droidinactu.booklib.library.INTENT_EBOOK_MODIFIED_PATH"
         /**

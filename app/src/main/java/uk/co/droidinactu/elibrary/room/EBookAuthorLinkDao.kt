@@ -8,7 +8,7 @@ import androidx.room.Query
 @Dao
 interface EBookAuthorLinkDao {
     @Query("SELECT * FROM ebookauthorlink")
-    fun getAll(): MutableList<EBookAuthorLink>
+    fun getAll(): List<EBookAuthorLink>
 
 //    @Query("SELECT * FROM ebooks INNER JOIN ebookauthorlink ON ebooks.id=ebookauthorlink.ebookId WHERE ebookauthorlink.authorId=:authorId")
 //    fun getBooksForAuthor(authorId: Int): MutableList<EBookAuthorLink>

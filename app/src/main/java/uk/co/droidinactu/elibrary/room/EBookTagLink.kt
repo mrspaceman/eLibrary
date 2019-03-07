@@ -1,7 +1,9 @@
 package uk.co.droidinactu.elibrary.room
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 
 @Entity(
     tableName = "ebooktaglink",
@@ -17,8 +19,15 @@ import androidx.room.ForeignKey
             parentColumns = arrayOf("id"),
             childColumns = arrayOf("tagId")
         )
-    )
+    ),
+    indices = arrayOf(Index(value = ["ebookId", "tagId"]))
 )
-class EBookTagLink(ebookId: EBook, tagId: Tag) {
-    constructor() {}
+class EBookTagLink(ebookId: Int, tagId: Int) {
+
+    @ColumnInfo
+    var ebookId: Int = 0
+
+    @ColumnInfo
+    var tagId: Int = 0
+
 }

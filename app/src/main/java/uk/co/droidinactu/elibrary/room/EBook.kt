@@ -131,22 +131,24 @@ class EBook() {
         return background
     }
 
-//    fun addTag(pTag: Tag) {
-//        this.tags.add(pTag)
-//    }
+    fun addTag(pTag: Tag) {
+        this.tags.add(pTag)
+    }
+
+    fun addFileType(pFiletype: FileType) {
+        filetypes.add(pFiletype)
+    }
 
     fun addFileType(pFiletype: String) {
         filetypes.add(FileType.valueOf(pFiletype))
     }
 
     fun addAuthors(pAuthors: List<nl.siegmann.epublib.domain.Author>) {}
-
-//    fun addAuthor(pAuthor: Author) {
-//        authors.add(pAuthor)
-//    }
+    fun addAuthor(author: Author) {
+        authors.add(author)
+    }
 
     companion object {
-        private val LOG_TAG = EBook::class.java.simpleName + ":"
         val COLUMN_NAME_FIRSTNAME = "firstname"
         val COLUMN_NAME_LASTNAME = "lastname"
         val COLUMN_NAME_WEBSITE = "website"
