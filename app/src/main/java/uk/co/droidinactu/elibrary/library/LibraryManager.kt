@@ -17,7 +17,7 @@ import uk.co.droidinactu.elibrary.R
 import uk.co.droidinactu.elibrary.room.*
 import java.io.File
 
-class LibraryManager  {
+class LibraryManager {
 
     private var scanLibTask: LibraryScanTask? = null
     private var scanningInProgress = false
@@ -48,7 +48,7 @@ class LibraryManager  {
     }
 
     fun clear() {
-        Log.d(LOG_TAG , "clear()")
+        Log.d(LOG_TAG, "clear()")
         for (libname in getLibraryList()) {
             val intent = Intent(
                 BookLibApplication.instance.applicationContext,
@@ -224,7 +224,12 @@ class LibraryManager  {
     }
 
     fun getLibraries(): List<Library> {
-        return libraryDao.getAll()
+        try {
+            return libraryDao.getAll()
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, "Exception getting libraries: ", e)
+        }
+        return ArrayList<Library>()
     }
 
     fun refreshLibraries(prgBrHandler: Handler?, handler: Handler?) {
@@ -233,7 +238,8 @@ class LibraryManager  {
             val aList = getLibraries()
             for (lib in aList) {
                 if (MyDebug.DEBUGGING) {
-                    Log.d(LOG_TAG , "Scanning library [" + lib.libraryTitle
+                    Log.d(
+                        LOG_TAG, "Scanning library [" + lib.libraryTitle
                                 + "] before has ["
                                 + getBooksForLibrary(lib).size
                                 + "] ebooks"
@@ -246,7 +252,7 @@ class LibraryManager  {
 
     fun initiateScan(prgBrHandler: Handler?, handler: Handler?, lib: Library) {
         if (MyDebug.DEBUGGING) {
-            Log.d(LOG_TAG , "Scanning library [" + lib.libraryTitle + "]")
+            Log.d(LOG_TAG, "Scanning library [" + lib.libraryTitle + "]")
         }
         if (scanLibTask == null || scanLibTask?.taskComplete == true) {
             scanLibTask = LibraryScanTask()
@@ -269,7 +275,7 @@ class LibraryManager  {
         try {
             libraryDao.insert(l)
         } catch (pE: java.sql.SQLException) {
-            Log.e(LOG_TAG ,"Exception adding library", pE)
+            Log.e(LOG_TAG, "Exception adding library", pE)
         }
         initiateScan(prgBrHandler, handler, l)
     }
@@ -282,7 +288,7 @@ class LibraryManager  {
             // FIXME : add authors
             // FIXME : add link objects
         } catch (pE: java.sql.SQLException) {
-            Log.e(LOG_TAG ,"Exception adding book to library", pE)
+            Log.e(LOG_TAG, "Exception adding book to library", pE)
         }
     }
 

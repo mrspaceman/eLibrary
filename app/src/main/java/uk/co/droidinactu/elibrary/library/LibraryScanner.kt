@@ -1,16 +1,14 @@
 package uk.co.droidinactu.elibrary.library
 
-
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Handler
 import android.os.ParcelFileDescriptor
+import android.util.Log
 import com.shockwave.pdfium.PdfiumCore
 import nl.siegmann.epublib.epub.EpubReader
-import org.jetbrains.anko.AnkoLogger
-import org.jetbrains.anko.debug
 import uk.co.droidinactu.elibrary.BookLibApplication
 import uk.co.droidinactu.elibrary.BookLibApplication.Companion.LOG_TAG
 import uk.co.droidinactu.elibrary.R
@@ -29,7 +27,7 @@ import java.util.concurrent.Executors
  * Created by aspela on 31/08/16.
  */
 
-class LibraryScanner : AnkoLogger {
+class LibraryScanner {
 
     var maxFiles = 0
     var currReadFiles = 0
@@ -131,7 +129,7 @@ class LibraryScanner : AnkoLogger {
             }
 
         } else {
-            debug(LOG_TAG + "Skipping Large epub [filename: " + filename + ", size: " + f.length() + "]")
+            Log.d(LOG_TAG, "Skipping Large epub [filename: " + filename + ", size: " + f.length() + "]")
         }
     }
 
@@ -274,7 +272,7 @@ class LibraryScanner : AnkoLogger {
         } catch (oob: StringIndexOutOfBoundsException) {
             ebk.addTag(libMgr!!.getTag(Tag.UNCLASSIFIED))
         }
-        debug(LOG_TAG + "parsing file [filename: " + filename + ", size: " + f.length() + "]");
+        Log.d(LOG_TAG, "parsing file [filename: " + filename + ", size: " + f.length() + "]");
 
         if (filename.toLowerCase().endsWith("epub")) {
             ebk.addFileType(FileType.EPUB)
@@ -291,14 +289,14 @@ class LibraryScanner : AnkoLogger {
 
     fun printPdfInfo(core: PdfiumCore, doc: com.shockwave.pdfium.PdfDocument) {
         val meta = core.getDocumentMeta(doc)
-        debug(LOG_TAG + "title = " + meta.getTitle())
-        debug(LOG_TAG + "author = " + meta.getAuthor())
-        debug(LOG_TAG + "subject = " + meta.getSubject())
-        debug(LOG_TAG + "keywords = " + meta.getKeywords())
-        debug(LOG_TAG + "creator = " + meta.getCreator())
-        debug(LOG_TAG + "producer = " + meta.getProducer())
-        debug(LOG_TAG + "creationDate = " + meta.getCreationDate())
-        debug(LOG_TAG + "modDate = " + meta.getModDate())
+        Log.d(LOG_TAG, "title = " + meta.getTitle())
+        Log.d(LOG_TAG, "author = " + meta.getAuthor())
+        Log.d(LOG_TAG, "subject = " + meta.getSubject())
+        Log.d(LOG_TAG, "keywords = " + meta.getKeywords())
+        Log.d(LOG_TAG, "creator = " + meta.getCreator())
+        Log.d(LOG_TAG, "producer = " + meta.getProducer())
+        Log.d(LOG_TAG, "creationDate = " + meta.getCreationDate())
+        Log.d(LOG_TAG, "modDate = " + meta.getModDate())
     }
 
 }

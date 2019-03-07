@@ -4,25 +4,24 @@ import android.app.IntentService
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
-import org.jetbrains.anko.AnkoLogger
-import org.jetbrains.anko.info
+import android.util.Log
 import uk.co.droidinactu.elibrary.BookLibApplication
 import uk.co.droidinactu.elibrary.BookLibApplication.Companion.LOG_TAG
 
-class FileObserverService : IntentService, AnkoLogger {
+class FileObserverService : IntentService {
 
     constructor() : super("Booklib FileTreeNode Watcher") {}
 
     constructor(name: String) : super(name) {}
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        info(LOG_TAG + "onStartCommand()")
+        Log.d(LOG_TAG, "onStartCommand()")
         onHandleIntent(intent)
         return Service.START_STICKY
     }
 
     override fun onDestroy() {
-        info(LOG_TAG + "onDestroy()")
+        Log.d(LOG_TAG, "onDestroy()")
         super.onDestroy()
     }
 
@@ -32,7 +31,7 @@ class FileObserverService : IntentService, AnkoLogger {
     }
 
     override fun onHandleIntent(pIntent: Intent?) {
-        info(LOG_TAG + "onHandleIntent()")
+        Log.d(LOG_TAG, "onHandleIntent()")
         if (pIntent != null) {
             // Gets data from the incoming Intent
             val file_obs_action = pIntent.getStringExtra("file_obs_action")
@@ -50,7 +49,7 @@ class FileObserverService : IntentService, AnkoLogger {
                         libname
                     )
                     //BookLibApplication.getInstance().delFileWatcher(libname);
-                    else -> info(LOG_TAG + "unknown action [" + file_obs_action + "]")
+                    else -> Log.d(LOG_TAG, "unknown action [" + file_obs_action + "]")
                 }
             }
         }

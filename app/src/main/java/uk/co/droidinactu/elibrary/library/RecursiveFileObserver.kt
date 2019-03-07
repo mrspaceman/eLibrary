@@ -2,8 +2,7 @@ package uk.co.droidinactu.elibrary.library
 
 import android.content.Intent
 import android.os.FileObserver
-import org.jetbrains.anko.AnkoLogger
-import org.jetbrains.anko.debug
+import android.util.Log
 import uk.co.droidinactu.elibrary.BookLibApplication
 import uk.co.droidinactu.elibrary.BookLibApplication.Companion.LOG_TAG
 import java.io.File
@@ -18,7 +17,7 @@ import java.util.*
 class RecursiveFileObserver @JvmOverloads constructor(
     private val mPath: String,
     private val mMask: Int = FileObserver.ALL_EVENTS
-) : FileObserver(mPath, mMask), AnkoLogger {
+) : FileObserver(mPath, mMask) {
 
     private var mObservers: MutableList<SingleFileObserver>? = null
 
@@ -43,7 +42,7 @@ class RecursiveFileObserver @JvmOverloads constructor(
 
         for (sfo in mObservers!!) {
             sfo.startWatching()
-            debug(LOG_TAG + "startWatching() : " + sfo.mPath)
+            Log.d(LOG_TAG, "startWatching() : " + sfo.mPath)
         }
     }
 
@@ -62,42 +61,42 @@ class RecursiveFileObserver @JvmOverloads constructor(
         val localIntent = Intent(INTENT_EBOOK_MODIFIED)
         localIntent.putExtra(INTENT_EBOOK_MODIFIED_PATH, path)
         when (event) {
-            FileObserver.ACCESS -> debug(LOG_TAG + "onEvent() ACCESS: " + path)
-            FileObserver.ATTRIB -> debug(LOG_TAG + "onEvent() ATTRIB: " + path)
-            FileObserver.CLOSE_NOWRITE -> debug(LOG_TAG + "onEvent() CLOSE_NOWRITE: " + path)
-            FileObserver.CLOSE_WRITE -> debug(LOG_TAG + "onEvent() CLOSE_WRITE: " + path)
+            FileObserver.ACCESS -> Log.d(LOG_TAG, "onEvent() ACCESS: " + path)
+            FileObserver.ATTRIB -> Log.d(LOG_TAG, "onEvent() ATTRIB: " + path)
+            FileObserver.CLOSE_NOWRITE -> Log.d(LOG_TAG, "onEvent() CLOSE_NOWRITE: " + path)
+            FileObserver.CLOSE_WRITE -> Log.d(LOG_TAG, "onEvent() CLOSE_WRITE: " + path)
             FileObserver.CREATE -> {
-                debug(LOG_TAG + "onEvent() CREATE: " + path)
+                Log.d(LOG_TAG, "onEvent() CREATE: " + path)
                 BookLibApplication.instance.sendBroadcast(localIntent)
             }
             FileObserver.DELETE -> {
-                debug(LOG_TAG + "onEvent() DELETE: " + path)
+                Log.d(LOG_TAG, "onEvent() DELETE: " + path)
                 BookLibApplication.instance.sendBroadcast(localIntent)
             }
             FileObserver.DELETE_SELF -> {
-                debug(LOG_TAG + "onEvent() DELETE_SELF: " + path)
+                Log.d(LOG_TAG, "onEvent() DELETE_SELF: " + path)
                 BookLibApplication.instance.sendBroadcast(localIntent)
             }
             FileObserver.MODIFY -> {
-                debug(LOG_TAG + "onEvent() MODIFY: " + path)
+                Log.d(LOG_TAG, "onEvent() MODIFY: " + path)
                 BookLibApplication.instance.sendBroadcast(localIntent)
             }
             FileObserver.MOVE_SELF -> {
-                debug(LOG_TAG + "onEvent() MOVE_SELF: " + path)
+                Log.d(LOG_TAG, "onEvent() MOVE_SELF: " + path)
                 BookLibApplication.instance.sendBroadcast(localIntent)
             }
             FileObserver.MOVED_FROM -> {
-                debug(LOG_TAG + "onEvent() MOVED_FROM: " + path)
+                Log.d(LOG_TAG, "onEvent() MOVED_FROM: " + path)
                 BookLibApplication.instance.sendBroadcast(localIntent)
             }
             FileObserver.MOVED_TO -> {
-                debug(LOG_TAG + "onEvent() MOVED_TO: " + path)
+                Log.d(LOG_TAG, "onEvent() MOVED_TO: " + path)
                 BookLibApplication.instance.sendBroadcast(localIntent)
             }
-            FileObserver.OPEN -> debug(LOG_TAG + "onEvent() OPEN: " + path)
+            FileObserver.OPEN -> Log.d(LOG_TAG, "onEvent() OPEN: " + path)
             else -> {
             }
-        }//debug(LOG_TAG + "onEvent() DEFAULT(" + event + "): " + path);
+        }//Log.d(LOG_TAG,"onEvent() DEFAULT(" + event + "): " + path);
     }
 
     /**

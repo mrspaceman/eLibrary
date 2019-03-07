@@ -8,9 +8,8 @@ import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import org.jetbrains.anko.AnkoLogger
 
-class BookLibSearchActivity : AppCompatActivity(), AnkoLogger {
+class BookLibSearchActivity : AppCompatActivity() {
 
     private var txtSearchText: EditText? = null
     private var btnSearch: Button? = null

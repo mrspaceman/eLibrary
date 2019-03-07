@@ -35,7 +35,7 @@ import uk.co.droidinactu.elibrary.room.Tag
 import java.io.File
 import java.util.*
 
-class BookLibrary() : AppCompatActivity() {
+class BookLibrary : AppCompatActivity() {
 
     private val NO_TAG_SELECTED = "<none selected>"
     private var libraryScanPndingIntnt: PendingIntent? = null
@@ -52,8 +52,6 @@ class BookLibrary() : AppCompatActivity() {
     private var progressBar: ProgressBar? = null
     private var progressBarLabel: TextView? = null
     private var progressBarContainer: RelativeLayout? = null
-
-    private var ctx: Context? = null
 
     /**
      *
@@ -243,9 +241,9 @@ class BookLibrary() : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         Log.d(LOG_TAG, "onStart()")
-        if (BookLibApplication.instance.getLibManager().getLibraries().size === 0) {
-            browseForLibrary()
-        }
+//        if (BookLibApplication.instance.getLibManager().getLibraries().size === 0) {
+//            browseForLibrary()
+//        }
         BookLibApplication.instance.registerReceiver(
             ebkChngdListener,
             IntentFilter(INTENT_EBOOK_MODIFIED)
