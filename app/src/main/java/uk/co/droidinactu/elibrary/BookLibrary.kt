@@ -26,6 +26,8 @@ import com.github.angads25.filepicker.model.DialogConfigs
 import com.github.angads25.filepicker.model.DialogProperties
 import com.github.angads25.filepicker.view.FilePickerDialog
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.uiThread
 import uk.co.droidinactu.elibrary.BookLibApplication.Companion.LOG_TAG
 import uk.co.droidinactu.elibrary.library.FileObserverService
 import uk.co.droidinactu.elibrary.library.LibraryManager
@@ -117,13 +119,13 @@ class BookLibrary : AppCompatActivity() {
 
         if (BuildConfig.DEBUG) {
             val appTitle = getString(R.string.app_title)
-            val appVerName=""
+            val appVerName = ""
             try {
                 val appVerName = BookLibApplication.instance.getAppVersionName(
                     "uk.co.droidinactu.elibrary"
                 )
-            }catch(e:Exception ){
-                error(LOG_TAG+"Exception getting app vername")
+            } catch (e: Exception) {
+                error(LOG_TAG + "Exception getting app vername")
             }
             supportActionBar!!.setTitle(
                 appTitle + " (" + appVerName + ")"
@@ -160,37 +162,42 @@ class BookLibrary : AppCompatActivity() {
     }
 
     private fun pickTag(tagToSet: Int) {
-        val tglist = BookLibApplication.instance.getLibManager().getTagList()
-        // val tgTree = BookLibApplication.getLibManager().getTagTree()
-        //    tglist.remove(BookTag.CURRENTLY_READING)
+        val ctx = this
+        doAsync {
+            val tglist = BookLibApplication.instance.getLibManager().getTagList()
+            // val tgTree = BookLibApplication.getLibManager().getTagTree()
+            //    tglist.remove(BookTag.CURRENTLY_READING)
 
-        val dialog = Dialog(this)
-        dialog.setContentView(R.layout.tag_list_picker_dialog)
-        dialog.setTitle("Pick an EBook tag")
+            uiThread {
+                val dialog = Dialog(ctx)
+                dialog.setContentView(R.layout.tag_list_picker_dialog)
+                dialog.setTitle("Pick an EBook tag")
 
-        // set the custom dialog components - text, image and button
-        val tagLstIncludeSubTags = dialog.findViewById<View>(R.id.tag_list_picker_include_subtags) as CheckBox
-        tagLstIncludeSubTags.isChecked = true
-        val tagLstPickerList = dialog.findViewById<View>(R.id.tag_list_picker_list) as ListView
-        val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, android.R.id.text1, tglist)
-        tagLstPickerList.adapter = adapter
+                // set the custom dialog components - text, image and button
+                val tagLstIncludeSubTags = dialog.findViewById<View>(R.id.tag_list_picker_include_subtags) as CheckBox
+                tagLstIncludeSubTags.isChecked = true
+                val tagLstPickerList = dialog.findViewById<View>(R.id.tag_list_picker_list) as ListView
+                val adapter = ArrayAdapter(ctx, android.R.layout.simple_list_item_1, android.R.id.text1, tglist)
+                tagLstPickerList.adapter = adapter
 
-        tagLstPickerList.onItemClickListener =
-            AdapterView.OnItemClickListener { parent, view, position, id ->
-                val selectedFromList = tglist[position]
-                when (tagToSet) {
-                    1 -> {
-                        bookListTag1Title?.setText(selectedFromList)
-                        bookListTag1IncludeSubTags = tagLstIncludeSubTags.isChecked
-                        savePreferences()
-                        updateBookListTag1(bookListTag1IncludeSubTags)
+                tagLstPickerList.onItemClickListener =
+                    AdapterView.OnItemClickListener { parent, view, position, id ->
+                        val selectedFromList = tglist[position]
+                        when (tagToSet) {
+                            1 -> {
+                                bookListTag1Title?.setText(selectedFromList)
+                                bookListTag1IncludeSubTags = tagLstIncludeSubTags.isChecked
+                                savePreferences()
+                                updateBookListTag1(bookListTag1IncludeSubTags)
+                            }
+                            2 -> {
+                            }
+                        }
+                        dialog.dismiss()
                     }
-                    2 -> {
-                    }
-                }
-                dialog.dismiss()
+                dialog.show()
             }
-        dialog.show()
+        }
     }
 
     private fun browseForLibrary() {
@@ -286,7 +293,9 @@ class BookLibrary : AppCompatActivity() {
                 return true
             }
             R.id.action_clear_db -> {
-                BookLibApplication.instance.getLibManager()!!.clear()
+                doAsync {
+                    BookLibApplication.instance.getLibManager()!!.clear()
+                }
                 Toast.makeText(this, "Database cleared", Toast.LENGTH_LONG).show()
                 return true
             }
@@ -310,7 +319,12 @@ class BookLibrary : AppCompatActivity() {
 
     private fun rescanLibraries() {
         fab?.setEnabled(false)
-        progressBar?.setMax(BookLibApplication.instance.getLibManager().getBooks().size)
+        doAsync {
+            val nbrBooks = BookLibApplication.instance.getLibManager().getBooks().size
+            uiThread {
+                progressBar?.setMax(nbrBooks)
+            }
+        }
         progressBar?.setProgress(0)
         progressBar?.setVisibility(View.VISIBLE)
         progressBarContainer?.setVisibility(View.VISIBLE)
@@ -358,14 +372,18 @@ class BookLibrary : AppCompatActivity() {
     }
 
     private fun updateBookListCurrReading() {
-        val bklist =
-            BookLibApplication.instance.getLibManager().getBooksForTag(
-                Tag.CURRENTLY_READING,
-                false
-            )
-        bookListAdaptorCurrReading = BookListItemAdaptor(bklist)
-        bookListCurrentReading?.setAdapter(bookListAdaptorCurrReading)
-        setupShortcuts()
+        doAsync {
+            val bklist =
+                BookLibApplication.instance.getLibManager().getBooksForTag(
+                    Tag.CURRENTLY_READING,
+                    false
+                )
+            uiThread {
+                bookListAdaptorCurrReading = BookListItemAdaptor(bklist)
+                bookListCurrentReading?.setAdapter(bookListAdaptorCurrReading)
+                setupShortcuts()
+            }
+        }
     }
 
     private fun setupShortcuts() {

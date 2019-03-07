@@ -9,6 +9,7 @@ import android.os.AsyncTask
 import android.os.Handler
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import org.jetbrains.anko.doAsync
 import uk.co.droidinactu.elibrary.BookLibApplication
 import uk.co.droidinactu.elibrary.BookLibApplication.Companion.LOG_TAG
 import uk.co.droidinactu.elibrary.BookLibrary
@@ -235,17 +236,19 @@ class LibraryManager {
     fun refreshLibraries(prgBrHandler: Handler?, handler: Handler?) {
         if (!scanningInProgress) {
             scanningInProgress = true
-            val aList = getLibraries()
-            for (lib in aList) {
-                if (MyDebug.DEBUGGING) {
-                    Log.d(
-                        LOG_TAG, "Scanning library [" + lib.libraryTitle
-                                + "] before has ["
-                                + getBooksForLibrary(lib).size
-                                + "] ebooks"
-                    )
+            doAsync {
+                val aList = getLibraries()
+                for (lib in aList) {
+                    if (MyDebug.DEBUGGING) {
+                        Log.d(
+                            LOG_TAG, "Scanning library [" + lib.libraryTitle
+                                    + "] before has ["
+                                    + getBooksForLibrary(lib).size
+                                    + "] ebooks"
+                        )
+                    }
+                    initiateScan(prgBrHandler, handler, lib)
                 }
-                initiateScan(prgBrHandler, handler, lib)
             }
         }
     }
