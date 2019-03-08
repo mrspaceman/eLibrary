@@ -162,6 +162,7 @@ class BookLibrary : AppCompatActivity() {
     }
 
     private fun pickTag(tagToSet: Int) {
+        Log.d(LOG_TAG, "BookLibrary::pickTag($tagToSet) started")
         val ctx = this
         doAsync {
             val tglist = BookLibApplication.instance.getLibManager().getTagList()
@@ -201,7 +202,7 @@ class BookLibrary : AppCompatActivity() {
     }
 
     private fun browseForLibrary() {
-        Log.d(LOG_TAG, "browseForLibrary()")
+        Log.d(LOG_TAG, "BookLibrary::browseForLibrary()")
         fab?.setEnabled(false)
         val rootdir = "/storage/"
 
@@ -237,6 +238,7 @@ class BookLibrary : AppCompatActivity() {
     }
 
     private fun updateBookListTag1(includeSubTags: Boolean) {
+        Log.d(LOG_TAG, "BookLibrary::updateBookListTag1()")
         if (bookListTag1Title?.getText().toString().compareTo(NO_TAG_SELECTED) != 0) {
             val bklist = BookLibApplication.instance.getLibManager()
                 .getBooksForTag(bookListTag1Title?.getText().toString(), includeSubTags)
@@ -318,6 +320,7 @@ class BookLibrary : AppCompatActivity() {
     }
 
     private fun rescanLibraries() {
+        Log.d(LOG_TAG, "BookLibrary::rescanLibraries()")
         fab?.setEnabled(false)
         doAsync {
             val nbrBooks = BookLibApplication.instance.getLibManager().getBooks().size

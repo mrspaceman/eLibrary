@@ -234,29 +234,33 @@ class LibraryManager {
     }
 
     fun refreshLibraries(prgBrHandler: Handler?, handler: Handler?) {
+        Log.d(LOG_TAG, "BookLibrary::refreshLibraries()")
         if (!scanningInProgress) {
             scanningInProgress = true
             doAsync {
                 val aList = getLibraries()
-                for (lib in aList) {
-                    if (MyDebug.DEBUGGING) {
-                        Log.d(
-                            LOG_TAG, "Scanning library [" + lib.libraryTitle
-                                    + "] before has ["
-                                    + getBooksForLibrary(lib).size
-                                    + "] ebooks"
-                        )
+                if (aList.size == 0) {
+                    val completeMessage = handler!!.obtainMessage(64, "")
+                    completeMessage.sendToTarget()
+                } else {
+                    for (lib in aList) {
+                        if (MyDebug.DEBUGGING) {
+                            Log.d(
+                                LOG_TAG, "Scanning library [" + lib.libraryTitle
+                                        + "] before has ["
+                                        + getBooksForLibrary(lib).size
+                                        + "] ebooks"
+                            )
+                        }
+                        initiateScan(prgBrHandler, handler, lib)
                     }
-                    initiateScan(prgBrHandler, handler, lib)
                 }
             }
         }
     }
 
     fun initiateScan(prgBrHandler: Handler?, handler: Handler?, lib: Library) {
-        if (MyDebug.DEBUGGING) {
-            Log.d(LOG_TAG, "Scanning library [" + lib.libraryTitle + "]")
-        }
+        Log.d(LOG_TAG, "LibraryManager::initiateScan() Scanning library [" + lib.libraryTitle + "]")
         if (scanLibTask == null || scanLibTask?.taskComplete == true) {
             scanLibTask = LibraryScanTask()
             scanLibTask?.execute(prgBrHandler, handler, lib.libraryRootDir, lib.libraryTitle)
@@ -295,23 +299,16 @@ class LibraryManager {
         }
     }
 
-
-    companion object {
-        val DB_NAME = "books-db"
-        val DB_NAME_ENC = "books-db-encrypted"
-        val CHANNEL_ID = "ScanningChannel"
-    }
-
-
     private inner class LibraryScanTask : AsyncTask<Any, Void, Void>() {
         private lateinit var prgBrHandler: Handler
         private lateinit var msgHndlr: Handler
         private lateinit var libTitle: String
         private lateinit var libRootDir: String
-        private val m_libraryScanner = LibraryScanner()
+        private val libraryScanner = LibraryScanner()
         var taskComplete: Boolean = false
 
         override fun doInBackground(vararg params: Any): Void? {
+            Log.d(LOG_TAG, "LibraryScanTask::doInBackground(" + params[3] as String + ") started")
             taskComplete = false
             prgBrHandler = params[0] as Handler
             msgHndlr = params[1] as Handler
@@ -319,7 +316,7 @@ class LibraryManager {
             libTitle = params[3] as String
             displayScanningNotification(libTitle)
             Thread.currentThread().name = "LibraryScanTask:" + libTitle!!
-            m_libraryScanner.readFiles(
+            libraryScanner.readFiles(
                 BookLibApplication.instance.applicationContext,
                 prgBrHandler,
                 libTitle,
@@ -328,11 +325,8 @@ class LibraryManager {
             return null
         }
 
-        override fun onPreExecute() {
-            super.onPreExecute()
-        }
-
         override fun onPostExecute(aVoid: Void) {
+            Log.d(LOG_TAG, "LibraryScanTask::onPostExecute() started")
             super.onPostExecute(aVoid)
             if (msgHndlr != null) {
                 val completeMessage = msgHndlr!!.obtainMessage(64, libTitle)
@@ -421,4 +415,10 @@ class LibraryManager {
         mNotificationManager?.cancel(mNotificationId)
     }
 
+
+    companion object {
+        val DB_NAME = "books-db"
+        val DB_NAME_ENC = "books-db-encrypted"
+        val CHANNEL_ID = "ScanningChannel"
+    }
 }

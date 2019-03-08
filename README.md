@@ -41,3 +41,12 @@ Adobe PDF reader, Google Books etc...
     * [ ] allow marking ebooks as [read|reading|unread|new]
     * [ ] Watch file system for changes to ebook libraries
     * [ ] periodic [daily|weekly] scan of root dirs in background
+
+
+
+## For debugging:
+
+```
+adb shell
+setprop log.tag.BookLibApplication VERBOSE
+```

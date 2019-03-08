@@ -44,6 +44,7 @@ class LibraryScanner {
     private var libMgr: LibraryManager? = null
 
     fun readFiles(ctx: Context, prgBrHandler: Handler, libname: String, rootdir: String) {
+        Log.d(LOG_TAG, "LibraryScanner::readFiles() started")
         libMgr = BookLibApplication.instance.getLibManager()
         this.prgBrHandler = prgBrHandler
         librootdir = rootdir
@@ -60,6 +61,7 @@ class LibraryScanner {
     }
 
     private fun findDirs(dirname: String) {
+        Log.d(LOG_TAG, "LibraryScanner::findDirs() started")
         var f = File(dirname.trim { it <= ' ' })
         val listOfFiles = f.list()
 
@@ -74,6 +76,7 @@ class LibraryScanner {
     }
 
     private fun findFiles() {
+        Log.d(LOG_TAG, "LibraryScanner::findFiles() started")
         for (dir in dirnames!!) {
             var f = File(dir.trim { it <= ' ' })
             val listOfFiles = f.list()
@@ -88,6 +91,7 @@ class LibraryScanner {
     }
 
     private fun readFileData(ctx: Context, libname: String) {
+        Log.d(LOG_TAG, "LibraryScanner::readFileData() started")
         pdfiumCore = PdfiumCore(ctx.applicationContext)
         executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() - 1)
         maxFiles = filenames.size
@@ -106,6 +110,7 @@ class LibraryScanner {
     }
 
     private fun readEpubMetadata(filename: String, f: File, ebk: EBook) {
+        Log.d(LOG_TAG, "LibraryScanner::readEpubMetadata() started")
         ebk.addFileType(FileType.EPUB)
         ebk.bookTitle = (f.name.substring(0, f.name.length - 5))
         ebk.fullFileDirName = ebk.fileDir + File.separator + ebk.bookTitle
@@ -134,6 +139,7 @@ class LibraryScanner {
     }
 
     private fun readPdfMetadata(filename: String, f: File, ebk: EBook) {
+        Log.d(LOG_TAG, "LibraryScanner::readPdfMetadata() started")
         ebk.addFileType(FileType.PDF)
         ebk.bookTitle = f.name.substring(0, f.name.length - 4)
         ebk.fullFileDirName = ebk.fileDir + File.separator + ebk.bookTitle
@@ -237,6 +243,7 @@ class LibraryScanner {
 
     @Synchronized
     private fun addEBookToLibraryStorage(ctx: Context, libName: String, ebk: EBook) {
+        Log.d(LOG_TAG, "LibraryScanner::addEBookToLibraryStorage() started")
         libMgr!!.addBookToLibrary(libName, ebk)
 //        for (t in ebk.tags) {
 //            libMgr!!.addTagToBook(t.getTag(), ebk)
@@ -247,6 +254,7 @@ class LibraryScanner {
     }
 
     private fun readFile(ctx: Context, libname: String, filename: String) {
+        Log.d(LOG_TAG, "LibraryScanner::readFile($filename) started")
         val f = File(filename)
 
         val ebk = EBook()
@@ -288,6 +296,7 @@ class LibraryScanner {
     }
 
     fun printPdfInfo(core: PdfiumCore, doc: com.shockwave.pdfium.PdfDocument) {
+        Log.d(LOG_TAG, "LibraryScanner::printPdfInfo() started")
         val meta = core.getDocumentMeta(doc)
         Log.d(LOG_TAG, "title = " + meta.getTitle())
         Log.d(LOG_TAG, "author = " + meta.getAuthor())
