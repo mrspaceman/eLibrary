@@ -181,12 +181,11 @@ class LibraryManager {
     }
 
     fun getTagsForBook(ebk: EBook): List<Tag> {
-        var result = lookupTagsForEBook(ebk)
-        return result
+        return lookupTagsForEBook(ebk)
     }
 
     fun lookupTagsForEBook(ebk: EBook): List<Tag> {
-        var result = ArrayList<Tag>();
+        var result = ArrayList<Tag>()
 
 //        if (tagsForEBookQuery == null) {
 //            QueryBuilder<EBookTags, Long> dbQryBld = dbHelper . getEBookTagsDao ().queryBuilder();
@@ -212,8 +211,7 @@ class LibraryManager {
     /** Library CRUD */
     //region library
     fun getLibrary(libname: String): Library {
-        var l: Library = libraryDao.getByName(libname)
-        return l
+        return libraryDao.getByName(libname)
     }
 
     fun getLibraryList(): List<String> {
@@ -231,7 +229,7 @@ class LibraryManager {
         } catch (e: Exception) {
             Log.e(LOG_TAG, "Exception getting libraries: ", e)
         }
-        return ArrayList<Library>()
+        return ArrayList()
     }
 
     fun refreshLibraries(prgBrHandler: Handler?, handler: Handler?) {
@@ -323,7 +321,7 @@ class LibraryManager {
             libRootDir = params[2] as String
             libTitle = params[3] as String
             displayScanningNotification(libTitle)
-            Thread.currentThread().name = "LibraryScanTask:" + libTitle!!
+            Thread.currentThread().name = "LibraryScanTask:" + libTitle
             libraryScanner.readFiles(
                 BookLibApplication.instance.applicationContext,
                 prgBrHandler,
@@ -337,7 +335,7 @@ class LibraryManager {
             Log.d(LOG_TAG, "LibraryScanTask::onPostExecute() started")
             super.onPostExecute(aVoid)
             if (msgHndlr != null) {
-                val completeMessage = msgHndlr!!.obtainMessage(64, libTitle)
+                val completeMessage = msgHndlr.obtainMessage(64, libTitle)
                 completeMessage.sendToTarget()
             }
             BookLibApplication.instance.copyDbFileToSd(LibraryManager.DB_NAME)
@@ -363,8 +361,7 @@ class LibraryManager {
 
             for (ebk in result) {
                 for (ft in ebk.filetypes) {
-                    val selectedFileType = ft
-                    if (File(ebk.fullFileDirName + "." + selectedFileType).exists()) {
+                    if (File(ebk.fullFileDirName + "." + ft).exists()) {
                         // file exists so we leave it in the library
                     } else {
                         error(LOG_TAG + "EBook FileTreeNode Not Found so remove from library [" + ebk.fullFileDirName + "]")
@@ -373,10 +370,6 @@ class LibraryManager {
                 }
             }
             return null
-        }
-
-        override fun onPreExecute() {
-            super.onPreExecute()
         }
 
         override fun onPostExecute(aVoid: Void) {
@@ -390,9 +383,6 @@ class LibraryManager {
             removeScanningNotification("")
         }
 
-        override fun onProgressUpdate(vararg values: Void) {
-            super.onProgressUpdate(*values)
-        }
     }
 
 

@@ -10,9 +10,9 @@ import uk.co.droidinactu.elibrary.BookLibApplication.Companion.LOG_TAG
 
 class FileObserverService : IntentService {
 
-    constructor() : super("Booklib FileTreeNode Watcher") {}
+    constructor() : super("Booklib FileTreeNode Watcher")
 
-    constructor(name: String) : super(name) {}
+    constructor(name: String) : super(name)
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.d(LOG_TAG, "onStartCommand()")

@@ -82,7 +82,7 @@ class BookLibrary : AppCompatActivity() {
          */
         override fun handleMessage(inputMessage: Message) {
             val libTitle = inputMessage.obj as String
-            val bklist = BookLibApplication.instance.getLibManager()!!.getBooks()
+            val bklist = BookLibApplication.instance.getLibManager().getBooks()
             Log.d(LOG_TAG, "Library [" + libTitle + "] Updated. Now contains [" + bklist.size + "] ebooks")
             progressBarContainer?.setVisibility(View.GONE)
             updateLists()
@@ -102,7 +102,7 @@ class BookLibrary : AppCompatActivity() {
                 ebkPath = b.getString(INTENT_EBOOK_MODIFIED_PATH, "")
             }
             if (ebkPath != null && ebkPath.length > 0) {
-                BookLibApplication.instance.getLibManager()!!.reReadEBookMetadata(ebkPath)
+                BookLibApplication.instance.getLibManager().reReadEBookMetadata(ebkPath)
             }
         }
     }
@@ -136,29 +136,29 @@ class BookLibrary : AppCompatActivity() {
         toolBarBookLibrary?.setSubtitle(R.string.app_subtitle)
         toolBarBookLibrary?.setLogo(R.mipmap.ic_launcher)
 
-        bookListCurrentReading = findViewById(R.id.dashboard_books_list_reading) as RecyclerView
+        bookListCurrentReading = findViewById<RecyclerView>(R.id.dashboard_books_list_reading)
         val horizontalLayoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        bookListCurrentReading?.setLayoutManager(horizontalLayoutManager)
+        bookListCurrentReading?.layoutManager = horizontalLayoutManager
         bookListCurrentReading?.setHasFixedSize(true)
 
         val gridLayoutManager = GridLayoutManager(this, 4)
-        bookListTag1Title = findViewById(R.id.dashboard_books_list_tag1_title) as Button
-        bookListTag1 = findViewById(R.id.dashboard_books_list_tag1) as RecyclerView
-        bookListTag1?.setLayoutManager(gridLayoutManager)
+        bookListTag1Title = findViewById<Button>(R.id.dashboard_books_list_tag1_title)
+        bookListTag1 = findViewById<RecyclerView>(R.id.dashboard_books_list_tag1)
+        bookListTag1?.layoutManager = gridLayoutManager
         bookListTag1?.setHasFixedSize(true)
-        bookListTag1Title?.setOnClickListener(View.OnClickListener { pickTag(1) })
+        bookListTag1Title?.setOnClickListener({ pickTag(1) })
 
-        progressBarContainer = findViewById(R.id.dashboard_books_list_progressbar_container) as RelativeLayout
-        progressBarContainer?.setVisibility(View.GONE)
+        progressBarContainer = findViewById<RelativeLayout>(R.id.dashboard_books_list_progressbar_container)
+        progressBarContainer?.visibility = View.GONE
 
-        progressBar = findViewById(R.id.dashboard_books_list_progressbar) as ProgressBar
-        progressBar?.setVisibility(View.INVISIBLE)
-        progressBar?.setScaleY(3f)
-        progressBarLabel = findViewById(R.id.dashboard_books_list_progressbar_label) as TextView
-        progressBarLabel?.setText("")
+        progressBar = findViewById<ProgressBar>(R.id.dashboard_books_list_progressbar)
+        progressBar?.visibility = View.INVISIBLE
+        progressBar?.scaleY = 4f
+        progressBarLabel = findViewById<TextView>(R.id.dashboard_books_list_progressbar_label)
+        progressBarLabel?.text = ""
 
-        fab = findViewById(R.id.fab) as FloatingActionButton
-        fab?.setOnClickListener(View.OnClickListener { browseForLibrary() })
+        fab = findViewById<FloatingActionButton>(R.id.fab)
+        fab?.setOnClickListener({ browseForLibrary() })
     }
 
     private fun pickTag(tagToSet: Int) {
@@ -222,7 +222,7 @@ class BookLibrary : AppCompatActivity() {
                 progressBar?.setProgress(0)
                 progressBar?.setVisibility(View.VISIBLE)
                 progressBarContainer?.setVisibility(View.VISIBLE)
-                BookLibApplication.instance.getLibManager()!!
+                BookLibApplication.instance.getLibManager()
                     .addLibrary(prgBrHandler, mHandler, libraryName, files[0])
             }
         }
@@ -267,9 +267,6 @@ class BookLibrary : AppCompatActivity() {
         BookLibApplication.instance.applicationContext.startService(intent)
     }
 
-    override fun onStop() {
-        super.onStop()
-    }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         val inflater = menuInflater
@@ -300,7 +297,7 @@ class BookLibrary : AppCompatActivity() {
             }
             R.id.action_clear_db -> {
                 doAsync {
-                    BookLibApplication.instance.getLibManager()!!.clear()
+                    BookLibApplication.instance.getLibManager().clear()
                 }
                 Toast.makeText(this, "Database cleared", Toast.LENGTH_LONG).show()
                 return true

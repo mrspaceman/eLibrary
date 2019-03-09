@@ -48,7 +48,7 @@ import java.io.File
  *
  * @author aspela
  */
-object MyDebug  {
+object MyDebug {
 
     var DEBUGGING = true
     var TRACE = false
@@ -67,15 +67,15 @@ object MyDebug  {
     }
 
     fun debugIntent(intent: Intent) {
-        Log.d(BookLibApplication.LOG_TAG,"MyDebug::debugIntent action: " + intent.action!!)
-        Log.d(BookLibApplication.LOG_TAG,"MyDebug::debugIntent component: " + intent.component!!)
+        Log.d(BookLibApplication.LOG_TAG, "MyDebug::debugIntent action: " + intent.action!!)
+        Log.d(BookLibApplication.LOG_TAG, "MyDebug::debugIntent component: " + intent.component!!)
         val connChgBndle = intent.extras
         if (connChgBndle != null) {
             for (key in connChgBndle.keySet()) {
-                Log.d(BookLibApplication.LOG_TAG,"MyDebug::debugIntent key [" + key + "]: " + connChgBndle.get(key))
+                Log.d(BookLibApplication.LOG_TAG, "MyDebug::debugIntent key [" + key + "]: " + connChgBndle.get(key))
             }
         } else {
-            Log.d(BookLibApplication.LOG_TAG,"MyDebug::debugIntent no extras")
+            Log.d(BookLibApplication.LOG_TAG, "MyDebug::debugIntent no extras")
         }
     }
 

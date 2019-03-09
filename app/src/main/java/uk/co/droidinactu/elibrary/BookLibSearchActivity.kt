@@ -51,12 +51,12 @@ class BookLibSearchActivity : AppCompatActivity() {
         cbTitle?.setSelected(true)
         cbDirs?.setSelected(true)
 
-        btnSearch?.setOnClickListener(View.OnClickListener {
+        btnSearch?.setOnClickListener {
             val bklist = BookLibApplication.instance.getLibManager()
                 .searchBooksMatching(txtSearchText?.getText().toString())
             bkListSearchAdaptor = BookListItemAdaptor(bklist)
             bkListSearch?.setAdapter(bkListSearchAdaptor)
-        })
+        }
     }
 
 }

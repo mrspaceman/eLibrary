@@ -12,8 +12,7 @@ class FiletypeConverter {
     @TypeConverter
     fun jsonToList(value: String): List<FileType>? {
         val objects = Gson().fromJson(value, Array<FileType>::class.java) as Array<FileType>
-        val list = objects.toList()
-        return list
+        return objects.toList()
     }
 
 }

@@ -283,7 +283,7 @@ class LibraryScanner {
         } catch (oob: StringIndexOutOfBoundsException) {
             ebk.addTag(libMgr!!.getTag(Tag.UNCLASSIFIED))
         }
-        Log.d(LOG_TAG, "parsing file [filename: " + filename + ", size: " + f.length() + "]");
+        Log.d(LOG_TAG, "parsing file [filename: " + filename + ", size: " + f.length() + "]")
 
         if (filename.toLowerCase().endsWith("epub")) {
             ebk.addFileType(FileType.EPUB)

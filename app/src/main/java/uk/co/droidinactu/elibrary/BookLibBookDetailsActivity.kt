@@ -18,7 +18,7 @@ class BookLibBookDetailsActivity : AppCompatActivity() {
     private var mAuthor: EditText? = null
     private var tagList: ListView? = null
     private var ebk: EBook? = null
-    private var book_full_file_dir_name: String? = ""
+    private var bookFullFileDirName: String? = ""
 
 
     override fun onCreate(savedInstanceState: Bundle?) {

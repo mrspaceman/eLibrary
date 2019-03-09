@@ -50,13 +50,13 @@ class BookLibApplication : Application() {
     fun addFileWatcher(libname: String?, rootdir: String?) {
         if (libname != null && rootdir != null) {
             if (!libraryWatcher.containsKey(libname)) {
-                Log.d(LOG_TAG , "Adding file observer for [" + libname + "] @ [" + rootdir + "]")
+                Log.d(LOG_TAG, "Adding file observer for [" + libname + "] @ [" + rootdir + "]")
                 val fileOb = RecursiveFileObserver(rootdir, CHANGES_ONLY)
                 libraryWatcher[libname] = fileOb
                 fileOb.startWatching()
             }
         } else {
-            Log.d(LOG_TAG , "Already watching for [" + libname + "] @ [" + rootdir + "]")
+            Log.d(LOG_TAG, "Already watching for [" + libname + "] @ [" + rootdir + "]")
         }
     }
 
@@ -89,7 +89,7 @@ class BookLibApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         instance = this
-        Log.d(LOG_TAG ,"onCreate(); application being created.")
+        Log.d(LOG_TAG, "onCreate(); application being created.")
 
         copyDbFileToSd(LibraryManager.DB_NAME)
 
@@ -137,21 +137,21 @@ class BookLibApplication : Application() {
             if (isExternalStorageWritable()) {
                 val someDate = DateTime()
                 val currentDBPath = "//data//$packageName//databases//$dbName"
-                val sdf_file = DateTimeFormat.forPattern("yyyy-MM-dd")
+                val sdfFile = DateTimeFormat.forPattern("yyyy-MM-dd")
                 val backupDBPath =
-                    sd.path + File.separator + dbName + "-" + someDate.toString(sdf_file)
+                    sd.path + File.separator + dbName + "-" + someDate.toString(sdfFile)
                 val currentDB = File(data, currentDBPath)
                 val backupDB = File(sd, backupDBPath)
 
                 if (currentDB.exists()) {
                     copyFileUsingApacheCommonsIO(currentDB.absolutePath, backupDBPath)
-                    Log.d(LOG_TAG ,"Database file backed up to sdcard")
+                    Log.d(LOG_TAG, "Database file backed up to sdcard")
                 }
             } else {
-                Log.d(LOG_TAG ,"External Storage not writable")
+                Log.d(LOG_TAG, "External Storage not writable")
             }
         } catch (e: Exception) {
-            Log.e(LOG_TAG ,"Exception backing up database")
+            Log.e(LOG_TAG, "Exception backing up database")
         }
     }
 
@@ -168,19 +168,13 @@ class BookLibApplication : Application() {
     /* Checks if external storage is available for read and write */
     fun isExternalStorageWritable(): Boolean {
         val state = Environment.getExternalStorageState()
-        return if (Environment.MEDIA_MOUNTED == state) {
-            true
-        } else false
+        return Environment.MEDIA_MOUNTED == state
     }
 
     /* Checks if external storage is available to at least read */
     fun isExternalStorageReadable(): Boolean {
         val state = Environment.getExternalStorageState()
-        return if (Environment.MEDIA_MOUNTED == state || Environment.MEDIA_MOUNTED_READ_ONLY == state) {
-            true
-        } else {
-            false
-        }
+        return (Environment.MEDIA_MOUNTED == state || Environment.MEDIA_MOUNTED_READ_ONLY == state)
     }
 
     fun getAppImage(packageName: String): Drawable? {

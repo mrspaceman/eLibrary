@@ -134,11 +134,11 @@ class BookListItemAdaptor(private val mBooks: MutableList<EBook>) :
         }
 
         private fun openBook(ctx: Context, selectedFileType: String) {
-            (ctx.applicationContext as BookLibApplication).getLibManager()!!.addTagToBook(
+            BookLibApplication.instance.getLibManager().addTagToBook(
                 Tag.CURRENTLY_READING,
                 ebk
             )
-            val i = BookLibApplication.instance.getLibManager()!!.getOpenIntentForBook(
+            val i = BookLibApplication.instance.getLibManager().getOpenIntentForBook(
                 ebk!!,
                 selectedFileType
             )
