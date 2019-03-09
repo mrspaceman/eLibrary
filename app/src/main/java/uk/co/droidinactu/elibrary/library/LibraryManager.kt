@@ -20,6 +20,7 @@ import java.io.File
 
 class LibraryManager {
 
+    //region definitions
     private var scanLibTask: LibraryScanTask? = null
     private var scanningInProgress = false
     private var mNotificationManager: NotificationManager? = null
@@ -32,7 +33,7 @@ class LibraryManager {
     private lateinit var authorDao: AuthorDao
     private lateinit var tagDao: TagDao
     private lateinit var libraryDao: LibraryDao
-
+    //endregion
 
     fun open() {
         val ctx = BookLibApplication.instance.applicationContext
@@ -62,7 +63,7 @@ class LibraryManager {
     }
 
     /** EBook CRUB */
-
+    //region ebooks
     fun getOpenIntentForBook(pEbk: EBook, pSelectedFileType: String): Intent? {
         var intent: Intent? = null
         if (pSelectedFileType == "epub") {
@@ -113,10 +114,10 @@ class LibraryManager {
     fun reReadEBookMetadata(ebkPath: String) {
         //FIXME :
     }
-
+    //endregion
 
     /** Author CRUD */
-
+    // region authors
     fun addAuthor(pFirstname: String, pLastname: String): Author? {
         var t = authorDao.getByName(pFirstname, pLastname)
         if (t == null) {
@@ -128,10 +129,10 @@ class LibraryManager {
     fun getAuthors(): List<Author> {
         return authorDao.getAll()
     }
-
+    //endregion
 
     /** Tag CRUD */
-
+    //region tags
     fun addTagToBook(newTag: String, ebk: EBook?) {
         if (ebk != null) {
             var t = getTag(newTag)
@@ -206,10 +207,10 @@ class LibraryManager {
 
         return result
     }
-
+    //endregion
 
     /** Library CRUD */
-
+    //region library
     fun getLibrary(libname: String): Library {
         var l: Library = libraryDao.getByName(libname)
         return l
@@ -258,7 +259,10 @@ class LibraryManager {
             }
         }
     }
+    //endregion
 
+    /** EBook Scanning */
+    //region scanning
     fun initiateScan(prgBrHandler: Handler?, handler: Handler?, lib: Library) {
         Log.d(LOG_TAG, "LibraryManager::initiateScan() Scanning library [" + lib.libraryTitle + "]")
         if (scanLibTask == null || scanLibTask?.taskComplete == true) {
@@ -276,15 +280,19 @@ class LibraryManager {
     }
 
     fun addLibrary(prgBrHandler: Handler, handler: Handler, libname: String, rootDir: String) {
-        val l = Library()
-        l.libraryTitle = libname.trim { it <= ' ' }
-        l.libraryRootDir = rootDir.trim { it <= ' ' }
-        try {
-            libraryDao.insert(l)
-        } catch (pE: java.sql.SQLException) {
-            Log.e(LOG_TAG, "Exception adding library", pE)
+        doAsync {
+            val l = Library()
+            l.libraryTitle = libname.trim { it <= ' ' }
+            l.libraryRootDir = rootDir.trim { it <= ' ' }
+            try {
+                libraryDao.insert(l)
+            } catch (pE: java.sql.SQLException) {
+                Log.e(LOG_TAG, "Exception adding library", pE)
+            } catch (pE: Exception) {
+                Log.e(LOG_TAG, "Exception adding library", pE)
+            }
+            initiateScan(prgBrHandler, handler, l)
         }
-        initiateScan(prgBrHandler, handler, l)
     }
 
     fun addBookToLibrary(libname: String, ebk: EBook) {
@@ -414,7 +422,7 @@ class LibraryManager {
     private fun removeScanningNotification(libname: String) {
         mNotificationManager?.cancel(mNotificationId)
     }
-
+    //endregion
 
     companion object {
         val DB_NAME = "books-db"

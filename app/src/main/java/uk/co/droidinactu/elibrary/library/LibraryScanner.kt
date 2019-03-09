@@ -170,7 +170,9 @@ class LibraryScanner {
 
     }
 
-    //    private void readMobiMetadata(final String filename, final FileTreeNode f, final EBook ebk) {
+    //region mobi
+//    private fun readMobiMetadata( filename:String, f:FileTreeNode , ebk:EBook)
+//    {
     //        ebk.addFileType("mobi");
     //        ebk.setBook_title(f.getName().substring(0, f.getName().length() - 4));
     //        ebk.setFull_file_dir_name(ebk.getFile_dir() + FileTreeNode.separator + ebk.getBook_title());
@@ -239,7 +241,8 @@ class LibraryScanner {
     ////            catch (MobiMetaException e) {
     ////                BookLibApplication.e(LOG_TAG + "readMobiMetadata() Error saving file: " + e.getMessage());
     ////            }
-    //    }
+    //  }
+    //endregion
 
     @Synchronized
     private fun addEBookToLibraryStorage(ctx: Context, libName: String, ebk: EBook) {

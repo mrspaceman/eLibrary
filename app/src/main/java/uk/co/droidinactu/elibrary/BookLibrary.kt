@@ -240,10 +240,14 @@ class BookLibrary : AppCompatActivity() {
     private fun updateBookListTag1(includeSubTags: Boolean) {
         Log.d(LOG_TAG, "BookLibrary::updateBookListTag1()")
         if (bookListTag1Title?.getText().toString().compareTo(NO_TAG_SELECTED) != 0) {
-            val bklist = BookLibApplication.instance.getLibManager()
-                .getBooksForTag(bookListTag1Title?.getText().toString(), includeSubTags)
-            bookListAdaptorTag1 = BookListItemAdaptor(bklist)
-            bookListTag1?.setAdapter(bookListAdaptorTag1)
+            doAsync {
+                val bklist = BookLibApplication.instance.getLibManager()
+                    .getBooksForTag(bookListTag1Title?.getText().toString(), includeSubTags)
+                bookListAdaptorTag1 = BookListItemAdaptor(bklist)
+                uiThread {
+                    bookListTag1?.setAdapter(bookListAdaptorTag1)
+                }
+            }
         }
     }
 
