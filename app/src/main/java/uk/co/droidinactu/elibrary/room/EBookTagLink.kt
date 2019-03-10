@@ -22,12 +22,12 @@ import androidx.room.Index
     ),
     indices = arrayOf(Index(value = ["ebookId", "tagId"]))
 )
-class EBookTagLink(ebookId: Int, tagId: Int) {
+class EBookTagLink() {
 
     @ColumnInfo
-    var ebookId: Int = 0
+    var ebookId: Long = 0
 
     @ColumnInfo
-    var tagId: Int = 0
+    var tagId: Long = 0
 
 }

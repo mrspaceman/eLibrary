@@ -273,7 +273,7 @@ class LibraryScanner {
                     .toTypedArray()
             var prevBookTag: Tag? = null
             for (s in tagStrs) {
-                val t = libMgr!!.getTag(s)
+                val t = libMgr!!.addTag(s)
                 if (prevBookTag != null) {
                     t.parentTagId = prevBookTag.id
                 }
@@ -281,7 +281,7 @@ class LibraryScanner {
                 ebk.addTag(t)
             }
         } catch (oob: StringIndexOutOfBoundsException) {
-            ebk.addTag(libMgr!!.getTag(Tag.UNCLASSIFIED))
+            ebk.addTag(libMgr!!.addTag(Tag.UNCLASSIFIED))
         }
         Log.d(LOG_TAG, "parsing file [filename: " + filename + ", size: " + f.length() + "]")
 

@@ -5,16 +5,16 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "tags")
-class Tag(tag: String) {
+class Tag() {
 
     @PrimaryKey(autoGenerate = true)
-    var id: Int = 0
+    var id: Long = 0
 
     @ColumnInfo
     var tag: String = ""
 
     @ColumnInfo
-    var parentTagId: Int? = null
+    var parentTagId: Long? = null
 
     companion object {
         val UNCLASSIFIED = "Unclassified"

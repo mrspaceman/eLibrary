@@ -1,61 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-                                    xmlns:app="http://schemas.android.com/apk/res-auto"
-                                    xmlns:card_view="http://schemas.android.com/apk/res-auto"
-                                    android:id="@+id/book_list_item_card"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_gravity="center"
-                                    android:clickable="true"
-                                    android:foreground="?android:attr/selectableItemBackground"
-                                    android:padding="2dp"
-                                    app:cardUseCompatPadding="true"
-                                    card_view:cardCornerRadius="8dp"
-                                    card_view:cardElevation="8dp"
-                                    card_view:contentPadding="2dp">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/book_list_item_card"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:clickable="true"
+    android:foreground="?android:attr/selectableItemBackground"
+    android:padding="2dp"
+    app:cardUseCompatPadding="true"
+    card_view:cardCornerRadius="8dp"
+    card_view:cardElevation="8dp"
+    card_view:contentPadding="2dp">
 
     <RelativeLayout
         android:id="@+id/book_list_item"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
-        <uk.co.droidinactu.booklib.badgedimageview.BadgedImageView
+        <uk.co.droidinactu.elibrary.badgedimageview.BadgedImageView
             android:id="@+id/book_list_item_cover"
             android:layout_width="@dimen/book_list_cover_width"
             android:layout_height="@dimen/book_list_cover_height"
-            android:layout_alignParentEnd="true"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
             android:elevation="10dp"
             android:padding="5dp"
             android:src="@drawable/generic_book_cover"
             app:badgeColor="@color/accent"
             app:badgeGravity="top|right"
             app:badgePadding="5dp"
-            app:srcCompat="@drawable/generic_book_cover"/>
+            app:srcCompat="@drawable/generic_book_cover" />
 
         <TextView
             android:id="@+id/book_list_item_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
             android:layout_below="@+id/book_list_item_cover"
+            android:layout_alignParentStart="true"
             android:layout_toLeftOf="@+id/book_list_item_context_menu"
             android:gravity="center"
             android:lines="3"
             android:maxLines="3"
             android:padding="2dp"
-            android:text="ebook\ntitle"/>
+            android:text="ebook\ntitle" />
 
         <ImageView
             android:id="@+id/book_list_item_context_menu"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignEnd="@+id/book_list_item_cover"
             android:layout_below="@+id/book_list_item_cover"
+            android:layout_alignEnd="@+id/book_list_item_cover"
             android:layout_marginTop="6dp"
             android:padding="2dp"
-            card_view:srcCompat="@drawable/ic_dots_vertical_black_24dp"/>
+            card_view:srcCompat="@drawable/ic_dots_vertical_black_24dp" />
 
     </RelativeLayout>
 </androidx.cardview.widget.CardView>

@@ -17,7 +17,7 @@ interface TagDao {
     fun getTag(tagstr: String): Tag
 
     @Insert
-    fun insert(obj: Tag)
+    fun insert(obj: Tag): Long
 
     @Insert
     fun insertAll(vararg objs: Tag)

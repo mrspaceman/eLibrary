@@ -8,12 +8,13 @@ import android.net.Uri
 import android.os.AsyncTask
 import android.os.Handler
 import android.util.Log
+import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.uiThread
 import uk.co.droidinactu.elibrary.BookLibApplication
 import uk.co.droidinactu.elibrary.BookLibApplication.Companion.LOG_TAG
 import uk.co.droidinactu.elibrary.BookLibrary
-import uk.co.droidinactu.elibrary.MyDebug
 import uk.co.droidinactu.elibrary.R
 import uk.co.droidinactu.elibrary.room.*
 import java.io.File
@@ -121,7 +122,10 @@ class LibraryManager {
     fun addAuthor(pFirstname: String, pLastname: String): Author? {
         var t = authorDao.getByName(pFirstname, pLastname)
         if (t == null) {
-            authorDao.insert(Author(pFirstname, pLastname))
+            var a = Author()
+            a.firstname = pFirstname
+            a.lastname = pLastname
+            val newId = authorDao.insert(a)
         }
         return authorDao.getByName(pFirstname, pLastname)
     }
@@ -135,24 +139,21 @@ class LibraryManager {
     //region tags
     fun addTagToBook(newTag: String, ebk: EBook?) {
         if (ebk != null) {
-            var t = getTag(newTag)
-            var tagBookLink = EBookTagLink(ebk.id, t.id)
-            ebookTagDao.insert(tagBookLink)
+            var t = addTag(newTag)
+            var tagBookLink = EBookTagLink()
+            tagBookLink.ebookId = ebk.id
+            tagBookLink.tagId = t.id
+            val newId = ebookTagDao.insert(tagBookLink)
         }
     }
 
-    private fun addTag(tagstr: String): Tag {
+    fun addTag(tagstr: String): Tag {
         var t = tagDao.getTag(tagstr)
         if (t == null) {
-            tagDao.insert(Tag(tagstr))
-        }
-        return tagDao.getTag(tagstr)
-    }
-
-    fun getTag(tagname: String): Tag {
-        var t = tagDao.getTag(tagname)
-        if (t == null) {
-            t = addTag(tagname)
+            t = Tag()
+            t.tag = tagstr
+            val newId = tagDao.insert(t)
+            t.id = newId
         }
         return t
     }
@@ -239,18 +240,23 @@ class LibraryManager {
             doAsync {
                 val aList = getLibraries()
                 if (aList.size == 0) {
+                    Log.d(LOG_TAG, "BookLibrary::No Libraries to scan")
                     val completeMessage = handler!!.obtainMessage(64, "")
                     completeMessage.sendToTarget()
+                    scanningInProgress = false
+
+                    val text = "No Libraries to Scan!"
+                    val duration = Toast.LENGTH_SHORT
+                    uiThread {
+                        val toast = Toast.makeText(BookLibApplication.instance.applicationContext, text, duration)
+                        toast.show()
+                    }
                 } else {
                     for (lib in aList) {
-                        if (MyDebug.DEBUGGING) {
-                            Log.d(
-                                LOG_TAG, "Scanning library [" + lib.libraryTitle
-                                        + "] before has ["
-                                        + getBooksForLibrary(lib).size
-                                        + "] ebooks"
-                            )
-                        }
+                        Log.d(
+                            LOG_TAG, "Scanning library [" + lib.libraryTitle + "] before has ["
+                                    + getBooksForLibrary(lib).size + "] ebooks"
+                        )
                         initiateScan(prgBrHandler, handler, lib)
                     }
                 }

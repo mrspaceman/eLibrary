@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:app="http://schemas.android.com/apk/res-auto"
-                xmlns:card_view="http://schemas.android.com/apk/res-auto"
-                xmlns:tools="http://schemas.android.com/tools"
-                android:id="@+id/activity_book_lib_book_details"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:paddingBottom="@dimen/activity_vertical_margin"
-                android:paddingLeft="@dimen/activity_horizontal_margin"
-                android:paddingRight="@dimen/activity_horizontal_margin"
-                android:paddingTop="@dimen/activity_vertical_margin"
-                tools:context="uk.co.droidinactu.elibrary.BookLibBookDetailsActivity">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_book_lib_book_details"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    tools:context="uk.co.droidinactu.elibrary.BookLibBookDetailsActivity">
 
 
     <uk.co.droidinactu.elibrary.badgedimageview.BadgedImageView
@@ -26,7 +26,7 @@
         app:badgeColor="@color/accent"
         app:badgeGravity="top|right"
         app:badgePadding="5dp"
-        app:srcCompat="@drawable/generic_book_cover"/>
+        app:srcCompat="@drawable/generic_book_cover" />
 
     <EditText
         android:id="@+id/book_details_title"
@@ -39,33 +39,33 @@
         android:maxLines="3"
         android:padding="2dp"
         android:text="ebook\ntitle"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large"/>
+        android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
     <EditText
         android:id="@+id/book_details_filename"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignStart="@id/book_details_title"
         android:layout_below="@id/book_details_title"
+        android:layout_alignStart="@id/book_details_title"
         android:gravity="center"
         android:lines="3"
         android:maxLines="3"
         android:padding="2dp"
         android:text="ebook\ntitle"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
     <EditText
         android:id="@+id/book_details_author"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/book_details_title"
         android:layout_below="@+id/book_details_filename"
+        android:layout_alignStart="@+id/book_details_title"
         android:gravity="center"
         android:lines="3"
         android:maxLines="3"
         android:padding="2dp"
         android:text="ebook\ntitle"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
     <TextView
         android:id="@+id/book_details_added_to_lib"
@@ -76,30 +76,30 @@
         android:gravity="center"
         android:padding="2dp"
         android:text="xx yyy zzzz"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
     <TextView
         android:id="@+id/book_details_lib_entry_modified"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@id/book_details_title"
         android:layout_above="@id/book_details_added_to_lib"
+        android:layout_alignLeft="@id/book_details_title"
         android:gravity="center"
         android:padding="2dp"
         android:text="xx yyy zzzz"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
     <ListView
         android:id="@+id/book_details_tags"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@id/book_details_cover"
         android:layout_below="@id/book_details_cover"
+        android:layout_alignLeft="@id/book_details_cover"
         android:gravity="center"
         android:lines="3"
         android:maxLines="3"
         android:padding="2dp"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
     <ImageView
         android:id="@+id/book_details_context_menu"
@@ -108,6 +108,6 @@
         android:layout_alignEnd="@id/book_details_cover"
         android:layout_marginTop="6dp"
         android:padding="2dp"
-        card_view:srcCompat="@drawable/ic_dots_vertical_black_24dp"/>
+        card_view:srcCompat="@drawable/ic_dots_vertical_black_24dp" />
 
 </RelativeLayout>

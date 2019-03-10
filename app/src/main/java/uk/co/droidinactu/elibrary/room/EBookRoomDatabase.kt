@@ -6,6 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import uk.co.droidinactu.elibrary.BookLibApplication
+import uk.co.droidinactu.elibrary.library.LibraryManager
 
 @Database(
     entities = arrayOf(
@@ -15,7 +16,9 @@ import uk.co.droidinactu.elibrary.BookLibApplication
         Library::class,
         EBookAuthorLink::class,
         EBookTagLink::class
-    ), version = 1
+    ),
+    exportSchema = true,
+    version = 1
 )
 @TypeConverters(FiletypeConverter::class)
 abstract class EBookRoomDatabase : RoomDatabase() {
@@ -36,7 +39,7 @@ abstract class EBookRoomDatabase : RoomDatabase() {
                 synchronized(EBookRoomDatabase::class) {
                     INSTANCE = Room.databaseBuilder(
                         BookLibApplication.instance.applicationContext,
-                        EBookRoomDatabase::class.java, "ebooks.db"
+                        EBookRoomDatabase::class.java, LibraryManager.DB_NAME
                     )
                         .build()
                 }
@@ -47,5 +50,6 @@ abstract class EBookRoomDatabase : RoomDatabase() {
         fun destroyInstance() {
             INSTANCE = null
         }
+
     }
 }

@@ -81,11 +81,11 @@ class BookLibApplication : Application() {
             private set
     }
 
-    /*
-         * (non-Javadoc)
-         *
-         * @see android.app.Application#onCreate()
-         */
+    /**
+     * (non-Javadoc)
+     *
+     * @see android.app.Application#onCreate()
+     */
     override fun onCreate() {
         super.onCreate()
         instance = this
@@ -106,7 +106,7 @@ class BookLibApplication : Application() {
     }
 
 
-    /*
+    /**
      * (non-Javadoc)
      *
      * @see android.app.Application#onTerminate()
@@ -128,30 +128,31 @@ class BookLibApplication : Application() {
 
     fun copyDbFileToSd(dbName: String) {
         try {
-            val sd = Environment.getExternalStorageDirectory()
-            val data = Environment.getDataDirectory()
+            var sd = Environment.getExternalStorageDirectory()
+            //   val data = Environment.getDataDirectory()
 
-            //            sd = new FileTreeNode("/storage/9C33-6BBD/");
-            //            sd = new FileTreeNode("/sdcard/");
+            val dbPath = getDatabasePath(dbName)
+
+            sd = File("/storage/9C33-6BBD/")
 
             if (isExternalStorageWritable()) {
                 val someDate = DateTime()
-                val currentDBPath = "//data//$packageName//databases//$dbName"
                 val sdfFile = DateTimeFormat.forPattern("yyyy-MM-dd")
                 val backupDBPath =
                     sd.path + File.separator + dbName + "-" + someDate.toString(sdfFile)
-                val currentDB = File(data, currentDBPath)
-                val backupDB = File(sd, backupDBPath)
 
-                if (currentDB.exists()) {
-                    copyFileUsingApacheCommonsIO(currentDB.absolutePath, backupDBPath)
+
+                if (dbPath.exists()) {
+                    copyFileUsingApacheCommonsIO(dbPath.absolutePath, backupDBPath)
                     Log.d(LOG_TAG, "Database file backed up to sdcard")
+                } else {
+                    Log.d(LOG_TAG, "Can't find Database file [$dbPath]")
                 }
             } else {
                 Log.d(LOG_TAG, "External Storage not writable")
             }
         } catch (e: Exception) {
-            Log.e(LOG_TAG, "Exception backing up database")
+            Log.e(LOG_TAG, "Exception backing up database", e)
         }
     }
 
@@ -222,7 +223,7 @@ class BookLibApplication : Application() {
 
     fun getAppVersionName(packageName: String): String {
         try {
-            val pInfo = packageManager.getPackageInfo(packageName, PackageManager.GET_META_DATA)
+            val pInfo = packageManager.getPackageInfo(getPackageName(), PackageManager.GET_META_DATA)
             return pInfo.versionName
         } catch (e: PackageManager.NameNotFoundException) {
             e.printStackTrace()

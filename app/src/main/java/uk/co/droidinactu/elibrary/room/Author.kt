@@ -6,10 +6,10 @@ import androidx.room.PrimaryKey
 import org.jetbrains.annotations.NotNull
 
 @Entity(tableName = "authors")
-class Author(firstname: String, lastname: String) {
+class Author() {
 
     @PrimaryKey(autoGenerate = true)
-    var id: Int = 0
+    var id: Long = 0
 
     @ColumnInfo
     @NotNull

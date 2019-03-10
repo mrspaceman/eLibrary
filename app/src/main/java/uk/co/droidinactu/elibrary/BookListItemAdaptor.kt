@@ -12,8 +12,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.recyclerview.widget.RecyclerView
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.uiThread
 import uk.co.droidinactu.elibrary.badgedimageview.BadgedImageView
-import uk.co.droidinactu.elibrary.library.LibraryManager
 import uk.co.droidinactu.elibrary.room.EBook
 import uk.co.droidinactu.elibrary.room.FileType
 import uk.co.droidinactu.elibrary.room.Tag
@@ -27,12 +28,10 @@ class BookListItemAdaptor(private val mBooks: MutableList<EBook>) :
     RecyclerView.Adapter<BookListItemAdaptor.ViewHolder>() {
 
     private val NOTIFY_DELAY = 500
-    private var libMgr: LibraryManager? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val v = LayoutInflater.from(parent.context)
             .inflate(R.layout.book_list_item, parent, false)
-        libMgr = BookLibApplication.instance.getLibManager()
         return ViewHolder(v)
     }
 
@@ -134,16 +133,20 @@ class BookListItemAdaptor(private val mBooks: MutableList<EBook>) :
         }
 
         private fun openBook(ctx: Context, selectedFileType: String) {
-            BookLibApplication.instance.getLibManager().addTagToBook(
-                Tag.CURRENTLY_READING,
-                ebk
-            )
-            val i = BookLibApplication.instance.getLibManager().getOpenIntentForBook(
-                ebk!!,
-                selectedFileType
-            )
-            if (i != null) {
-                ctx.startActivity(i)
+            doAsync {
+                BookLibApplication.instance.getLibManager().addTagToBook(
+                    Tag.CURRENTLY_READING,
+                    ebk
+                )
+                val i = BookLibApplication.instance.getLibManager().getOpenIntentForBook(
+                    ebk!!,
+                    selectedFileType
+                )
+                if (i != null) {
+                    uiThread {
+                        ctx.startActivity(i)
+                    }
+                }
             }
         }
 

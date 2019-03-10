@@ -24,10 +24,10 @@ class EBook() {
     var tags: MutableList<Tag> = ArrayList()
 
     @PrimaryKey(autoGenerate = true)
-    var id: Int = 0
+    var id: Long = 0
 
     @ColumnInfo
-    var inLibraryId = -1
+    var inLibraryId = -1L
 
     @ColumnInfo
     @NotNull

@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull
 class Library {
 
     @PrimaryKey(autoGenerate = true)
-    var id: Int = 0
+    var id: Long = 0
 
     @ColumnInfo
     @NotNull

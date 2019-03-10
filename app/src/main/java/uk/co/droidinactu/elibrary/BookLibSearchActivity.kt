@@ -8,6 +8,8 @@ import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.uiThread
 
 class BookLibSearchActivity : AppCompatActivity() {
 
@@ -52,10 +54,14 @@ class BookLibSearchActivity : AppCompatActivity() {
         cbDirs?.setSelected(true)
 
         btnSearch?.setOnClickListener {
-            val bklist = BookLibApplication.instance.getLibManager()
-                .searchBooksMatching(txtSearchText?.getText().toString())
-            bkListSearchAdaptor = BookListItemAdaptor(bklist)
-            bkListSearch?.setAdapter(bkListSearchAdaptor)
+            doAsync {
+                val bklist = BookLibApplication.instance.getLibManager()
+                    .searchBooksMatching(txtSearchText?.getText().toString())
+                uiThread {
+                    bkListSearchAdaptor = BookListItemAdaptor(bklist)
+                    bkListSearch?.setAdapter(bkListSearchAdaptor)
+                }
+            }
         }
     }
 

@@ -11,7 +11,7 @@ interface EBookDao {
     fun getAll(): MutableList<EBook>
 
     @Query("SELECT * FROM ebooks WHERE inLibraryId IN (:inLibraryId)")
-    fun getAllInLibrary(inLibraryId: Int): MutableList<EBook>
+    fun getAllInLibrary(inLibraryId: Long): MutableList<EBook>
 
     @Query("SELECT * FROM ebooks WHERE bookTitle like '%' || :titleStr  || '%'")
     fun getAllWithTitle(titleStr: String): MutableList<EBook>

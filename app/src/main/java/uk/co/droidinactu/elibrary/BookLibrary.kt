@@ -82,11 +82,15 @@ class BookLibrary : AppCompatActivity() {
          */
         override fun handleMessage(inputMessage: Message) {
             val libTitle = inputMessage.obj as String
-            val bklist = BookLibApplication.instance.getLibManager().getBooks()
-            Log.d(LOG_TAG, "Library [" + libTitle + "] Updated. Now contains [" + bklist.size + "] ebooks")
-            progressBarContainer?.setVisibility(View.GONE)
-            updateLists()
-            fab?.setEnabled(true)
+            doAsync {
+                val bklist = BookLibApplication.instance.getLibManager().getBooks()
+                uiThread {
+                    Log.d(LOG_TAG, "Library [" + libTitle + "] Updated. Now contains [" + bklist.size + "] ebooks")
+                    progressBarContainer?.setVisibility(View.GONE)
+                    updateLists()
+                    fab?.setEnabled(true)
+                }
+            }
         }
     }
     private val ebkChngdListener = EBookChangedReceiver()
@@ -222,8 +226,10 @@ class BookLibrary : AppCompatActivity() {
                 progressBar?.setProgress(0)
                 progressBar?.setVisibility(View.VISIBLE)
                 progressBarContainer?.setVisibility(View.VISIBLE)
-                BookLibApplication.instance.getLibManager()
-                    .addLibrary(prgBrHandler, mHandler, libraryName, files[0])
+                doAsync {
+                    BookLibApplication.instance.getLibManager()
+                        .addLibrary(prgBrHandler, mHandler, libraryName, files[0])
+                }
             }
         }
         dialog.show()
@@ -327,13 +333,13 @@ class BookLibrary : AppCompatActivity() {
             val nbrBooks = BookLibApplication.instance.getLibManager().getBooks().size
             uiThread {
                 progressBar?.setMax(nbrBooks)
+                progressBar?.setProgress(0)
+                progressBar?.setVisibility(View.VISIBLE)
+                progressBarContainer?.setVisibility(View.VISIBLE)
             }
+            BookLibApplication.instance.getLibManager().refreshLibraries(prgBrHandler, mHandler)
+            scheduleNextLibraryScan()
         }
-        progressBar?.setProgress(0)
-        progressBar?.setVisibility(View.VISIBLE)
-        progressBarContainer?.setVisibility(View.VISIBLE)
-        BookLibApplication.instance.getLibManager().refreshLibraries(prgBrHandler, mHandler)
-        scheduleNextLibraryScan()
     }
 
     private fun showSettings() {
