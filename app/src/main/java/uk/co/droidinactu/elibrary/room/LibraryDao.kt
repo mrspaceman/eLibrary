@@ -20,4 +20,7 @@ interface LibraryDao {
     @Delete
     fun delete(obj: Library)
 
+    @Query("delete FROM libraries")
+    fun clear()
+
 }

@@ -10,13 +10,8 @@ interface EBookTagLinkDao {
     @Query("SELECT * FROM ebooktaglink")
     fun getAll(): List<EBookTagLink>
 
-//    @Query("SELECT * FROM ebooks INNER JOIN ebooktaglink ON ebooks.id=ebooktaglink.ebookId WHERE ebooktaglink.tagId=:tagId")
-//    fun getBooksForTag(tagId: Int): MutableList<EBook>
-//
-//    @Query(
-//        "SELECT * FROM tags INNER JOIN ebooktaglink ON tags.id = ebooktaglink.tagId WHERE ebooktaglink.ebookId =:ebookId"
-//    )
-//    fun getTagsForBook(ebookId: Int): MutableList<Tag>
+    @Query("SELECT * FROM ebooktaglink WHERE ebookId=:bookId and tagId=:tagId")
+    fun getBookTagLink(bookId: Long, tagId: Long): EBookTagLink
 
     @Insert
     fun insert(obj: EBookTagLink)
@@ -26,5 +21,8 @@ interface EBookTagLinkDao {
 
     @Delete
     fun delete(obj: EBookTagLink)
+
+    @Query("delete FROM ebooktaglink")
+    fun clear()
 
 }

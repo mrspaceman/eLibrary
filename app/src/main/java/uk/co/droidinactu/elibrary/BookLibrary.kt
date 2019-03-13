@@ -129,7 +129,7 @@ class BookLibrary : AppCompatActivity() {
                     "uk.co.droidinactu.elibrary"
                 )
             } catch (e: Exception) {
-                error(LOG_TAG + "Exception getting app vername")
+                Log.e(LOG_TAG, "Exception getting app vername")
             }
             supportActionBar!!.setTitle(
                 appTitle + " (" + appVerName + ")"

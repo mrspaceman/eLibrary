@@ -12,9 +12,7 @@ import nl.siegmann.epublib.epub.EpubReader
 import uk.co.droidinactu.elibrary.BookLibApplication
 import uk.co.droidinactu.elibrary.BookLibApplication.Companion.LOG_TAG
 import uk.co.droidinactu.elibrary.R
-import uk.co.droidinactu.elibrary.room.EBook
-import uk.co.droidinactu.elibrary.room.FileType
-import uk.co.droidinactu.elibrary.room.Tag
+import uk.co.droidinactu.elibrary.room.*
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
@@ -100,7 +98,11 @@ class LibraryScanner {
             completeMessage.sendToTarget()
         }
         for (filename in filenames) {
-            readFile(ctx, libname, filename)
+            try {
+                readFile(ctx, libname, filename)
+            } catch (e: Exception) {
+                Log.e(LOG_TAG, "Exception reading book file [" + filename + "] " + e.message)
+            }
             currReadFiles++
             if (prgBrHandler != null && currReadFiles % 5 == 0) {
                 val completeMessage = prgBrHandler!!.obtainMessage(64, "$libname:$currReadFiles:$maxFiles")
@@ -128,9 +130,9 @@ class LibraryScanner {
                 }
                 epubInputStream.close()
             } catch (e: IOException) {
-                error(LOG_TAG + "Failed to read epub details from [" + filename + "] " + e.message)
+                Log.e(LOG_TAG, "Failed to read epub details from [" + filename + "] " + e.message)
             } catch (npe: NullPointerException) {
-                error(LOG_TAG + "NullPointerException reading epub details from [" + filename + "] " + npe.message)
+                Log.e(LOG_TAG, "NullPointerException reading epub details from [" + filename + "] " + npe.message)
             }
 
         } else {
@@ -163,9 +165,9 @@ class LibraryScanner {
             pdfiumCore!!.closeDocument(pdfDocument)
 
         } catch (e: FileNotFoundException) {
-            error(LOG_TAG + "FileNotFoundException reading pdf file [" + filename + "] " + e.message)
+            Log.e(LOG_TAG, "FileNotFoundException reading pdf file [" + filename + "] " + e.message)
         } catch (e1: IOException) {
-            error(LOG_TAG + "IOException reading pdf file [" + filename + "] " + e1.message)
+            Log.e(LOG_TAG, "IOException reading pdf file [" + filename + "] " + e1.message)
         }
 
     }
@@ -247,21 +249,27 @@ class LibraryScanner {
     @Synchronized
     private fun addEBookToLibraryStorage(ctx: Context, libName: String, ebk: EBook) {
         Log.d(LOG_TAG, "LibraryScanner::addEBookToLibraryStorage() started")
-        libMgr!!.addBookToLibrary(libName, ebk)
-//        for (t in ebk.tags) {
-//            libMgr!!.addTagToBook(t.getTag(), ebk)
-//        }
-//        for (ft in ebk.filetypes) {
-//            libMgr!!.addFileTypeToBook(ft, ebk)
-//        }
+        libMgr!!.updateBook(ebk)
+        for (t in ebk.tags) {
+            var ebkTg = EBookTagLink()
+            ebkTg.ebookId = ebk.id
+            ebkTg.tagId = t.id
+            libMgr?.addEbookTagLink(ebkTg)
+        }
+        for (a in ebk.authors) {
+            var ebkAuth = EBookAuthorLink()
+            ebkAuth.ebookId = ebk.id
+            ebkAuth.authorId = a.id
+            libMgr?.addEbookAuthorLink(ebkAuth)
+        }
     }
 
     private fun readFile(ctx: Context, libname: String, filename: String) {
         Log.d(LOG_TAG, "LibraryScanner::readFile($filename) started")
         val f = File(filename)
 
-        val ebk = EBook()
-        ebk.inLibraryId = libMgr!!.getLibrary(libname).id
+        val ebk = libMgr!!.getBook(filename, libname)
+        //  ebk.inLibraryId = libMgr!!.getLibrary(libname).id
         ebk.fileDir = f.parent
         ebk.fileName = filename.substring(ebk.fileDir.length + 1)
         ebk.lastModified = f.lastModified()

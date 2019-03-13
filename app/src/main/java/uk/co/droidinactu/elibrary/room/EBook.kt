@@ -7,7 +7,6 @@ import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import org.jetbrains.annotations.NotNull
 import java.io.ByteArrayOutputStream
-import java.util.*
 
 /**
  * Created by aspela on 31/08/16.
@@ -15,13 +14,13 @@ import java.util.*
 @Entity(tableName = "ebooks")
 class EBook() {
 
-    var filetypes: MutableList<FileType> = ArrayList()
+    var filetypes = mutableListOf<FileType>()
 
     @Ignore
-    var authors: MutableList<Author> = ArrayList()
+    var authors = mutableListOf<Author>()
 
     @Ignore
-    var tags: MutableList<Tag> = ArrayList()
+    var tags = mutableListOf<Tag>()
 
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0
@@ -132,18 +131,30 @@ class EBook() {
     }
 
     fun addTag(pTag: Tag) {
-        this.tags.add(pTag)
+        if (!tags.contains(pTag)) {
+            this.tags.add(pTag)
+        }
     }
 
     fun addFileType(pFiletype: FileType) {
-        filetypes.add(pFiletype)
+        if (!filetypes.contains(pFiletype)) {
+            filetypes.add(pFiletype)
+        }
     }
 
     fun addFileType(pFiletype: String) {
         filetypes.add(FileType.valueOf(pFiletype))
     }
 
-    fun addAuthors(pAuthors: List<nl.siegmann.epublib.domain.Author>) {}
+    fun addAuthors(pAuthors: List<nl.siegmann.epublib.domain.Author>) {
+        for (anAuth in pAuthors) {
+            var a = Author()
+            a.firstname = anAuth.firstname
+            a.lastname = anAuth.lastname
+            addAuthor(a)
+        }
+    }
+
     fun addAuthor(author: Author) {
         authors.add(author)
     }

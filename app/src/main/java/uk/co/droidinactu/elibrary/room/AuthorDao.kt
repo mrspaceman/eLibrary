@@ -25,4 +25,8 @@ interface AuthorDao {
 
     @Delete
     fun delete(obj: Author)
+
+    @Query("delete FROM authors")
+    fun clear()
+
 }

@@ -30,22 +30,29 @@ val Context.myApp: BookLibApplication
 
 class BookLibApplication : Application() {
 
-    val IS_DEBUGGING = true
+    companion object {
+        val LOG_TAG = BookLibApplication::class.java.simpleName
 
-    val LINE_SEPARATOR = System.getProperty("line.separator")
-    val sdf = DateTimeFormat.forPattern("yyyy-MM-dd")
-    val logDataFmt = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS")
-    val simpleDateFmtStrView = "dd-MMM-yyyy"
-    val simpleDateFmtStrDb = "yyyyMMdd"
+        lateinit var instance: BookLibApplication
+            private set
 
-    val minsFmt = DecimalFormat("#0")
-    val kmFmt = DecimalFormat("#0.0")
-    val decFmt = DecimalFormat("#0.00")
-    val gbp = DecimalFormat("£#0.00")
+        val IS_DEBUGGING = true
 
-    val ONE_SECOND = 1000
-    val ONE_MINUTE = 60000
-    val BLE_DEVICE_SCAN_PERIOD: Long = 10000
+        val LINE_SEPARATOR = System.getProperty("line.separator")
+        val sdf = DateTimeFormat.forPattern("yyyy-MM-dd")
+        val logDataFmt = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS")
+        val simpleDateFmtStrView = "dd-MMM-yyyy"
+        val simpleDateFmtStrDb = "yyyyMMdd"
+
+        val minsFmt = DecimalFormat("#0")
+        val kmFmt = DecimalFormat("#0.0")
+        val decFmt = DecimalFormat("#0.00")
+        val gbp = DecimalFormat("£#0.00")
+
+        val ONE_SECOND = 1000
+        val ONE_MINUTE = 60000
+        val BLE_DEVICE_SCAN_PERIOD: Long = 10000
+    }
 
     fun addFileWatcher(libname: String?, rootdir: String?) {
         if (libname != null && rootdir != null) {
@@ -74,13 +81,6 @@ class BookLibApplication : Application() {
 
     private lateinit var fileObserverService: FileObserverService
 
-    companion object {
-        val LOG_TAG = BookLibApplication::class.java.simpleName
-
-        lateinit var instance: BookLibApplication
-            private set
-    }
-
     /**
      * (non-Javadoc)
      *
@@ -91,7 +91,7 @@ class BookLibApplication : Application() {
         instance = this
         Log.d(LOG_TAG, "onCreate(); application being created.")
 
-        copyDbFileToSd(LibraryManager.DB_NAME)
+        //     copyDbFileToSd(LibraryManager.DB_NAME)
 
         libMgr = LibraryManager()
         try {
@@ -134,6 +134,7 @@ class BookLibApplication : Application() {
             val dbPath = getDatabasePath(dbName)
 
             sd = File("/storage/9C33-6BBD/")
+            sd = File("/sdcard")
 
             if (isExternalStorageWritable()) {
                 val someDate = DateTime()
@@ -141,15 +142,15 @@ class BookLibApplication : Application() {
                 val backupDBPath =
                     sd.path + File.separator + dbName + "-" + someDate.toString(sdfFile)
 
-
+                Log.d(LOG_TAG, "copying db file from [$dbPath] to [$backupDBPath]")
                 if (dbPath.exists()) {
-                    copyFileUsingApacheCommonsIO(dbPath.absolutePath, backupDBPath)
+                    dbPath.copyTo(File(backupDBPath), true)
                     Log.d(LOG_TAG, "Database file backed up to sdcard")
                 } else {
-                    Log.d(LOG_TAG, "Can't find Database file [$dbPath]")
+                    Log.e(LOG_TAG, "Can't find Database file [$dbPath]")
                 }
             } else {
-                Log.d(LOG_TAG, "External Storage not writable")
+                Log.e(LOG_TAG, "External Storage not writable")
             }
         } catch (e: Exception) {
             Log.e(LOG_TAG, "Exception backing up database", e)

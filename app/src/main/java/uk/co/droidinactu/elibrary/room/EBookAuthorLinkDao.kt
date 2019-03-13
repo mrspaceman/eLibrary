@@ -27,4 +27,7 @@ interface EBookAuthorLinkDao {
     @Delete
     fun delete(obj: EBookAuthorLink)
 
+    @Query("delete FROM ebookauthorlink")
+    fun clear()
+
 }

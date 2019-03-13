@@ -61,10 +61,44 @@ class LibraryManager {
             intent.putExtra("libname", libname)
             BookLibApplication.instance.applicationContext.startService(intent)
         }
+        ebookDao.clear()
+        ebookAuthorDao.clear()
+        ebookTagDao.clear()
+        authorDao.clear()
+        tagDao.clear()
+        libraryDao.clear()
     }
 
     /** EBook CRUB */
     //region ebooks
+    fun addBookToLibrary(libname: String, ebk: EBook) {
+        ebk.inLibraryId = libraryDao.getByName(libname).id
+        try {
+            val newId = ebookDao.insert(ebk)
+        } catch (pE: java.sql.SQLException) {
+            Log.e(LOG_TAG, "Exception adding book to library", pE)
+        }
+    }
+
+    fun getBook(fullFilename: String): EBook {
+        return getBook(fullFilename, getLibraries().get(0).libraryTitle)
+    }
+
+    fun updateBook(ebk: EBook) {
+        ebookDao.update(ebk)
+    }
+
+    fun getBook(fullFilename: String, libname: String): EBook {
+        var ebk = ebookDao.getBookFromFilname(fullFilename)
+        if (ebk == null) {
+            ebk = EBook()
+            ebk.fullFileDirName = fullFilename
+            addBookToLibrary(libname, ebk)
+            ebk = ebookDao.getBookFromFilname(fullFilename)
+        }
+        return ebk
+    }
+
     fun getOpenIntentForBook(pEbk: EBook, pSelectedFileType: String): Intent? {
         var intent: Intent? = null
         if (pSelectedFileType == "epub") {
@@ -76,7 +110,7 @@ class LibraryManager {
                 intent.action = Intent.ACTION_VIEW
                 intent.setDataAndType(ebkURI, "application/epub+zip")
             } else {
-                error(LOG_TAG + "EBook FileTreeNode Not Found so remove from library [" + pEbk.fullFileDirName + "]")
+                Log.e(LOG_TAG, "EBook FileTreeNode Not Found so remove from library [" + pEbk.fullFileDirName + "]")
                 //FIXME:     BookLibApplication.instance.getLibManager().removeBook(pEbk)
             }
         } else {
@@ -88,7 +122,7 @@ class LibraryManager {
                 intent.action = Intent.ACTION_VIEW
                 intent.setDataAndType(ebkURI, "application/pdf")
             } else {
-                error(LOG_TAG + "EBook FileTreeNode Not Found so remove from library [" + pEbk.fullFileDirName + "]")
+                Log.e(LOG_TAG, "EBook FileTreeNode Not Found so remove from library [" + pEbk.fullFileDirName + "]")
                 //FIXME:  BookLibApplication.instance.getLibManager().removeBook(pEbk)
             }
         }
@@ -106,7 +140,6 @@ class LibraryManager {
     fun getBooksForTag(tagStr: String, subtags: Boolean): MutableList<EBook> {
         return ebookDao.getAllForTag(tagStr)
     }
-
 
     fun searchBooksMatching(titleStr: String): MutableList<EBook> {
         return ebookDao.getAllWithTitle(titleStr)
@@ -130,6 +163,13 @@ class LibraryManager {
         return authorDao.getByName(pFirstname, pLastname)
     }
 
+    fun addEbookAuthorLink(ebkAuth: EBookAuthorLink) {
+        var a = ebookTagDao.getBookTagLink(ebkAuth.ebookId, ebkAuth.authorId)
+        if (a == null) {
+            ebookAuthorDao.insert(ebkAuth)
+        }
+    }
+
     fun getAuthors(): List<Author> {
         return authorDao.getAll()
     }
@@ -147,6 +187,20 @@ class LibraryManager {
         }
     }
 
+    fun addEbookTagLink(ebkTg: EBookTagLink) {
+        var t = ebookTagDao.getBookTagLink(ebkTg.ebookId, ebkTg.tagId)
+        if (t == null) {
+            ebookTagDao.insert(ebkTg)
+        }
+    }
+
+    fun getEbookTagLink(ebkTg: EBookTagLink) {
+        var t = ebookTagDao.getBookTagLink(ebkTg.ebookId, ebkTg.tagId)
+        if (t == null) {
+            addEbookTagLink(ebkTg)
+        }
+    }
+
     fun addTag(tagstr: String): Tag {
         var t = tagDao.getTag(tagstr)
         if (t == null) {
@@ -160,7 +214,7 @@ class LibraryManager {
 
     fun getTagList(): List<String> {
         var bookTags = getTags()
-        var tagStrs = ArrayList<String>()
+        var tagStrs = mutableListOf<String>()
         for (t in bookTags) {
             tagStrs.add(t.tag)
         }
@@ -186,7 +240,7 @@ class LibraryManager {
     }
 
     fun lookupTagsForEBook(ebk: EBook): List<Tag> {
-        var result = ArrayList<Tag>()
+        var result = mutableListOf<Tag>()
 
 //        if (tagsForEBookQuery == null) {
 //            QueryBuilder<EBookTags, Long> dbQryBld = dbHelper . getEBookTagsDao ().queryBuilder();
@@ -217,10 +271,8 @@ class LibraryManager {
 
     fun getLibraryList(): List<String> {
         val aList = getLibraries()
-        val strLst = java.util.ArrayList<String>()
-        for (t in aList) {
-            strLst.add(t.libraryTitle)
-        }
+        val strLst = ArrayList<String>()
+        aList.stream().forEach { t -> { strLst.add(t.libraryTitle) } }
         return strLst
     }
 
@@ -230,7 +282,7 @@ class LibraryManager {
         } catch (e: Exception) {
             Log.e(LOG_TAG, "Exception getting libraries: ", e)
         }
-        return ArrayList()
+        return mutableListOf<Library>()
     }
 
     fun refreshLibraries(prgBrHandler: Handler?, handler: Handler?) {
@@ -299,18 +351,6 @@ class LibraryManager {
         }
     }
 
-    fun addBookToLibrary(libname: String, ebk: EBook) {
-        ebk.inLibraryId = libraryDao.getByName(libname).id
-        try {
-            ebookDao.insert(ebk)
-            // FIXME : add bookTags
-            // FIXME : add authors
-            // FIXME : add link objects
-        } catch (pE: java.sql.SQLException) {
-            Log.e(LOG_TAG, "Exception adding book to library", pE)
-        }
-    }
-
     private inner class LibraryScanTask : AsyncTask<Any, Void, Void>() {
         private lateinit var prgBrHandler: Handler
         private lateinit var msgHndlr: Handler
@@ -344,7 +384,7 @@ class LibraryManager {
                 val completeMessage = msgHndlr.obtainMessage(64, libTitle)
                 completeMessage.sendToTarget()
             }
-            BookLibApplication.instance.copyDbFileToSd(LibraryManager.DB_NAME)
+            //     BookLibApplication.instance.copyDbFileToSd(LibraryManager.DB_NAME)
             taskComplete = true
             LibraryCheckLinksTask().execute(msgHndlr, libRootDir)
         }
@@ -370,7 +410,10 @@ class LibraryManager {
                     if (File(ebk.fullFileDirName + "." + ft).exists()) {
                         // file exists so we leave it in the library
                     } else {
-                        error(LOG_TAG + "EBook FileTreeNode Not Found so remove from library [" + ebk.fullFileDirName + "]")
+                        Log.e(
+                            LOG_TAG,
+                            "EBook FileTreeNode Not Found so removed from library [" + ebk.fullFileDirName + "]"
+                        )
                         //FIXME : delete book from db
                     }
                 }
@@ -390,7 +433,6 @@ class LibraryManager {
         }
 
     }
-
 
     private fun displayScanningNotification(libname: String) {
         val resultIntent = Intent(BookLibApplication.instance.applicationContext, BookLibrary::class.java)
@@ -421,7 +463,7 @@ class LibraryManager {
     //endregion
 
     companion object {
-        val DB_NAME = "books-db"
+        val DB_NAME = "books-db.sqlite"
         val DB_NAME_ENC = "books-db-encrypted"
         val CHANNEL_ID = "ScanningChannel"
     }

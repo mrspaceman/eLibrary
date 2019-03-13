@@ -15,7 +15,7 @@ import androidx.room.Index
             childColumns = arrayOf("ebookId")
         ),
         ForeignKey(
-            entity = Author::class,
+            entity = Tag::class,
             parentColumns = arrayOf("id"),
             childColumns = arrayOf("tagId")
         )
