@@ -2,10 +2,14 @@ package uk.co.droidinactu.elibrary.room
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import org.jetbrains.annotations.NotNull
 
-@Entity(tableName = "authors")
+@Entity(
+    tableName = "authors",
+    indices = arrayOf(Index(value = arrayOf("id"), unique = true))
+)
 class Author() {
 
     @PrimaryKey(autoGenerate = true)
