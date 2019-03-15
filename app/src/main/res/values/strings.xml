@@ -100,4 +100,8 @@
     <string name="extstorage">Ext Storage</string>
     <string name="title_activity_book_lib_search">BookLibSearchActivity</string>
     <string name="title_activity_book_lib_book_details">BookLibBookDetailsActivity</string>
+
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
 </resources>

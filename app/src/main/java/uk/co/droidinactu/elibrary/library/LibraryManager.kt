@@ -84,20 +84,33 @@ class LibraryManager {
         return getBook(fullFilename, getLibraries().get(0).libraryTitle)
     }
 
+    fun getBookFromFilename(fileName: String): EBook {
+        return ebookDao.getBookFromFilename(fileName)
+    }
+
+    fun getBookFromFullFilename(fileName: String): EBook {
+        return ebookDao.getBookFromFullFilename(fileName)
+    }
+
+    fun getBookCalled(bookTitle: String): EBook {
+        return ebookDao.getBookCalled(bookTitle)
+    }
+
     fun updateBook(ebk: EBook) {
         ebookDao.update(ebk)
     }
 
     fun getBook(fullFilename: String, libname: String): EBook {
-        var ebk = ebookDao.getBookFromFilname(fullFilename)
+        var ebk = ebookDao.getBookFromFullFilename(fullFilename)
         if (ebk == null) {
             ebk = EBook()
             ebk.fullFileDirName = fullFilename
             addBookToLibrary(libname, ebk)
-            ebk = ebookDao.getBookFromFilname(fullFilename)
+            ebk = ebookDao.getBookFromFilename(fullFilename)
         }
         return ebk
     }
+
 
     fun getOpenIntentForBook(pEbk: EBook, pSelectedFileType: String): Intent? {
         var intent: Intent? = null
@@ -138,7 +151,7 @@ class LibraryManager {
     }
 
     fun getBooksForTag(tagStr: String, subtags: Boolean): MutableList<EBook> {
-        return ebookDao.getAllForTag(tagStr)
+        return ebookDao.getAllForTag(tagDao.getTag(tagStr).id)
     }
 
     fun searchBooksMatching(titleStr: String): MutableList<EBook> {

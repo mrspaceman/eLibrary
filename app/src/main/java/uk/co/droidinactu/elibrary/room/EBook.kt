@@ -1,17 +1,17 @@
 package uk.co.droidinactu.elibrary.room
 
 import android.graphics.*
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.Ignore
-import androidx.room.PrimaryKey
+import androidx.room.*
 import org.jetbrains.annotations.NotNull
 import java.io.ByteArrayOutputStream
 
 /**
  * Created by aspela on 31/08/16.
  */
-@Entity(tableName = "ebooks")
+@Entity(
+    tableName = "ebooks",
+    indices = arrayOf(Index(value = arrayOf("id"), unique = true))
+)
 class EBook() {
 
     var filetypes = mutableListOf<FileType>()
@@ -140,6 +140,10 @@ class EBook() {
         if (!filetypes.contains(pFiletype)) {
             filetypes.add(pFiletype)
         }
+    }
+
+    fun addFileTypes(pFiletype: MutableList<FileType>) {
+        filetypes.addAll(pFiletype)
     }
 
     fun addFileType(pFiletype: String) {

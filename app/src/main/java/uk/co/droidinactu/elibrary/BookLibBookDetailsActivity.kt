@@ -7,8 +7,11 @@ import android.widget.EditText
 import android.widget.ListView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.uiThread
 import org.joda.time.DateTime
 import uk.co.droidinactu.elibrary.badgedimageview.BadgedImageView
+import uk.co.droidinactu.elibrary.room.EBook
 import uk.co.droidinactu.elibrary.room.FileType
 
 class BookLibBookDetailsActivity : AppCompatActivity() {
@@ -48,10 +51,18 @@ class BookLibBookDetailsActivity : AppCompatActivity() {
     }
 
     fun updateBookDetails() {
-
         val libMgr = BookLibApplication.instance.getLibManager()
-        val ebk = libMgr.getBook(bookFullFileDirName)
+        doAsync {
+            val ebk = libMgr.getBook(bookFullFileDirName)
+            if (ebk != null) {
+                uiThread {
+                    updateBookDetails(ebk)
+                }
+            }
+        }
+    }
 
+    private fun updateBookDetails(ebk: EBook) {
         var cvrBmp = ebk!!.coverImageAsBitmap
         if (cvrBmp == null) {
             cvrBmp = BitmapFactory.decodeResource(resources, R.drawable.generic_book_cover)
@@ -65,7 +76,9 @@ class BookLibBookDetailsActivity : AppCompatActivity() {
 
         mTitle.setText(ebk.bookTitle)
         mFilename.setText(ebk.fileName)
-        mAuthor.setText(ebk.authors.get(0).fullName)
+        if (ebk.authors.size > 0) {
+            mAuthor.setText(ebk.authors.get(0).fullName)
+        }
         mCover.setImageBitmap(cvrBmp)
         val ftypes = ebk.filetypes
         if (ftypes.size == 1) {

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".EbookLibrary2">
+
+    <include layout="@layout/toolbar_main" />
+
+    <TextView
+        android:id="@+id/dashboard_books_list_reading_title"
+        style="@style/tag_button_style"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/toolbar"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="2dp"
+        android:text="Recently Read"
+        app:layout_constraintTop_toTopOf="@+id/dashboard_books_list_tag1" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/dashboard_books_list_reading"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/dashboard_books_list_reading_title"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:minHeight="225dp" />
+
+    <Button
+        android:id="@+id/dashboard_books_list_tag1_title"
+        style="@style/tag_button_style"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/dashboard_books_list_reading"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="5dp"
+        android:text="Tag" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/dashboard_books_list_tag1"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_above="@+id/dashboard_books_list_progressbar_container"
+        android:layout_below="@+id/dashboard_books_list_tag1_title"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:minHeight="275dp" />
+
+    <RelativeLayout
+        android:id="@+id/dashboard_books_list_progressbar_container"
+        android:layout_width="match_parent"
+        android:layout_height="50dip"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_above="@id/nav_view"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="50dp"
+        android:maxHeight="50dp"
+        android:minHeight="50dp">
+
+        <ProgressBar
+            android:id="@+id/dashboard_books_list_progressbar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignLeft="@id/dashboard_books_list_progressbar"
+            android:layout_alignTop="@id/dashboard_books_list_progressbar"
+            android:layout_alignRight="@id/dashboard_books_list_progressbar"
+            android:layout_alignBottom="@id/dashboard_books_list_progressbar" />
+
+        <TextView
+            android:id="@+id/dashboard_books_list_progressbar_label"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignLeft="@id/dashboard_books_list_progressbar"
+            android:layout_alignTop="@id/dashboard_books_list_progressbar"
+            android:layout_alignRight="@id/dashboard_books_list_progressbar"
+            android:layout_alignBottom="@id/dashboard_books_list_progressbar"
+            android:background="#00000000" />
+    </RelativeLayout>
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/nav_view"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="0dp"
+        android:layout_marginEnd="0dp"
+        android:background="?android:attr/windowBackground"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:menu="@menu/bottom_nav_menu" />
+
+</RelativeLayout>

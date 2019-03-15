@@ -11,13 +11,22 @@ interface EBookDao {
     fun getAllInLibrary(inLibraryId: Long): MutableList<EBook>
 
     @Query("SELECT * FROM ebooks WHERE fullFileDirName like :filename || '%'")
-    fun getBookFromFilname(filename: String): EBook
+    fun getBookFromFullFilename(filename: String): EBook
+
+    @Query("SELECT * FROM ebooks WHERE fileName = :filename")
+    fun getBookFromFilename(filename: String): EBook
 
     @Query("SELECT * FROM ebooks WHERE bookTitle like '%' || :titleStr  || '%'")
     fun getAllWithTitle(titleStr: String): MutableList<EBook>
 
-    @Query("SELECT * FROM ebooks WHERE bookTitle like '%' || :titleStr  || '%'")
-    fun getAllForTag(titleStr: String): MutableList<EBook>
+    @Query("SELECT * FROM ebooks WHERE bookTitle = :titleStr  limit 1")
+    fun getBookCalled(titleStr: String): EBook
+
+    @Query(
+        "select ebks.* from ebooks ebks where ebks.id in " +
+                "(select bktg.ebookId from ebooktaglink bktg where bktg.tagId = :tagId)"
+    )
+    fun getAllForTag(tagId: Long): MutableList<EBook>
 
     @Update
     fun update(obj: EBook)

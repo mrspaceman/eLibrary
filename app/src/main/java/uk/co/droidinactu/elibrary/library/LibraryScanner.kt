@@ -9,9 +9,9 @@ import android.os.ParcelFileDescriptor
 import android.util.Log
 import com.shockwave.pdfium.PdfiumCore
 import nl.siegmann.epublib.epub.EpubReader
+import org.apache.commons.io.FilenameUtils
 import uk.co.droidinactu.elibrary.BookLibApplication
 import uk.co.droidinactu.elibrary.BookLibApplication.Companion.LOG_TAG
-import uk.co.droidinactu.elibrary.R
 import uk.co.droidinactu.elibrary.room.*
 import java.io.File
 import java.io.FileInputStream
@@ -20,6 +20,7 @@ import java.io.IOException
 import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+
 
 /**
  * Created by aspela on 31/08/16.
@@ -249,16 +250,24 @@ class LibraryScanner {
     @Synchronized
     private fun addEBookToLibraryStorage(ctx: Context, libName: String, ebk: EBook) {
         Log.d(LOG_TAG, "LibraryScanner::addEBookToLibraryStorage() started")
-        libMgr!!.updateBook(ebk)
+        var dbEbk = libMgr!!.getBookFromFullFilename(ebk.fullFileDirName)
+        if (dbEbk == null) {
+            libMgr!!.addBookToLibrary(libName, ebk)
+            dbEbk = libMgr!!.getBookCalled(ebk.bookTitle)
+
+        } else {
+            dbEbk.addFileTypes(ebk.filetypes)
+            libMgr!!.updateBook(dbEbk)
+        }
         for (t in ebk.tags) {
             var ebkTg = EBookTagLink()
-            ebkTg.ebookId = ebk.id
+            ebkTg.ebookId = dbEbk.id
             ebkTg.tagId = t.id
             libMgr?.addEbookTagLink(ebkTg)
         }
         for (a in ebk.authors) {
             var ebkAuth = EBookAuthorLink()
-            ebkAuth.ebookId = ebk.id
+            ebkAuth.ebookId = dbEbk.id
             ebkAuth.authorId = a.id
             libMgr?.addEbookAuthorLink(ebkAuth)
         }
@@ -268,12 +277,18 @@ class LibraryScanner {
         Log.d(LOG_TAG, "LibraryScanner::readFile($filename) started")
         val f = File(filename)
 
-        val ebk = libMgr!!.getBook(filename, libname)
-        //  ebk.inLibraryId = libMgr!!.getLibrary(libname).id
+        val ebk = EBook()
+        ebk.inLibraryId = libMgr!!.getLibrary(libname).id
         ebk.fileDir = f.parent
         ebk.fileName = filename.substring(ebk.fileDir.length + 1)
+        ebk.fileName = FilenameUtils.removeExtension(filename.substring(ebk.fileDir.length + 1))
         ebk.lastModified = f.lastModified()
-        ebk.setCoverImageFromBitmap(BitmapFactory.decodeResource(ctx.resources, R.drawable.generic_book_cover))
+        ebk.setCoverImageFromBitmap(
+            BitmapFactory.decodeResource(
+                ctx.resources,
+                uk.co.droidinactu.elibrary.R.drawable.generic_book_cover
+            )
+        )
 
         try {
             var tagStrs =

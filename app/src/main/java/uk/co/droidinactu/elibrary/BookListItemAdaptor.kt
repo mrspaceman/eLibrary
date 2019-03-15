@@ -142,14 +142,13 @@ class BookListItemAdaptor(private val mBooks: MutableList<EBook>) :
                     ebk!!,
                     selectedFileType
                 )
-                if (i != null) {
-                    uiThread {
+                uiThread {
+                    if (i != null) {
                         ctx.startActivity(i)
                     }
                 }
             }
         }
-
 
         override fun onMenuItemClick(item: MenuItem): Boolean {
             Toast.makeText(mOverflowIcon.context, "DO SOME STUFF HERE\n" + ebk!!.bookTitle, Toast.LENGTH_LONG).show()

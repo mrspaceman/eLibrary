@@ -17,7 +17,7 @@ import uk.co.droidinactu.elibrary.library.LibraryManager
         EBookAuthorLink::class,
         EBookTagLink::class
     ),
-    exportSchema = true,
+    exportSchema = false,
     version = 1
 )
 @TypeConverters(FiletypeConverter::class)

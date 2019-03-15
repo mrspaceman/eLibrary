@@ -8,6 +8,7 @@ import androidx.room.Index
 @Entity(
     tableName = "ebookauthorlink",
     primaryKeys = arrayOf("ebookId", "authorId"),
+    indices = arrayOf(Index(value = arrayOf("ebookId", "authorId"), unique = true)),
     foreignKeys = arrayOf(
         ForeignKey(
             entity = EBook::class,
@@ -19,8 +20,7 @@ import androidx.room.Index
             parentColumns = arrayOf("id"),
             childColumns = arrayOf("authorId")
         )
-    ),
-    indices = arrayOf(Index(value = ["ebookId", "authorId"]))
+    )
 )
 class EBookAuthorLink() {
 
