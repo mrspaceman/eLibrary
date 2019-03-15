@@ -9,7 +9,7 @@ buildscript {
         materialVersion = "1.1.0-alpha04"
         navigationVersion = "2.0.0"
         constraintLayoutVersion = "2.0.0-alpha3"
-        androidRoomVersion = "2.1.0-alpha05"
+        androidRoomVersion = "2.1.0-alpha04"
         androidWorkVersion = "1.0.0"
     }
 
