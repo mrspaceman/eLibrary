@@ -26,6 +26,8 @@ import com.github.angads25.filepicker.model.DialogConfigs
 import com.github.angads25.filepicker.model.DialogProperties
 import com.github.angads25.filepicker.view.FilePickerDialog
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.unnamed.b.atv.model.TreeNode
+import com.unnamed.b.atv.view.AndroidTreeView
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import uk.co.droidinactu.elibrary.BookLibApplication.Companion.LOG_TAG
@@ -33,6 +35,7 @@ import uk.co.droidinactu.elibrary.library.FileObserverService
 import uk.co.droidinactu.elibrary.library.LibraryManager
 import uk.co.droidinactu.elibrary.library.RecursiveFileObserver.Companion.INTENT_EBOOK_MODIFIED
 import uk.co.droidinactu.elibrary.library.RecursiveFileObserver.Companion.INTENT_EBOOK_MODIFIED_PATH
+import uk.co.droidinactu.elibrary.library.TagTree
 import uk.co.droidinactu.elibrary.room.Tag
 import java.io.File
 import java.util.*
@@ -111,7 +114,6 @@ class BookLibrary : AppCompatActivity() {
         }
     }
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -150,7 +152,7 @@ class BookLibrary : AppCompatActivity() {
         bookListTag1 = findViewById<RecyclerView>(R.id.dashboard_books_list_tag1)
         bookListTag1?.layoutManager = gridLayoutManager
         bookListTag1?.setHasFixedSize(true)
-        bookListTag1Title?.setOnClickListener({ pickTag(1) })
+        bookListTag1Title?.setOnClickListener({ pickTag2(1);pickTag(1) })
 
         progressBarContainer = findViewById<RelativeLayout>(R.id.dashboard_books_list_progressbar_container)
         progressBarContainer?.visibility = View.GONE
@@ -163,6 +165,50 @@ class BookLibrary : AppCompatActivity() {
 
         fab = findViewById<FloatingActionButton>(R.id.fab)
         fab?.setOnClickListener({ browseForLibrary() })
+    }
+
+    var dialogTagTree: Dialog? = null
+    private fun pickTag2(tagToSet: Int) {
+        Log.d(LOG_TAG, "BookLibrary::pickTag2($tagToSet) started")
+        var root = TreeNode.root()
+        val ctx = this
+
+        doAsync {
+            val tgTree = BookLibApplication.instance.getLibManager().getTagTree()
+
+            val root = TreeNode.root()
+            var parent = TreeNode("Tags")
+
+            for (t in tgTree.rootTags) {
+                addTagToTree(parent, t)
+            }
+            root.addChild(parent)
+
+            uiThread {
+                val tView = AndroidTreeView(ctx, root)
+                dialogTagTree = Dialog(ctx)
+                dialogTagTree?.setContentView(tView.getView())
+                dialogTagTree?.setTitle("Pick an EBook tag")
+                dialogTagTree?.show()
+            }
+        }
+    }
+
+    private fun addTagToTree(parent: TreeNode, tag: TagTree.TreeTag) {
+        var child = TreeNode(tag.me)
+        child.clickListener = TreeNode.TreeNodeClickListener { treeNode: TreeNode, any: Any ->
+            fun onClick(node: TreeNode?, value: Any?) {
+                val tag = node?.value as TagTree.TreeTag
+                savePreferences()
+                updateBookListTag1(bookListTag1IncludeSubTags)
+                dialogTagTree?.dismiss()
+            }
+        }
+        parent.addChild(child)
+
+        for (t in tag.children) {
+            addTagToTree(child, t)
+        }
     }
 
     private fun pickTag(tagToSet: Int) {
@@ -330,7 +376,7 @@ class BookLibrary : AppCompatActivity() {
         Log.d(LOG_TAG, "BookLibrary::rescanLibraries()")
         fab?.setEnabled(false)
         doAsync {
-            val nbrBooks = BookLibApplication.instance.getLibManager().getBooks().size
+            val nbrBooks = BookLibApplication.instance.getLibManager().getBookCount()
             uiThread {
                 progressBar?.setMax(nbrBooks)
                 progressBar?.setProgress(0)

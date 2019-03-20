@@ -92,6 +92,9 @@ dependencies {
     implementation 'org.slf4j:slf4j-android:1.7.25'
     implementation 'android.arch.navigation:navigation-fragment:1.0.0'
     implementation 'android.arch.navigation:navigation-ui:1.0.0'
+
+    implementation 'com.izikode.izilib:accordionrecycler:0.5'
+    implementation 'com.github.bmelnychuk:atv:1.2.+'
 }
 
 print "name         :"

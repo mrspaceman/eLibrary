@@ -7,6 +7,12 @@ interface EBookDao {
     @Query("SELECT * FROM ebooks")
     fun getAll(): MutableList<EBook>
 
+    @Query("SELECT count(id) FROM ebooks")
+    fun getCount(): Int
+
+    @Query("SELECT count(id) FROM ebooks where inLibraryId = :libId")
+    fun getCount(libId: Long): Int
+
     @Query("SELECT * FROM ebooks WHERE inLibraryId IN (:inLibraryId)")
     fun getAllInLibrary(inLibraryId: Long): MutableList<EBook>
 

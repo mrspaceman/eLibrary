@@ -21,7 +21,6 @@ import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
-
 /**
  * Created by aspela on 31/08/16.
  */
@@ -297,11 +296,9 @@ class LibraryScanner {
             var prevBookTag: Tag? = null
             for (s in tagStrs) {
                 val t = libMgr!!.addTag(s)
-                if (prevBookTag != null) {
-                    t.parentTagId = prevBookTag.id
-                }
-                prevBookTag = t
+                t.parentTagId = prevBookTag?.id
                 ebk.addTag(t)
+                prevBookTag = t
             }
         } catch (oob: StringIndexOutOfBoundsException) {
             ebk.addTag(libMgr!!.addTag(Tag.UNCLASSIFIED))

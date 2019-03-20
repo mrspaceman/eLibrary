@@ -20,6 +20,10 @@ class Tag() {
     @ColumnInfo
     var parentTagId: Long? = null
 
+    override fun toString(): String {
+        return tag
+    }
+
     companion object {
         val UNCLASSIFIED = "Unclassified"
         val CURRENTLY_READING = "Currently Reading"

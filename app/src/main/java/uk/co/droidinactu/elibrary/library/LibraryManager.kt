@@ -142,6 +142,14 @@ class LibraryManager {
         return intent
     }
 
+    fun getBookCount(): Int {
+        return ebookDao.getCount()
+    }
+
+    private fun getBookCount(lib: Library): Int {
+        return ebookDao.getCount(lib.id)
+    }
+
     fun getBooks(): MutableList<EBook> {
         return ebookDao.getAll()
     }
@@ -196,7 +204,11 @@ class LibraryManager {
             var tagBookLink = EBookTagLink()
             tagBookLink.ebookId = ebk.id
             tagBookLink.tagId = t.id
-            val newId = ebookTagDao.insert(tagBookLink)
+            try {
+                val newId = ebookTagDao.insert(tagBookLink)
+            } finally {
+
+            }
         }
     }
 
@@ -234,15 +246,14 @@ class LibraryManager {
         return tagStrs
     }
 
-//    fun getTagTree(): TagTree {
-//        var bookTags = getTags()
-//        var tagTree = TagTree()
-//        String[] tgLst = new String[bookTags.size()]
-//        for (BookTag t : bookTags) {
-//            tagTree.add(t)
-//        }
-//        return tagTree
-//    }
+    fun getTagTree(): TagTree {
+        var bookTags = getTags()
+        var tagTree = TagTree()
+        for (t in bookTags) {
+            tagTree.add(t)
+        }
+        return tagTree
+    }
 
     fun getTags(): List<Tag> {
         return tagDao.getAll()
@@ -319,8 +330,8 @@ class LibraryManager {
                 } else {
                     for (lib in aList) {
                         Log.d(
-                            LOG_TAG, "Scanning library [" + lib.libraryTitle + "] before has ["
-                                    + getBooksForLibrary(lib).size + "] ebooks"
+                            LOG_TAG,
+                            "Scanning library [${lib.libraryTitle}] before has [${getBookCount(lib)}] ebooks"
                         )
                         initiateScan(prgBrHandler, handler, lib)
                     }
