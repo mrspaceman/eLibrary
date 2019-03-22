@@ -183,6 +183,13 @@ class LibraryManager {
         }
         return authorDao.getByName(pFirstname, pLastname)
     }
+    fun addAuthor(authr:Author): Author? {
+        var t = authorDao.getByName(authr.firstname!!, authr.lastname!!)
+        if (t == null) {
+            val newId = authorDao.insert(authr)
+        }
+        return authorDao.getByName(authr.firstname!!, authr.lastname!!)
+    }
 
     fun addEbookAuthorLink(ebkAuth: EBookAuthorLink) {
         var a = ebookTagDao.getBookTagLink(ebkAuth.ebookId, ebkAuth.authorId)

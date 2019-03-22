@@ -1,23 +1,23 @@
-apply plugin: 'com.android.application'
-
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-kapt'
-apply plugin: 'kotlin-android-extensions'
-
-apply plugin: 'checkstyle'
-apply plugin: 'findbugs'
-//apply plugin: 'plantuml'
+plugins {
+    id("com.android.application")
+    id("kotlin-android")
+    id("kotlin-kapt")
+    id("kotlin-android-extensions")
+    id("checkstyle")
+    id("findbugs")
+    //id("plantuml")
+}
 
 task checkstyle(type: Checkstyle) {
     configFile file("${project.rootDir}/config/quality/checkstyle.xml")
     configProperties.checkstyleSuppressionsPath = file("${project.rootDir}/config/quality/checkstyle/suppressions.xml").absolutePath
-    source 'src'
-    include '**/*.java'
-    exclude '**/gen/**'
+    source "src"
+    include "**/*.java"
+    exclude "**/gen/**"
     classpath = files()
 }
 
-check.dependsOn 'checkstyle'
+check.dependsOn "checkstyle"
 
 android {
     compileSdkVersion 28
@@ -32,7 +32,7 @@ android {
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
         }
     }
     compileOptions {
@@ -42,59 +42,59 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$rootProject.kotlinVersion"
-    implementation 'androidx.appcompat:appcompat:1.0.2'
-    implementation 'androidx.core:core-ktx:1.0.1'
-    implementation "androidx.constraintlayout:constraintlayout:$rootProject.constraintLayoutVersion"
-    implementation "com.google.android.material:material:$rootProject.materialVersion"
-    implementation "androidx.appcompat:appcompat:$rootProject.appCompatVersion"
-    implementation "androidx.recyclerview:recyclerview:$rootProject.recyclerVersion"
+    implementation fileTree(dir: "libs", include: ["*.jar"])
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:$rootProject.kotlinVersion")
+    implementation("androidx.appcompat:appcompat:1.0.2")
+    implementation("androidx.core:core-ktx:1.0.1")
+    implementation("androidx.constraintlayout:constraintlayout:$rootProject.constraintLayoutVersion")
+    implementation("com.google.android.material:material:$rootProject.materialVersion")
+    implementation("androidx.appcompat:appcompat:$rootProject.appCompatVersion")
+    implementation("androidx.recyclerview:recyclerview:$rootProject.recyclerVersion")
 
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
+    testImplementation("junit:junit:4.12")
+    androidTestImplementation("androidx.test.ext:junit:1.1.0")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.1.1")
 
-    implementation 'androidx.cardview:cardview:1.0.0'
-    implementation 'androidx.recyclerview:recyclerview:1.0.0'
+    implementation("androidx.cardview:cardview:1.0.0")
+    implementation("androidx.recyclerview:recyclerview:1.0.0")
 
-    implementation "androidx.room:room-runtime:$rootProject.androidRoomVersion"
-    kapt "androidx.room:room-compiler:$rootProject.androidRoomVersion"
+    implementation("androidx.room:room-runtime:$rootProject.androidRoomVersion")
+    kapt ("androidx.room:room-compiler:$rootProject.androidRoomVersion" )
     // For Kotlin use kapt instead of annotationProcessor
     // optional - RxJava support for Room
-    implementation "androidx.room:room-rxjava2:$rootProject.androidRoomVersion"
+    implementation("androidx.room:room-rxjava2:$rootProject.androidRoomVersion")
     // optional - Coroutines support for Room
-    implementation "androidx.room:room-coroutines:$rootProject.androidRoomVersion"
+    implementation("androidx.room:room-coroutines:$rootProject.androidRoomVersion")
 
     // Kotlin KTX + coroutines
-    implementation "android.arch.work:work-runtime-ktx:$rootProject.androidWorkVersion"
+    implementation("android.arch.work:work-runtime-ktx:$rootProject.androidWorkVersion")
 
 
-    implementation 'com.github.angads25:filepicker:1.0.2'
-    implementation 'org.apache.commons:commons-io:1.3.2'
-    implementation 'org.apache.commons:commons-csv:1.1'
-    implementation 'org.apache.commons:commons-lang3:3.4'
+    implementation("com.github.angads25:filepicker:1.0.2")
+    implementation("org.apache.commons:commons-io:1.3.2")
+    implementation("org.apache.commons:commons-csv:1.1")
+    implementation("org.apache.commons:commons-lang3:3.4")
 
-    implementation "org.jetbrains.anko:anko:0.10.8"
+    implementation("org.jetbrains.anko:anko:0.10.8")
 
-    implementation 'joda-time:joda-time:2.9.4'
+    implementation("joda-time:joda-time:2.9.4")
 
-    implementation 'com.izikode.izilib:accordionrecycler:0.5'
+    implementation("com.izikode.izilib:accordionrecycler:0.5")
 
-    implementation 'com.github.barteksc:pdfium-android:1.4.0'
+    implementation("com.github.barteksc:pdfium-android:1.4.0")
 
-    implementation 'com.google.code.gson:gson:2.8.2'
+    implementation("com.google.code.gson:gson:2.8.2")
 
-    implementation('nl.siegmann.epublib:epublib-core:3.1') {
-        exclude group: 'org.slf4j'
-        exclude group: 'xmlpull'
+    implementation("nl.siegmann.epublib:epublib-core:3.1") {
+        exclude group: "org.slf4j"
+        exclude group: "xmlpull"
     }
-    implementation 'org.slf4j:slf4j-android:1.7.25'
-    implementation 'android.arch.navigation:navigation-fragment:1.0.0'
-    implementation 'android.arch.navigation:navigation-ui:1.0.0'
+    implementation("org.slf4j:slf4j-android:1.7.25")
+    implementation("android.arch.navigation:navigation-fragment:1.0.0")
+    implementation("android.arch.navigation:navigation-ui:1.0.0")
 
-    implementation 'com.izikode.izilib:accordionrecycler:0.5'
-    implementation 'com.github.bmelnychuk:atv:1.2.+'
+    implementation("com.izikode.izilib:accordionrecycler:0.5")
+    implementation("com.github.bmelnychuk:atv:1.2.+")
 }
 
 print "name         :"
@@ -114,11 +114,11 @@ println version
 print "project.name :"
 println project.name
 
-// logger.quiet('An info log message which is always logged.')
-// logger.error('An error log message.')
-// logger.warn('A warning log message.')
-// logger.lifecycle('A lifecycle info log message.')
-// logger.info('An info log message.')
-// logger.debug('A debug log message.')
-// logger.trace('A trace log message.')
+// logger.quiet("An info log message which is always logged.")
+// logger.error("An error log message.")
+// logger.warn("A warning log message.")
+// logger.lifecycle("A lifecycle info log message.")
+// logger.info("An info log message.")
+// logger.debug("A debug log message.")
+// logger.trace("A trace log message.")
 

@@ -265,9 +265,10 @@ class LibraryScanner {
             libMgr?.addEbookTagLink(ebkTg)
         }
         for (a in ebk.authors) {
+            val t = libMgr!!.addAuthor(a)
             var ebkAuth = EBookAuthorLink()
             ebkAuth.ebookId = dbEbk.id
-            ebkAuth.authorId = a.id
+            ebkAuth.authorId = t!!.id
             libMgr?.addEbookAuthorLink(ebkAuth)
         }
     }

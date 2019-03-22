@@ -187,7 +187,10 @@ class BookLibrary : AppCompatActivity() {
             uiThread {
                 val tView = AndroidTreeView(ctx, root)
                 dialogTagTree = Dialog(ctx)
-                dialogTagTree?.setContentView(tView.getView())
+                var ll = findViewById<LinearLayout>(R.id.tag_list_tree)
+                ll.addView(tView.getView())
+                dialogTagTree?.setContentView(R.layout.tag_list_tree_dialog)
+                //   dialogTagTree?.setContentView(tView.getView())
                 dialogTagTree?.setTitle("Pick an EBook tag")
                 dialogTagTree?.show()
             }
@@ -216,8 +219,7 @@ class BookLibrary : AppCompatActivity() {
         val ctx = this
         doAsync {
             val tglist = BookLibApplication.instance.getLibManager().getTagList()
-            // val tgTree = BookLibApplication.getLibManager().getTagTree()
-            //    tglist.remove(BookTag.CURRENTLY_READING)
+            //tglist.remove(BookTag.CURRENTLY_READING)
 
             uiThread {
                 val dialog = Dialog(ctx)
