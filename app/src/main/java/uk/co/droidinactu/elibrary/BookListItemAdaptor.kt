@@ -13,7 +13,6 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.recyclerview.widget.RecyclerView
 import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.uiThread
 import uk.co.droidinactu.elibrary.badgedimageview.BadgedImageView
 import uk.co.droidinactu.elibrary.room.EBook
 import uk.co.droidinactu.elibrary.room.FileType
@@ -110,7 +109,7 @@ class BookListItemAdaptor(private val mBooks: MutableList<EBook>) :
                 if (ftypes != null && ftypes.size > 1) {
                     showFileTypePickerDialog(view.context)
                 } else {
-                    openBook(view.context, ftypes?.get(0).toString().toLowerCase())
+                    openBook(BookLibApplication.instance.applicationContext, ftypes?.get(0).toString().toLowerCase())
                 }
             }
         }
@@ -134,18 +133,20 @@ class BookListItemAdaptor(private val mBooks: MutableList<EBook>) :
 
         private fun openBook(ctx: Context, selectedFileType: String) {
             doAsync {
-                BookLibApplication.instance.getLibManager().addTagToBook(
-                    Tag.CURRENTLY_READING,
-                    ebk
-                )
+                try {
+                    BookLibApplication.instance.getLibManager().addTagToBook(
+                        Tag.CURRENTLY_READING,
+                        ebk
+                    )
+                } finally {
+                }
                 val i = BookLibApplication.instance.getLibManager().getOpenIntentForBook(
                     ebk!!,
                     selectedFileType
                 )
-                uiThread {
-                    if (i != null) {
-                        ctx.startActivity(i)
-                    }
+                if (i != null) {
+                    val intent = i
+                    ctx.startActivity(intent)
                 }
             }
         }

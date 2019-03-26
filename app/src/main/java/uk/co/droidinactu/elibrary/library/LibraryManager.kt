@@ -183,7 +183,8 @@ class LibraryManager {
         }
         return authorDao.getByName(pFirstname, pLastname)
     }
-    fun addAuthor(authr:Author): Author? {
+
+    fun addAuthor(authr: Author): Author? {
         var t = authorDao.getByName(authr.firstname!!, authr.lastname!!)
         if (t == null) {
             val newId = authorDao.insert(authr)
@@ -208,29 +209,36 @@ class LibraryManager {
     fun addTagToBook(newTag: String, ebk: EBook?) {
         if (ebk != null) {
             var t = addTag(newTag)
-            var tagBookLink = EBookTagLink()
-            tagBookLink.ebookId = ebk.id
-            tagBookLink.tagId = t.id
-            try {
-                val newId = ebookTagDao.insert(tagBookLink)
-            } finally {
-
+            var tagBookLink = getEbookTagLink(ebk.id, t.id)
+            if (tagBookLink == null) {
+                tagBookLink = EBookTagLink()
+                tagBookLink.ebookId = ebk.id
+                tagBookLink.tagId = t.id
+                try {
+                    val newId = ebookTagDao.insert(tagBookLink)
+                } finally {
+                }
             }
         }
     }
 
     fun addEbookTagLink(ebkTg: EBookTagLink) {
-        var t = ebookTagDao.getBookTagLink(ebkTg.ebookId, ebkTg.tagId)
+        var t = getEbookTagLink(ebkTg.ebookId, ebkTg.tagId)
         if (t == null) {
             ebookTagDao.insert(ebkTg)
         }
     }
 
     fun getEbookTagLink(ebkTg: EBookTagLink) {
-        var t = ebookTagDao.getBookTagLink(ebkTg.ebookId, ebkTg.tagId)
+        var t = getEbookTagLink(ebkTg.ebookId, ebkTg.tagId)
         if (t == null) {
             addEbookTagLink(ebkTg)
         }
+    }
+
+    fun getEbookTagLink(ebookId: Long, tagId: Long): EBookTagLink? {
+        var t = ebookTagDao.getBookTagLink(ebookId, tagId)
+        return t
     }
 
     fun addTag(tagstr: String): Tag {
@@ -296,6 +304,10 @@ class LibraryManager {
 
     /** Library CRUD */
     //region library
+    fun getLibrary(): Library {
+        return getLibraries().get(0)
+    }
+
     fun getLibrary(libname: String): Library {
         return libraryDao.getByName(libname)
     }

@@ -104,4 +104,5 @@
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
+    <string name="library_contains_x_books">Library %1$s contains %2$d books</string>
 </resources>

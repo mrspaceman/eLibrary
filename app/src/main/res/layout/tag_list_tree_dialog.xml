@@ -19,6 +19,7 @@
         android:layout_height="match_parent"
         android:layout_below="@+id/tag_list_picker_include_subtags"
         android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignParentEnd="true"
+        android:orientation="vertical" />
 
 </RelativeLayout>

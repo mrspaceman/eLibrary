@@ -12,27 +12,6 @@
     tools:context=".BookLibrary"
     tools:showIn="@layout/activity_main">
 
-    <include layout="@layout/toolbar_main" />
-
-    <TextView
-        android:id="@+id/dashboard_books_list_reading_title"
-        style="@style/tag_button_style"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/toolbar"
-        android:layout_alignParentStart="true"
-        android:layout_marginTop="2dp"
-        android:text="Recently Read" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/dashboard_books_list_reading"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/dashboard_books_list_reading_title"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:minHeight="225dp" />
-
     <Button
         android:id="@+id/dashboard_books_list_tag1_title"
         style="@style/tag_button_style"
@@ -43,15 +22,23 @@
         android:layout_marginTop="5dp"
         android:text="Tag" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/dashboard_books_list_tag1"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_above="@+id/dashboard_books_list_progressbar_container"
-        android:layout_below="@+id/dashboard_books_list_tag1_title"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:minHeight="275dp" />
+    <LinearLayout
+        android:id="@+id/dashboard_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/primary"
+        android:orientation="horizontal"
+        android:padding="10dip">
+
+        <TextView
+            android:id="@+id/dashboard_library_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/library_contains_x_books"
+            android:textColor="@color/primary_light"
+            android:textSize="24sp" />
+    </LinearLayout>
 
     <RelativeLayout
         android:id="@+id/dashboard_books_list_progressbar_container"
@@ -85,5 +72,34 @@
             android:layout_alignBottom="@id/dashboard_books_list_progressbar"
             android:background="#00000000" />
     </RelativeLayout>
+
+    <TextView
+        android:id="@+id/dashboard_books_list_reading_title"
+        style="@style/tag_button_style"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/dashboard_toolbar"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="2dp"
+        android:text="Recently Read" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/dashboard_books_list_tag1"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_above="@+id/dashboard_books_list_progressbar_container"
+        android:layout_below="@+id/dashboard_books_list_tag1_title"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:minHeight="275dp" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/dashboard_books_list_reading"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/dashboard_books_list_reading_title"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:minHeight="225dp" />
 
 </RelativeLayout>

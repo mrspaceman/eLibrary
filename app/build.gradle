@@ -1,12 +1,17 @@
 plugins {
-    id("com.android.application")
-    id("kotlin-android")
-    id("kotlin-kapt")
-    id("kotlin-android-extensions")
-    id("checkstyle")
-    id("findbugs")
-    //id("plantuml")
+    id "gradle.site" version "0.6"
 }
+
+apply plugin: "com.android.application"
+
+apply plugin: ("kotlin-android")
+apply plugin: ("kotlin-android-extensions")
+apply plugin: ("kotlin-kapt")
+
+apply plugin: ("checkstyle")
+apply plugin: ("findbugs")
+//apply plugin:("plantuml")
+
 
 task checkstyle(type: Checkstyle) {
     configFile file("${project.rootDir}/config/quality/checkstyle.xml")
@@ -14,6 +19,7 @@ task checkstyle(type: Checkstyle) {
     source "src"
     include "**/*.java"
     exclude "**/gen/**"
+    exclude "build/**"
     classpath = files()
 }
 
@@ -26,7 +32,7 @@ android {
         minSdkVersion 26
         targetSdkVersion 28
         versionCode 1
-        versionName "2019.03"
+        versionName "2019.08"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -59,7 +65,7 @@ dependencies {
     implementation("androidx.recyclerview:recyclerview:1.0.0")
 
     implementation("androidx.room:room-runtime:$rootProject.androidRoomVersion")
-    kapt ("androidx.room:room-compiler:$rootProject.androidRoomVersion" )
+    kapt("androidx.room:room-compiler:$rootProject.androidRoomVersion")
     // For Kotlin use kapt instead of annotationProcessor
     // optional - RxJava support for Room
     implementation("androidx.room:room-rxjava2:$rootProject.androidRoomVersion")

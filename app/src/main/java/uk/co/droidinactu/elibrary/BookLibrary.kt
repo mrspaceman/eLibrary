@@ -32,7 +32,6 @@ import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import uk.co.droidinactu.elibrary.BookLibApplication.Companion.LOG_TAG
 import uk.co.droidinactu.elibrary.library.FileObserverService
-import uk.co.droidinactu.elibrary.library.LibraryManager
 import uk.co.droidinactu.elibrary.library.RecursiveFileObserver.Companion.INTENT_EBOOK_MODIFIED
 import uk.co.droidinactu.elibrary.library.RecursiveFileObserver.Companion.INTENT_EBOOK_MODIFIED_PATH
 import uk.co.droidinactu.elibrary.library.TagTree
@@ -130,12 +129,10 @@ class BookLibrary : AppCompatActivity() {
                 val appVerName = BookLibApplication.instance.getAppVersionName(
                     "uk.co.droidinactu.elibrary"
                 )
+                supportActionBar!!.setTitle(appTitle + " (" + appVerName + ")")
             } catch (e: Exception) {
                 Log.e(LOG_TAG, "Exception getting app vername")
             }
-            supportActionBar!!.setTitle(
-                appTitle + " (" + appVerName + ")"
-            )
         } else {
             supportActionBar!!.setTitle(getString(R.string.app_title))
         }
@@ -152,7 +149,10 @@ class BookLibrary : AppCompatActivity() {
         bookListTag1 = findViewById<RecyclerView>(R.id.dashboard_books_list_tag1)
         bookListTag1?.layoutManager = gridLayoutManager
         bookListTag1?.setHasFixedSize(true)
-        bookListTag1Title?.setOnClickListener({ pickTag2(1);pickTag(1) })
+        bookListTag1Title?.setOnClickListener {
+            //pickTag2(1);
+            pickTag(1)
+        }
 
         progressBarContainer = findViewById<RelativeLayout>(R.id.dashboard_books_list_progressbar_container)
         progressBarContainer?.visibility = View.GONE
@@ -187,9 +187,10 @@ class BookLibrary : AppCompatActivity() {
             uiThread {
                 val tView = AndroidTreeView(ctx, root)
                 dialogTagTree = Dialog(ctx)
+                dialogTagTree?.setContentView(R.layout.tag_list_tree_dialog)
+                dialogTagTree?.setTitle("Pick an EBook tag")
                 var ll = findViewById<LinearLayout>(R.id.tag_list_tree)
                 ll.addView(tView.getView())
-                dialogTagTree?.setContentView(R.layout.tag_list_tree_dialog)
                 //   dialogTagTree?.setContentView(tView.getView())
                 dialogTagTree?.setTitle("Pick an EBook tag")
                 dialogTagTree?.show()
@@ -321,14 +322,12 @@ class BookLibrary : AppCompatActivity() {
         BookLibApplication.instance.applicationContext.startService(intent)
     }
 
-
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         val inflater = menuInflater
         inflater.inflate(R.menu.menu_booklib, menu)
         return true
     }
 
-    private lateinit var libMgr: LibraryManager
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         Log.d(LOG_TAG, "onOptionsItemSelected()")
         // Handle item selection
@@ -425,8 +424,21 @@ class BookLibrary : AppCompatActivity() {
     }
 
     private fun updateLists() {
+        updateInfoBar()
         updateBookListCurrReading()
         updateBookListTag1(bookListTag1IncludeSubTags)
+    }
+
+    private fun updateInfoBar() {
+        doAsync {
+            val libInfo = findViewById<TextView>(R.id.dashboard_library_info)
+            val libTitle = BookLibApplication.instance.getLibManager().getLibrary().libraryTitle
+            val nbrBooks = BookLibApplication.instance.getLibManager().getBookCount()
+            var text = getString(R.string.library_contains_x_books, libTitle, nbrBooks)
+            uiThread {
+                libInfo.setText(text)
+            }
+        }
     }
 
     private fun updateBookListCurrReading() {
