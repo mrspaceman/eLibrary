@@ -26,6 +26,9 @@ import com.github.angads25.filepicker.model.DialogConfigs
 import com.github.angads25.filepicker.model.DialogProperties
 import com.github.angads25.filepicker.view.FilePickerDialog
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.microsoft.appcenter.AppCenter
+import com.microsoft.appcenter.analytics.Analytics
+import com.microsoft.appcenter.crashes.Crashes
 import com.unnamed.b.atv.model.TreeNode
 import com.unnamed.b.atv.view.AndroidTreeView
 import org.jetbrains.anko.doAsync
@@ -69,9 +72,10 @@ class BookLibrary : AppCompatActivity() {
             val max = Integer.valueOf(prgrsMsg[2])
             val res = resources
             val prgMsg = String.format(res.getString(R.string.rescan_progress_msg), libName, curr, max)
-            progressBar?.setProgress(curr)
-            progressBar?.setMax(max)
-            progressBarLabel?.setText(prgMsg)
+            progressBar?.progress = curr
+            progressBar?.max = max
+            progressBarLabel?.text = prgMsg
+            updateInfoBar()
         }
     }
 
@@ -88,9 +92,9 @@ class BookLibrary : AppCompatActivity() {
                 val bklist = BookLibApplication.instance.getLibManager().getBooks()
                 uiThread {
                     Log.d(LOG_TAG, "Library [" + libTitle + "] Updated. Now contains [" + bklist.size + "] ebooks")
-                    progressBarContainer?.setVisibility(View.GONE)
+                    progressBarContainer?.visibility = View.GONE
                     updateLists()
-                    fab?.setEnabled(true)
+                    fab?.isEnabled = true
                 }
             }
         }
@@ -117,6 +121,13 @@ class BookLibrary : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        AppCenter.start(
+            application,
+            "86146a8c-ea35-4dd0-b365-620bcc915476",
+            Analytics::class.java,
+            Crashes::class.java
+        )
+
         toolBarBookLibrary = findViewById(R.id.toolbar)
         if (toolBarBookLibrary != null) {
             setSupportActionBar(toolBarBookLibrary)
@@ -129,7 +140,7 @@ class BookLibrary : AppCompatActivity() {
                 val appVerName = BookLibApplication.instance.getAppVersionName(
                     "uk.co.droidinactu.elibrary"
                 )
-                supportActionBar!!.setTitle(appTitle + " (" + appVerName + ")")
+                supportActionBar!!.title = appTitle + " (" + appVerName + ")"
             } catch (e: Exception) {
                 Log.e(LOG_TAG, "Exception getting app vername")
             }
@@ -190,7 +201,7 @@ class BookLibrary : AppCompatActivity() {
                 dialogTagTree?.setContentView(R.layout.tag_list_tree_dialog)
                 dialogTagTree?.setTitle("Pick an EBook tag")
                 var ll = findViewById<LinearLayout>(R.id.tag_list_tree)
-                ll.addView(tView.getView())
+                ll.addView(tView.view)
                 //   dialogTagTree?.setContentView(tView.getView())
                 dialogTagTree?.setTitle("Pick an EBook tag")
                 dialogTagTree?.show()
@@ -239,7 +250,7 @@ class BookLibrary : AppCompatActivity() {
                         val selectedFromList = tglist[position]
                         when (tagToSet) {
                             1 -> {
-                                bookListTag1Title?.setText(selectedFromList)
+                                bookListTag1Title?.text = selectedFromList
                                 bookListTag1IncludeSubTags = tagLstIncludeSubTags.isChecked
                                 savePreferences()
                                 updateBookListTag1(bookListTag1IncludeSubTags)
@@ -256,7 +267,7 @@ class BookLibrary : AppCompatActivity() {
 
     private fun browseForLibrary() {
         Log.d(LOG_TAG, "BookLibrary::browseForLibrary()")
-        fab?.setEnabled(false)
+        fab?.isEnabled = false
         val rootdir = "/storage/"
 
         val properties = DialogProperties()
@@ -271,10 +282,10 @@ class BookLibrary : AppCompatActivity() {
             if (files.size > 0) {
                 val fileBits = files[0].split("/".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
                 val libraryName = fileBits[fileBits.size - 1]
-                progressBar?.setMax(2500)
-                progressBar?.setProgress(0)
-                progressBar?.setVisibility(View.VISIBLE)
-                progressBarContainer?.setVisibility(View.VISIBLE)
+                progressBar?.max = 2500
+                progressBar?.progress = 0
+                progressBar?.visibility = View.VISIBLE
+                progressBarContainer?.visibility = View.VISIBLE
                 doAsync {
                     BookLibApplication.instance.getLibManager()
                         .addLibrary(prgBrHandler, mHandler, libraryName, files[0])
@@ -287,20 +298,20 @@ class BookLibrary : AppCompatActivity() {
     private fun savePreferences() {
         val settings = getSharedPreferences(BookLibApplication.LOG_TAG, 0)
         val editor = settings.edit()
-        editor.putString("bookListTag1Title", bookListTag1Title?.getText().toString())
+        editor.putString("bookListTag1Title", bookListTag1Title?.text.toString())
         editor.putBoolean("bookListTag1IncludeSubTags", bookListTag1IncludeSubTags)
         editor.apply()
     }
 
     private fun updateBookListTag1(includeSubTags: Boolean) {
         Log.d(LOG_TAG, "BookLibrary::updateBookListTag1()")
-        if (bookListTag1Title?.getText().toString().compareTo(NO_TAG_SELECTED) != 0) {
+        if (bookListTag1Title?.text.toString().compareTo(NO_TAG_SELECTED) != 0) {
             doAsync {
                 val bklist = BookLibApplication.instance.getLibManager()
-                    .getBooksForTag(bookListTag1Title?.getText().toString(), includeSubTags)
+                    .getBooksForTag(bookListTag1Title?.text.toString(), includeSubTags)
                 bookListAdaptorTag1 = BookListItemAdaptor(bklist)
                 uiThread {
-                    bookListTag1?.setAdapter(bookListAdaptorTag1)
+                    bookListTag1?.adapter = bookListAdaptorTag1
                 }
             }
         }
@@ -368,21 +379,21 @@ class BookLibrary : AppCompatActivity() {
         super.onResume()
         Log.d(LOG_TAG, "onResume()")
         val settings = getSharedPreferences(BookLibApplication.LOG_TAG, 0)
-        bookListTag1Title?.setText(settings.getString("bookListTag1Title", NO_TAG_SELECTED))
+        bookListTag1Title?.text = settings.getString("bookListTag1Title", NO_TAG_SELECTED)
         bookListTag1IncludeSubTags = settings.getBoolean("bookListTag1IncludeSubTags", true)
         updateLists()
     }
 
     private fun rescanLibraries() {
         Log.d(LOG_TAG, "BookLibrary::rescanLibraries()")
-        fab?.setEnabled(false)
+        fab?.isEnabled = false
         doAsync {
             val nbrBooks = BookLibApplication.instance.getLibManager().getBookCount()
             uiThread {
-                progressBar?.setMax(nbrBooks)
-                progressBar?.setProgress(0)
-                progressBar?.setVisibility(View.VISIBLE)
-                progressBarContainer?.setVisibility(View.VISIBLE)
+                progressBar?.max = nbrBooks
+                progressBar?.progress = 0
+                progressBar?.visibility = View.VISIBLE
+                progressBarContainer?.visibility = View.VISIBLE
             }
             BookLibApplication.instance.getLibManager().refreshLibraries(prgBrHandler, mHandler)
             scheduleNextLibraryScan()
@@ -436,7 +447,7 @@ class BookLibrary : AppCompatActivity() {
             val nbrBooks = BookLibApplication.instance.getLibManager().getBookCount()
             var text = getString(R.string.library_contains_x_books, libTitle, nbrBooks)
             uiThread {
-                libInfo.setText(text)
+                libInfo.text = text
             }
         }
     }
@@ -450,7 +461,7 @@ class BookLibrary : AppCompatActivity() {
                 )
             uiThread {
                 bookListAdaptorCurrReading = BookListItemAdaptor(bklist)
-                bookListCurrentReading?.setAdapter(bookListAdaptorCurrReading)
+                bookListCurrentReading?.adapter = bookListAdaptorCurrReading
                 setupShortcuts()
             }
         }
@@ -474,8 +485,8 @@ class BookLibrary : AppCompatActivity() {
 
     inner class LibraryScanFinishedReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            fab?.setEnabled(true)
-            progressBarContainer?.setVisibility(View.INVISIBLE)
+            fab?.isEnabled = true
+            progressBarContainer?.visibility = View.INVISIBLE
         }
     }
 
