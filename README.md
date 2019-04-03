@@ -1,7 +1,5 @@
 # ebookmgr
 
-()[https://build.appcenter.ms/v0.1/apps/6603308e-b77f-4403-ad2a-0b4ffa3f963a/branches/master/badge]
-
 [![AppCentreBuild](https://build.appcenter.ms/v0.1/apps/6603308e-b77f-4403-ad2a-0b4ffa3f963a/branches/master/badge)](https://build.appcenter.ms/v0.1/apps/6603308e-b77f-4403-ad2a-0b4ffa3f963a/branches/master/badge)
 
 ## Android EBook Library Manager
