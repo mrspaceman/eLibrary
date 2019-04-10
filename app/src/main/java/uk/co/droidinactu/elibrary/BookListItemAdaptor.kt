@@ -3,6 +3,7 @@ package uk.co.droidinactu.elibrary
 import android.app.Dialog
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ResolveInfo
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.os.Handler
@@ -144,9 +145,16 @@ class BookListItemAdaptor(private val mBooks: MutableList<EBook>) :
                     ebk!!,
                     selectedFileType
                 )
+
                 if (i != null) {
-                    val intent = i
-                    ctx.startActivity(intent)
+                    // Verify it resolves
+                    val activities: List<ResolveInfo> = ctx.packageManager.queryIntentActivities(i, 0)
+                    val isIntentSafe: Boolean = activities.isNotEmpty()
+
+                    // Start an activity if it's safe
+                    if (isIntentSafe) {
+                        ctx.startActivity(i)
+                    }
                 }
             }
         }

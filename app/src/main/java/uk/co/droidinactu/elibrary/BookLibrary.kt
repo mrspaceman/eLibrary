@@ -93,6 +93,7 @@ class BookLibrary : AppCompatActivity() {
                 uiThread {
                     Log.d(LOG_TAG, "Library [" + libTitle + "] Updated. Now contains [" + bklist.size + "] ebooks")
                     progressBarContainer?.visibility = View.GONE
+                    updateInfoBar()
                     updateLists()
                     fab?.isEnabled = true
                 }
@@ -188,7 +189,7 @@ class BookLibrary : AppCompatActivity() {
             val tgTree = BookLibApplication.instance.getLibManager().getTagTree()
 
             val root = TreeNode.root()
-            var parent = TreeNode("Tags")
+            val parent = TreeNode("Tags")
 
             for (t in tgTree.rootTags) {
                 addTagToTree(parent, t)
@@ -200,7 +201,7 @@ class BookLibrary : AppCompatActivity() {
                 dialogTagTree = Dialog(ctx)
                 dialogTagTree?.setContentView(R.layout.tag_list_tree_dialog)
                 dialogTagTree?.setTitle("Pick an EBook tag")
-                var ll = findViewById<LinearLayout>(R.id.tag_list_tree)
+                val ll = findViewById<LinearLayout>(R.id.tag_list_tree)
                 ll.addView(tView.view)
                 //   dialogTagTree?.setContentView(tView.getView())
                 dialogTagTree?.setTitle("Pick an EBook tag")
@@ -210,10 +211,10 @@ class BookLibrary : AppCompatActivity() {
     }
 
     private fun addTagToTree(parent: TreeNode, tag: TagTree.TreeTag) {
-        var child = TreeNode(tag.me)
+        val child = TreeNode(tag.me)
         child.clickListener = TreeNode.TreeNodeClickListener { treeNode: TreeNode, any: Any ->
             fun onClick(node: TreeNode?, value: Any?) {
-                val tag = node?.value as TagTree.TreeTag
+                val childtag = node?.value as TagTree.TreeTag
                 savePreferences()
                 updateBookListTag1(bookListTag1IncludeSubTags)
                 dialogTagTree?.dismiss()
@@ -445,7 +446,7 @@ class BookLibrary : AppCompatActivity() {
             val libInfo = findViewById<TextView>(R.id.dashboard_library_info)
             val libTitle = BookLibApplication.instance.getLibManager().getLibrary().libraryTitle
             val nbrBooks = BookLibApplication.instance.getLibManager().getBookCount()
-            var text = getString(R.string.library_contains_x_books, libTitle, nbrBooks)
+            val text = getString(R.string.library_contains_x_books, libTitle, nbrBooks)
             uiThread {
                 libInfo.text = text
             }

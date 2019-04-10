@@ -8,6 +8,7 @@ import android.net.Uri
 import android.os.AsyncTask
 import android.os.Handler
 import android.util.Log
+import android.webkit.MimeTypeMap
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import org.jetbrains.anko.doAsync
@@ -113,33 +114,22 @@ class LibraryManager {
 
 
     fun getOpenIntentForBook(pEbk: EBook, pSelectedFileType: String): Intent? {
-        var intent: Intent? = null
-        if (pSelectedFileType == "epub") {
-            if (File(pEbk.fullFileDirName + ".epub").exists()) {
-                val ebkURI = Uri.parse("file://" + pEbk.fullFileDirName + ".epub")
-                //final Uri ebkURI = FileProvider.getUriForFile(BookLibApplication.instance.applicationContext, BookLibApplication.applicationContext.getApplicationContext().getPackageName() + ".provider", new FileTreeNode(pEbk.getFull_file_dir_name() + ".epub"));
-                intent = Intent()
-                intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-                intent.action = Intent.ACTION_VIEW
-                intent.setDataAndType(ebkURI, "application/epub+zip")
-            } else {
-                Log.e(LOG_TAG, "EBook FileTreeNode Not Found so remove from library [" + pEbk.fullFileDirName + "]")
-                //FIXME:     BookLibApplication.instance.getLibManager().removeBook(pEbk)
-            }
+        var openBookIntent: Intent? = null
+        if (File(pEbk.fullFileDirName + "." + pSelectedFileType).exists()) {
+            openBookIntent = Intent(
+                Intent.ACTION_VIEW,
+                Uri.parse("file://" + pEbk.fullFileDirName + "." + pSelectedFileType)
+            )
+            openBookIntent.setDataAndType(
+                Uri.parse("file://" + pEbk.fullFileDirName + "." + pSelectedFileType),
+                MimeTypeMap.getSingleton().getMimeTypeFromExtension(pSelectedFileType)
+            )
+
         } else {
-            if (File(pEbk.fullFileDirName + ".pdf").exists()) {
-                val ebkURI = Uri.parse("file://" + pEbk.fullFileDirName + ".pdf")
-                //final Uri ebkURI = FileProvider.getUriForFile(BookLibApplication.instance.applicationContext, BookLibApplication.applicationContext.getApplicationContext().getPackageName() + ".provider", new FileTreeNode(pEbk.getFull_file_dir_name() + ".pdf"));
-                intent = Intent()
-                intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-                intent.action = Intent.ACTION_VIEW
-                intent.setDataAndType(ebkURI, "application/pdf")
-            } else {
-                Log.e(LOG_TAG, "EBook FileTreeNode Not Found so remove from library [" + pEbk.fullFileDirName + "]")
-                //FIXME:  BookLibApplication.instance.getLibManager().removeBook(pEbk)
-            }
+            Log.e(LOG_TAG, "EBook FileTreeNode Not Found so remove from library [" + pEbk.fullFileDirName + "]")
+            //FIXME:     BookLibApplication.instance.getLibManager().removeBook(pEbk)
         }
-        return intent
+        return openBookIntent
     }
 
     fun getBookCount(): Int {
@@ -174,7 +164,7 @@ class LibraryManager {
     /** Author CRUD */
     // region authors
     fun addAuthor(pFirstname: String, pLastname: String): Author? {
-        var t = authorDao.getByName(pFirstname, pLastname)
+        val t = authorDao.getByName(pFirstname, pLastname)
         if (t == null) {
             var a = Author()
             a.firstname = pFirstname
@@ -185,7 +175,7 @@ class LibraryManager {
     }
 
     fun addAuthor(authr: Author): Author? {
-        var t = authorDao.getByName(authr.firstname!!, authr.lastname!!)
+        val t = authorDao.getByName(authr.firstname!!, authr.lastname!!)
         if (t == null) {
             val newId = authorDao.insert(authr)
         }
@@ -193,7 +183,7 @@ class LibraryManager {
     }
 
     fun addEbookAuthorLink(ebkAuth: EBookAuthorLink) {
-        var a = ebookTagDao.getBookTagLink(ebkAuth.ebookId, ebkAuth.authorId)
+        val a = ebookTagDao.getBookTagLink(ebkAuth.ebookId, ebkAuth.authorId)
         if (a == null) {
             ebookAuthorDao.insert(ebkAuth)
         }
@@ -208,7 +198,7 @@ class LibraryManager {
     //region tags
     fun addTagToBook(newTag: String, ebk: EBook?) {
         if (ebk != null) {
-            var t = addTag(newTag)
+            val t = addTag(newTag)
             var tagBookLink = getEbookTagLink(ebk.id, t.id)
             if (tagBookLink == null) {
                 tagBookLink = EBookTagLink()
@@ -223,21 +213,21 @@ class LibraryManager {
     }
 
     fun addEbookTagLink(ebkTg: EBookTagLink) {
-        var t = getEbookTagLink(ebkTg.ebookId, ebkTg.tagId)
+        val t = getEbookTagLink(ebkTg.ebookId, ebkTg.tagId)
         if (t == null) {
             ebookTagDao.insert(ebkTg)
         }
     }
 
     fun getEbookTagLink(ebkTg: EBookTagLink) {
-        var t = getEbookTagLink(ebkTg.ebookId, ebkTg.tagId)
+        val t = getEbookTagLink(ebkTg.ebookId, ebkTg.tagId)
         if (t == null) {
             addEbookTagLink(ebkTg)
         }
     }
 
     fun getEbookTagLink(ebookId: Long, tagId: Long): EBookTagLink? {
-        var t = ebookTagDao.getBookTagLink(ebookId, tagId)
+        val t = ebookTagDao.getBookTagLink(ebookId, tagId)
         return t
     }
 
@@ -253,8 +243,8 @@ class LibraryManager {
     }
 
     fun getTagList(): List<String> {
-        var bookTags = getTags()
-        var tagStrs = mutableListOf<String>()
+        val bookTags = getTags()
+        val tagStrs = mutableListOf<String>()
         for (t in bookTags) {
             tagStrs.add(t.tag)
         }
@@ -262,8 +252,8 @@ class LibraryManager {
     }
 
     fun getTagTree(): TagTree {
-        var bookTags = getTags()
-        var tagTree = TagTree()
+        val bookTags = getTags()
+        val tagTree = TagTree()
         for (t in bookTags) {
             tagTree.add(t)
         }
@@ -279,7 +269,7 @@ class LibraryManager {
     }
 
     fun lookupTagsForEBook(ebk: EBook): List<Tag> {
-        var result = mutableListOf<Tag>()
+        val result = mutableListOf<Tag>()
 
 //        if (tagsForEBookQuery == null) {
 //            QueryBuilder<EBookTags, Long> dbQryBld = dbHelper . getEBookTagsDao ().queryBuilder();
