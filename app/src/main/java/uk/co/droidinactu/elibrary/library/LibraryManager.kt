@@ -116,14 +116,12 @@ class LibraryManager {
     fun getOpenIntentForBook(pEbk: EBook, pSelectedFileType: String): Intent? {
         var openBookIntent: Intent? = null
         if (File(pEbk.fullFileDirName + "." + pSelectedFileType).exists()) {
-            openBookIntent = Intent(
-                Intent.ACTION_VIEW,
-                Uri.parse("file://" + pEbk.fullFileDirName + "." + pSelectedFileType)
-            )
+            openBookIntent = Intent(Intent.ACTION_VIEW)
             openBookIntent.setDataAndType(
                 Uri.parse("file://" + pEbk.fullFileDirName + "." + pSelectedFileType),
                 MimeTypeMap.getSingleton().getMimeTypeFromExtension(pSelectedFileType)
             )
+            openBookIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
 
         } else {
             Log.e(LOG_TAG, "EBook FileTreeNode Not Found so remove from library [" + pEbk.fullFileDirName + "]")

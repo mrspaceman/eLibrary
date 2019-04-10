@@ -1,7 +1,9 @@
 package uk.co.droidinactu.elibrary
 
+import android.app.Activity
 import android.app.Dialog
 import android.content.Context
+import android.content.ContextWrapper
 import android.content.Intent
 import android.content.pm.ResolveInfo
 import android.graphics.BitmapFactory
@@ -107,12 +109,24 @@ class BookListItemAdaptor(private val mBooks: MutableList<EBook>) :
                 popup.show()
             } else {
                 val ftypes = ebk?.filetypes
+                val activity = getActivity(view)
                 if (ftypes != null && ftypes.size > 1) {
-                    showFileTypePickerDialog(view.context)
+                    showFileTypePickerDialog(activity!!)
                 } else {
-                    openBook(BookLibApplication.instance.applicationContext, ftypes?.get(0).toString().toLowerCase())
+                    openBook(activity!!, ftypes?.get(0).toString().toLowerCase())
                 }
             }
+        }
+
+        private fun getActivity(view: View): Activity? {
+            var context = view.context
+            while (context is ContextWrapper) {
+                if (context is Activity) {
+                    return context
+                }
+                context = context.baseContext
+            }
+            return null
         }
 
         private fun showFileTypePickerDialog(ctx: Context) {
