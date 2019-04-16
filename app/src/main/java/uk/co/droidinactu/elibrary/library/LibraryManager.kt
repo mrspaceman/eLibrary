@@ -4,11 +4,9 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.AsyncTask
 import android.os.Handler
 import android.util.Log
-import android.webkit.MimeTypeMap
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import org.jetbrains.anko.doAsync
@@ -112,24 +110,6 @@ class LibraryManager {
         return ebk
     }
 
-
-    fun getOpenIntentForBook(pEbk: EBook, pSelectedFileType: String): Intent? {
-        var openBookIntent: Intent? = null
-        if (File(pEbk.fullFileDirName + "." + pSelectedFileType).exists()) {
-            openBookIntent = Intent(Intent.ACTION_VIEW)
-            openBookIntent.setDataAndType(
-                Uri.parse("file://" + pEbk.fullFileDirName + "." + pSelectedFileType),
-                MimeTypeMap.getSingleton().getMimeTypeFromExtension(pSelectedFileType)
-            )
-            openBookIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-
-        } else {
-            Log.e(LOG_TAG, "EBook FileTreeNode Not Found so remove from library [" + pEbk.fullFileDirName + "]")
-            //FIXME:     BookLibApplication.instance.getLibManager().removeBook(pEbk)
-        }
-        return openBookIntent
-    }
-
     fun getBookCount(): Int {
         return ebookDao.getCount()
     }
@@ -148,6 +128,10 @@ class LibraryManager {
 
     fun getBooksForTag(tagStr: String, subtags: Boolean): MutableList<EBook> {
         return ebookDao.getAllForTag(tagDao.getTag(tagStr).id)
+    }
+
+    fun getBooksForTag(tag: Tag, subtags: Boolean): MutableList<EBook> {
+        return ebookDao.getAllForTag(tag.id)
     }
 
     fun searchBooksMatching(titleStr: String): MutableList<EBook> {
@@ -240,6 +224,10 @@ class LibraryManager {
         return t
     }
 
+    fun updateTag(t: Tag) {
+        tagDao.update(t)
+    }
+
     fun getTagList(): List<String> {
         val bookTags = getTags()
         val tagStrs = mutableListOf<String>()
@@ -260,6 +248,10 @@ class LibraryManager {
 
     fun getTags(): List<Tag> {
         return tagDao.getAll()
+    }
+
+    fun deleteTag(tag: Tag) {
+        tagDao.delete(tag)
     }
 
     fun getTagsForBook(ebk: EBook): List<Tag> {
@@ -434,9 +426,9 @@ class LibraryManager {
             libRootDir = params[1] as String
             Thread.currentThread().name = "LibraryCheckLinksTask:"
 
-            val result = getBooks()
+            val allBooks = getBooks()
 
-            for (ebk in result) {
+            for (ebk in allBooks) {
                 for (ft in ebk.filetypes) {
                     if (File(ebk.fullFileDirName + "." + ft).exists()) {
                         // file exists so we leave it in the library
@@ -447,6 +439,14 @@ class LibraryManager {
                         )
                         //FIXME : delete book from db
                     }
+                }
+            }
+
+            val allTags = getTags()
+            for (t in allTags) {
+                val booksForTag = getBooksForTag(t, true)
+                if (booksForTag.size < 3) {
+                    deleteTag(t)
                 }
             }
             return null
@@ -491,6 +491,7 @@ class LibraryManager {
     private fun removeScanningNotification(libname: String) {
         mNotificationManager?.cancel(mNotificationId)
     }
+
     //endregion
 
     companion object {

@@ -79,7 +79,6 @@ class BookLibrary : AppCompatActivity() {
         }
     }
 
-
     // Defines a Handler object that's attached to the UI thread
     private val mHandler = object : Handler(Looper.getMainLooper()) {
         /*
@@ -304,6 +303,19 @@ class BookLibrary : AppCompatActivity() {
         editor.apply()
     }
 
+    private fun updateBookListCurrReading() {
+        Log.d(LOG_TAG, "BookLibrary::updateBookListCurrReading()")
+        doAsync {
+            val bklist = BookLibApplication.instance.getLibManager()
+                .getBooksForTag(Tag.CURRENTLY_READING, false)
+            bookListAdaptorCurrReading = BookListItemAdaptor(bklist)
+            uiThread {
+                bookListCurrentReading?.adapter = bookListAdaptorCurrReading
+                setupShortcuts()
+            }
+        }
+    }
+
     private fun updateBookListTag1(includeSubTags: Boolean) {
         Log.d(LOG_TAG, "BookLibrary::updateBookListTag1()")
         if (bookListTag1Title?.text.toString().compareTo(NO_TAG_SELECTED) != 0) {
@@ -449,21 +461,6 @@ class BookLibrary : AppCompatActivity() {
             val text = getString(R.string.library_contains_x_books, libTitle, nbrBooks)
             uiThread {
                 libInfo.text = text
-            }
-        }
-    }
-
-    private fun updateBookListCurrReading() {
-        doAsync {
-            val bklist =
-                BookLibApplication.instance.getLibManager().getBooksForTag(
-                    Tag.CURRENTLY_READING,
-                    false
-                )
-            uiThread {
-                bookListAdaptorCurrReading = BookListItemAdaptor(bklist)
-                bookListCurrentReading?.adapter = bookListAdaptorCurrReading
-                setupShortcuts()
             }
         }
     }

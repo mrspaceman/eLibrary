@@ -10,6 +10,7 @@ import android.util.Log
 import com.shockwave.pdfium.PdfiumCore
 import nl.siegmann.epublib.epub.EpubReader
 import org.apache.commons.io.FilenameUtils
+import org.jetbrains.anko.doAsync
 import uk.co.droidinactu.elibrary.BookLibApplication
 import uk.co.droidinactu.elibrary.BookLibApplication.Companion.LOG_TAG
 import uk.co.droidinactu.elibrary.room.*
@@ -298,6 +299,7 @@ class LibraryScanner {
             for (s in tagStrs) {
                 val t = libMgr!!.addTag(s)
                 t.parentTagId = prevBookTag?.id
+                doAsync { libMgr!!.updateTag(t) }
                 ebk.addTag(t)
                 prevBookTag = t
             }

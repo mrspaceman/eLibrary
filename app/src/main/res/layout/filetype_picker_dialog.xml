@@ -3,6 +3,16 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
+    <Button
+        android:id="@+id/filetype_picker_dialog_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/filetype_picker_dialog_group"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="12dp"
+        android:padding="15dp"
+        android:text="@string/filetype_picker_dialog_btn" />
+
     <RadioGroup
         android:id="@+id/filetype_picker_dialog_group"
         android:layout_width="wrap_content"
@@ -14,27 +24,20 @@
             android:id="@+id/filetype_picker_dialog_epub"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:drawableTop="@drawable/logo_epub"
             android:padding="15dp"
-            android:text="@string/filetype_picker_dialog_epub"
             android:textAppearance="?android:attr/textAppearanceLarge" />
 
         <RadioButton
             android:id="@+id/filetype_picker_dialog_pdf"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:drawableTop="@drawable/logo_pdf"
             android:padding="15dp"
-            android:text="@string/filetype_picker_dialog_pdf"
             android:textAppearance="?android:attr/textAppearanceLarge" />
-    </RadioGroup>
 
-    <Button
-        android:id="@+id/filetype_picker_dialog_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/filetype_picker_dialog_group"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="12dp"
-        android:padding="15dp"
-        android:text="@string/filetype_picker_dialog_btn" />
+    </RadioGroup>
 
 </RelativeLayout>

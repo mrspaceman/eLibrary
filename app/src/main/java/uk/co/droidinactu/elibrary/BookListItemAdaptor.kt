@@ -48,17 +48,15 @@ class BookListItemAdaptor(private val mBooks: MutableList<EBook>) :
             cvrBmp = BitmapFactory.decodeResource(viewHolder.mCover.context.resources, R.drawable.generic_book_cover)
         }
         viewHolder.ebk = book
-        val tmpStr = book.bookTitle
-        viewHolder.mTitle.text = tmpStr
+        viewHolder.mTitle.text = book.bookTitle
         viewHolder.mCover.setImageBitmap(cvrBmp)
         if (book.filetypes.size == 1) {
             viewHolder.mCover.showBadge(true)
-            viewHolder.mCover.setBadgeText(book.filetypes.get(0).toString())
+            viewHolder.mCover.setBadgeText(book.filetypes[0].toString())
         } else {
             viewHolder.mCover.showBadge(true)
             viewHolder.mCover.setBadgeText(FileType.EPUB.toString() + "/" + FileType.PDF)
         }
-        viewHolder.mTitle.text = tmpStr
     }
 
     override fun getItemCount(): Int {
