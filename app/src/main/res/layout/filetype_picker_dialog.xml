@@ -27,6 +27,7 @@
             android:layout_gravity="bottom"
             android:drawableTop="@drawable/logo_epub"
             android:padding="15dp"
+            android:text="epub"
             android:textAppearance="?android:attr/textAppearanceLarge" />
 
         <RadioButton
@@ -36,6 +37,7 @@
             android:layout_gravity="bottom"
             android:drawableTop="@drawable/logo_pdf"
             android:padding="15dp"
+            android:text="pdf"
             android:textAppearance="?android:attr/textAppearanceLarge" />
 
     </RadioGroup>

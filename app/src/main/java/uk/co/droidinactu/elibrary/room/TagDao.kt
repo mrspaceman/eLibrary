@@ -4,7 +4,7 @@ import androidx.room.*
 
 @Dao
 interface TagDao {
-    @Query("SELECT * FROM tags")
+    @Query("SELECT * FROM tags order by tag")
     fun getAll(): List<Tag>
 
     @Query(
@@ -13,7 +13,7 @@ interface TagDao {
                 "        union select id from tags, tc" +
                 "               where tags.parentTagId  = tc.i" +
                 "     )" +
-                "  select * from tags where id in tc;"
+                "  select * from tags where id in tc order by tag;"
     )
     fun getAllByParentId(tagid: Int): List<Tag>
 
