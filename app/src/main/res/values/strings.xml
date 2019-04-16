@@ -19,6 +19,9 @@
     <string name="action_book_show_details">Details</string>
     <string name="title_activity_settings">Settings</string>
     <string name="rescan_progress_msg">Scanning %1$s : Book %2$d of %3$d</string>
+    <string name="application_not_available">Application not available</string>
+    <string name="copied_file_name">Copy of %s</string>
+    <string name="copied_file_name_2">Copy %1$d of %2$s</string>
 
     <!-- Strings related to Settings -->
 

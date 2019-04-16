@@ -5,7 +5,6 @@ import android.app.Dialog
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
-import android.content.pm.ResolveInfo
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.os.Handler
@@ -17,9 +16,13 @@ import android.widget.*
 import androidx.recyclerview.widget.RecyclerView
 import org.jetbrains.anko.doAsync
 import uk.co.droidinactu.elibrary.badgedimageview.BadgedImageView
+import uk.co.droidinactu.elibrary.files.FileHolder
+import uk.co.droidinactu.elibrary.files.FileUtils
+import uk.co.droidinactu.elibrary.files.MimeTypes
 import uk.co.droidinactu.elibrary.room.EBook
 import uk.co.droidinactu.elibrary.room.FileType
 import uk.co.droidinactu.elibrary.room.Tag
+import java.io.File
 
 
 /**
@@ -155,21 +158,8 @@ class BookListItemAdaptor(private val mBooks: MutableList<EBook>) :
                     )
                 } finally {
                 }
-                val i = BookLibApplication.instance.getLibManager().getOpenIntentForBook(
-                    ebk!!,
-                    selectedFileType
-                )
-
-                if (i != null) {
-                    // Verify it resolves
-                    val activities: List<ResolveInfo> = ctx.packageManager.queryIntentActivities(i, 0)
-                    val isIntentSafe: Boolean = activities.isNotEmpty()
-
-                    // Start an activity if it's safe
-                    if (isIntentSafe) {
-                        ctx.startActivity(i)
-                    }
-                }
+                MimeTypes.initInstance(ctx)
+                FileUtils.openFile(FileHolder(File(ebk!!.fullFileDirName + "." + selectedFileType), false), ctx)
             }
         }
 
