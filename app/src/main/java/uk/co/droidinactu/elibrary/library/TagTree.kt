@@ -6,7 +6,7 @@ import java.util.*
 
 class TagTree {
 
-    internal var tagMap: MutableMap<Long, TreeTag> = HashMap()
+    private var tagMap: MutableMap<Long, TreeTag> = HashMap()
     var rootTags: MutableList<TreeTag> = ArrayList()
 
     fun add(t: Tag) {

@@ -50,9 +50,9 @@ import java.io.File
  */
 object MyDebug {
 
-    var DEBUGGING = true
-    var TRACE = false
-    var TRACE_DIRECTORY = "uk.co.droidinactu.booklib.traces"
+    private var DEBUGGING = true
+    private var TRACE = false
+    private var TRACE_DIRECTORY = "uk.co.droidinactu.booklib.traces"
 
     fun startMethodTracing(traceFile: String) {
         if (DEBUGGING && TRACE) {

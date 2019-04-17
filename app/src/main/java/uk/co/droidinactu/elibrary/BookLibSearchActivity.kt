@@ -46,20 +46,20 @@ class BookLibSearchActivity : AppCompatActivity() {
         bkListSearch = findViewById<View>(R.id.book_lib_search_results) as RecyclerView
 
         val gridLayoutManager = GridLayoutManager(this, 4)
-        bkListSearch?.setLayoutManager(gridLayoutManager)
+        bkListSearch?.layoutManager = gridLayoutManager
         bkListSearch?.setHasFixedSize(true)
 
-        cbTags?.setSelected(true)
-        cbTitle?.setSelected(true)
-        cbDirs?.setSelected(true)
+        cbTags?.isSelected = true
+        cbTitle?.isSelected = true
+        cbDirs?.isSelected = true
 
         btnSearch?.setOnClickListener {
             doAsync {
                 val bklist = BookLibApplication.instance.getLibManager()
-                    .searchBooksMatching(txtSearchText?.getText().toString())
+                    .searchBooksMatching(txtSearchText?.text.toString())
                 uiThread {
                     bkListSearchAdaptor = BookListItemAdaptor(bklist)
-                    bkListSearch?.setAdapter(bkListSearchAdaptor)
+                    bkListSearch?.adapter = bkListSearchAdaptor
                 }
             }
         }

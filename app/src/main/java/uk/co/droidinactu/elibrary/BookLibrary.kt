@@ -111,7 +111,7 @@ class BookLibrary : AppCompatActivity() {
             if (b != null) {
                 ebkPath = b.getString(INTENT_EBOOK_MODIFIED_PATH, "")
             }
-            if (ebkPath != null && ebkPath.length > 0) {
+            if (ebkPath != null && ebkPath.isNotEmpty()) {
                 BookLibApplication.instance.getLibManager().reReadEBookMetadata(ebkPath)
             }
         }
@@ -140,7 +140,7 @@ class BookLibrary : AppCompatActivity() {
                 val appVerName = BookLibApplication.instance.getAppVersionName(
                     "uk.co.droidinactu.elibrary"
                 )
-                supportActionBar!!.title = appTitle + " (" + appVerName + ")"
+                supportActionBar!!.title = "$appTitle ($appVerName)"
             } catch (e: Exception) {
                 Log.e(LOG_TAG, "Exception getting app vername")
             }
@@ -150,14 +150,14 @@ class BookLibrary : AppCompatActivity() {
         toolBarBookLibrary?.setSubtitle(R.string.app_subtitle)
         toolBarBookLibrary?.setLogo(R.mipmap.ic_launcher)
 
-        bookListCurrentReading = findViewById<RecyclerView>(R.id.dashboard_books_list_reading)
+        bookListCurrentReading = findViewById(R.id.dashboard_books_list_reading)
         val horizontalLayoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         bookListCurrentReading?.layoutManager = horizontalLayoutManager
         bookListCurrentReading?.setHasFixedSize(true)
 
         val gridLayoutManager = GridLayoutManager(this, 4)
-        bookListTag1Title = findViewById<Button>(R.id.dashboard_books_list_tag1_title)
-        bookListTag1 = findViewById<RecyclerView>(R.id.dashboard_books_list_tag1)
+        bookListTag1Title = findViewById(R.id.dashboard_books_list_tag1_title)
+        bookListTag1 = findViewById(R.id.dashboard_books_list_tag1)
         bookListTag1?.layoutManager = gridLayoutManager
         bookListTag1?.setHasFixedSize(true)
         bookListTag1Title?.setOnClickListener {
@@ -165,20 +165,20 @@ class BookLibrary : AppCompatActivity() {
             pickTag(1)
         }
 
-        progressBarContainer = findViewById<RelativeLayout>(R.id.dashboard_books_list_progressbar_container)
+        progressBarContainer = findViewById(R.id.dashboard_books_list_progressbar_container)
         progressBarContainer?.visibility = View.GONE
 
-        progressBar = findViewById<ProgressBar>(R.id.dashboard_books_list_progressbar)
+        progressBar = findViewById(R.id.dashboard_books_list_progressbar)
         progressBar?.visibility = View.INVISIBLE
         progressBar?.scaleY = 4f
-        progressBarLabel = findViewById<TextView>(R.id.dashboard_books_list_progressbar_label)
+        progressBarLabel = findViewById(R.id.dashboard_books_list_progressbar_label)
         progressBarLabel?.text = ""
 
-        fab = findViewById<FloatingActionButton>(R.id.fab)
-        fab?.setOnClickListener({ browseForLibrary() })
+        fab = findViewById(R.id.fab)
+        fab?.setOnClickListener { browseForLibrary() }
     }
 
-    var dialogTagTree: Dialog? = null
+    private var dialogTagTree: Dialog? = null
     private fun pickTag2(tagToSet: Int) {
         Log.d(LOG_TAG, "BookLibrary::pickTag2($tagToSet) started")
         var root = TreeNode.root()
@@ -279,7 +279,7 @@ class BookLibrary : AppCompatActivity() {
 
         val dialog = FilePickerDialog(this@BookLibrary, properties)
         dialog.setDialogSelectionListener { files ->
-            if (files.size > 0) {
+            if (files.isNotEmpty()) {
                 val fileBits = files[0].split("/".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
                 val libraryName = fileBits[fileBits.size - 1]
                 progressBar?.max = 2500

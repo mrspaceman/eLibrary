@@ -34,22 +34,22 @@ class FileObserverService : IntentService {
         Log.d(LOG_TAG, "onHandleIntent()")
         if (pIntent != null) {
             // Gets data from the incoming Intent
-            val file_obs_action = pIntent.getStringExtra("file_obs_action")
+            val fileObsAction = pIntent.getStringExtra("file_obs_action")
             val libname = pIntent.getStringExtra("libname")
             val rootdir = pIntent.getStringExtra("rootdir")
 
-            if (file_obs_action != null) {
+            if (fileObsAction != null) {
                 when {
-                    file_obs_action.equals("ADD", ignoreCase = true) -> BookLibApplication.instance.addFileWatcher(
+                    fileObsAction.equals("ADD", ignoreCase = true) -> BookLibApplication.instance.addFileWatcher(
                         libname,
                         rootdir
                     )
                     //BookLibApplication.getInstance().addFileWatcher(libname, rootdir);
-                    file_obs_action.equals("DEL", ignoreCase = true) -> BookLibApplication.instance.delFileWatcher(
+                    fileObsAction.equals("DEL", ignoreCase = true) -> BookLibApplication.instance.delFileWatcher(
                         libname
                     )
                     //BookLibApplication.getInstance().delFileWatcher(libname);
-                    else -> Log.d(LOG_TAG, "unknown action [" + file_obs_action + "]")
+                    else -> Log.d(LOG_TAG, "unknown action [$fileObsAction]")
                 }
             }
         }

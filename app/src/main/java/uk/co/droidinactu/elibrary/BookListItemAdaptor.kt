@@ -1,5 +1,6 @@
 package uk.co.droidinactu.elibrary
 
+import android.annotation.TargetApi
 import android.app.Activity
 import android.app.Dialog
 import android.content.Context
@@ -87,6 +88,7 @@ class BookListItemAdaptor(private val mBooks: MutableList<EBook>) :
         handler.postDelayed({ notifyItemRemoved(position) }, NOTIFY_DELAY.toLong())
     }
 
+    @TargetApi(11)
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view), View.OnClickListener,
         PopupMenu.OnMenuItemClickListener {
         private val mOverflowIcon: ImageView

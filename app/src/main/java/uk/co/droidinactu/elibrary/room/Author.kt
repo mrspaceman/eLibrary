@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull
     tableName = "authors",
     indices = arrayOf(Index(value = arrayOf("id"), unique = true))
 )
-class Author() {
+class Author {
 
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0
@@ -36,7 +36,7 @@ class Author() {
     val fullName: String
         get() {
             var authorString = ""
-            authorString += " " + firstname + " " + lastname + " "
+            authorString += " $firstname $lastname "
             authorString.trim { it <= ' ' }
             return authorString
         }

@@ -9,7 +9,7 @@ import androidx.room.PrimaryKey
     tableName = "tags",
     indices = arrayOf(Index(value = arrayOf("id"), unique = true))
 )
-class Tag() {
+class Tag {
 
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0
@@ -25,7 +25,7 @@ class Tag() {
     }
 
     companion object {
-        val UNCLASSIFIED = "Unclassified"
-        val CURRENTLY_READING = "Currently Reading"
+        const val UNCLASSIFIED = "Unclassified"
+        const val CURRENTLY_READING = "Currently Reading"
     }
 }

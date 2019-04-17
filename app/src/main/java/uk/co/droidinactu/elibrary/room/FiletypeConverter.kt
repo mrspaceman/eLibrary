@@ -6,14 +6,13 @@ import com.google.gson.Gson
 class FiletypeConverter {
     @TypeConverter
     fun listToJson(value: MutableList<FileType>?): String {
-        val jsonStr = Gson().toJson(value)
-        return jsonStr
+        return Gson().toJson(value)
     }
 
     @TypeConverter
     fun jsonToList(value: String): MutableList<FileType> {
         return try {
-            var objs = Gson().fromJson(value, Array<String>::class.java)
+            val objs = Gson().fromJson(value, Array<String>::class.java)
             //   objs = (objs as MutableList<String>).toTypedArray()
             val fileTypes = mutableListOf<FileType>()
             for (s in objs) {
@@ -21,7 +20,7 @@ class FiletypeConverter {
             }
             fileTypes
         } catch (e: ClassCastException) {
-            mutableListOf<FileType>()
+            mutableListOf()
         }
     }
 }

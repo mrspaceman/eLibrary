@@ -28,8 +28,8 @@ import java.util.concurrent.Executors
 
 class LibraryScanner {
 
-    var maxFiles = 0
-    var currReadFiles = 0
+    private var maxFiles = 0
+    private var currReadFiles = 0
     private var librootdir = ""
     private var dirnames: MutableList<String>? = ArrayList()
     private val filenames = ArrayList<String>()
@@ -158,8 +158,8 @@ class LibraryScanner {
             val bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
             pdfiumCore!!.renderPageBitmap(pdfDocument, bmp, pageNum, 0, 0, width, height)
             ebk.setCoverImageFromBitmap(bmp)
-            val pdfTitle = meta.getTitle().trim()
-            if (pdfTitle.length > 0 && pdfTitle.toLowerCase() != "untitled") {
+            val pdfTitle = meta.title.trim()
+            if (pdfTitle.isNotEmpty() && pdfTitle.toLowerCase() != "untitled") {
                 ebk.bookTitle = pdfTitle
             }
             //   ebk.addAuthor(Author(meta.getAuthor()))
@@ -260,14 +260,14 @@ class LibraryScanner {
             libMgr!!.updateBook(dbEbk)
         }
         for (t in ebk.tags) {
-            var ebkTg = EBookTagLink()
+            val ebkTg = EBookTagLink()
             ebkTg.ebookId = dbEbk.id
             ebkTg.tagId = t.id
             libMgr?.addEbookTagLink(ebkTg)
         }
         for (a in ebk.authors) {
             val t = libMgr!!.addAuthor(a)
-            var ebkAuth = EBookAuthorLink()
+            val ebkAuth = EBookAuthorLink()
             ebkAuth.ebookId = dbEbk.id
             ebkAuth.authorId = t!!.id
             libMgr?.addEbookAuthorLink(ebkAuth)
@@ -292,7 +292,7 @@ class LibraryScanner {
         )
 
         try {
-            var tagStrs =
+            val tagStrs =
                 f.parent.substring(librootdir.length + 1).split(File.separator.toRegex()).dropLastWhile { it.isEmpty() }
                     .toTypedArray()
             var prevBookTag: Tag? = null
@@ -308,14 +308,17 @@ class LibraryScanner {
         }
         Log.d(LOG_TAG, "parsing file [filename: " + filename + ", size: " + f.length() + "]")
 
-        if (filename.toLowerCase().endsWith("epub")) {
-            ebk.addFileType(FileType.EPUB)
-            readEpubMetadata(filename, f, ebk)
-        } else if (filename.toLowerCase().endsWith("pdf")) { // create a new renderer
-            ebk.addFileType(FileType.PDF)
-            readPdfMetadata(filename, f, ebk)
-        } else if (filename.toLowerCase().endsWith("mobi")) { // create a new renderer
-            ebk.addFileType(FileType.MOBI)
+        when {
+            filename.toLowerCase().endsWith("epub") -> {
+                ebk.addFileType(FileType.EPUB)
+                readEpubMetadata(filename, f, ebk)
+            }
+            filename.toLowerCase().endsWith("pdf") -> { // create a new renderer
+                ebk.addFileType(FileType.PDF)
+                readPdfMetadata(filename, f, ebk)
+            }
+            filename.toLowerCase().endsWith("mobi") -> // create a new renderer
+                ebk.addFileType(FileType.MOBI)
             //readMobiMetadata(filename, f, ebk);
         }
         addEBookToLibraryStorage(ctx, libname, ebk)
@@ -324,14 +327,14 @@ class LibraryScanner {
     fun printPdfInfo(core: PdfiumCore, doc: com.shockwave.pdfium.PdfDocument) {
         Log.d(LOG_TAG, "LibraryScanner::printPdfInfo() started")
         val meta = core.getDocumentMeta(doc)
-        Log.d(LOG_TAG, "title = " + meta.getTitle())
-        Log.d(LOG_TAG, "author = " + meta.getAuthor())
-        Log.d(LOG_TAG, "subject = " + meta.getSubject())
-        Log.d(LOG_TAG, "keywords = " + meta.getKeywords())
-        Log.d(LOG_TAG, "creator = " + meta.getCreator())
-        Log.d(LOG_TAG, "producer = " + meta.getProducer())
-        Log.d(LOG_TAG, "creationDate = " + meta.getCreationDate())
-        Log.d(LOG_TAG, "modDate = " + meta.getModDate())
+        Log.d(LOG_TAG, "title = " + meta.title)
+        Log.d(LOG_TAG, "author = " + meta.author)
+        Log.d(LOG_TAG, "subject = " + meta.subject)
+        Log.d(LOG_TAG, "keywords = " + meta.keywords)
+        Log.d(LOG_TAG, "creator = " + meta.creator)
+        Log.d(LOG_TAG, "producer = " + meta.producer)
+        Log.d(LOG_TAG, "creationDate = " + meta.creationDate)
+        Log.d(LOG_TAG, "modDate = " + meta.modDate)
     }
 
 }

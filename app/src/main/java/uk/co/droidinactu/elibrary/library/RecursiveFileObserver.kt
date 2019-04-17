@@ -61,39 +61,39 @@ class RecursiveFileObserver @JvmOverloads constructor(
         val localIntent = Intent(INTENT_EBOOK_MODIFIED)
         localIntent.putExtra(INTENT_EBOOK_MODIFIED_PATH, path)
         when (event) {
-            FileObserver.ACCESS -> Log.d(LOG_TAG, "onEvent() ACCESS: " + path)
-            FileObserver.ATTRIB -> Log.d(LOG_TAG, "onEvent() ATTRIB: " + path)
-            FileObserver.CLOSE_NOWRITE -> Log.d(LOG_TAG, "onEvent() CLOSE_NOWRITE: " + path)
-            FileObserver.CLOSE_WRITE -> Log.d(LOG_TAG, "onEvent() CLOSE_WRITE: " + path)
+            FileObserver.ACCESS -> Log.d(LOG_TAG, "onEvent() ACCESS: $path")
+            FileObserver.ATTRIB -> Log.d(LOG_TAG, "onEvent() ATTRIB: $path")
+            FileObserver.CLOSE_NOWRITE -> Log.d(LOG_TAG, "onEvent() CLOSE_NOWRITE: $path")
+            FileObserver.CLOSE_WRITE -> Log.d(LOG_TAG, "onEvent() CLOSE_WRITE: $path")
             FileObserver.CREATE -> {
-                Log.d(LOG_TAG, "onEvent() CREATE: " + path)
+                Log.d(LOG_TAG, "onEvent() CREATE: $path")
                 BookLibApplication.instance.sendBroadcast(localIntent)
             }
             FileObserver.DELETE -> {
-                Log.d(LOG_TAG, "onEvent() DELETE: " + path)
+                Log.d(LOG_TAG, "onEvent() DELETE: $path")
                 BookLibApplication.instance.sendBroadcast(localIntent)
             }
             FileObserver.DELETE_SELF -> {
-                Log.d(LOG_TAG, "onEvent() DELETE_SELF: " + path)
+                Log.d(LOG_TAG, "onEvent() DELETE_SELF: $path")
                 BookLibApplication.instance.sendBroadcast(localIntent)
             }
             FileObserver.MODIFY -> {
-                Log.d(LOG_TAG, "onEvent() MODIFY: " + path)
+                Log.d(LOG_TAG, "onEvent() MODIFY: $path")
                 BookLibApplication.instance.sendBroadcast(localIntent)
             }
             FileObserver.MOVE_SELF -> {
-                Log.d(LOG_TAG, "onEvent() MOVE_SELF: " + path)
+                Log.d(LOG_TAG, "onEvent() MOVE_SELF: $path")
                 BookLibApplication.instance.sendBroadcast(localIntent)
             }
             FileObserver.MOVED_FROM -> {
-                Log.d(LOG_TAG, "onEvent() MOVED_FROM: " + path)
+                Log.d(LOG_TAG, "onEvent() MOVED_FROM: $path")
                 BookLibApplication.instance.sendBroadcast(localIntent)
             }
             FileObserver.MOVED_TO -> {
-                Log.d(LOG_TAG, "onEvent() MOVED_TO: " + path)
+                Log.d(LOG_TAG, "onEvent() MOVED_TO: $path")
                 BookLibApplication.instance.sendBroadcast(localIntent)
             }
-            FileObserver.OPEN -> Log.d(LOG_TAG, "onEvent() OPEN: " + path)
+            FileObserver.OPEN -> Log.d(LOG_TAG, "onEvent() OPEN: $path")
             else -> {
             }
         }//Log.d(LOG_TAG,"onEvent() DEFAULT(" + event + "): " + path);
@@ -121,8 +121,8 @@ class RecursiveFileObserver @JvmOverloads constructor(
     }
 
     companion object {
-        val INTENT_EBOOK_MODIFIED = "uk.co.droidinactu.booklib.library.INTENT_EBOOK_MODIFIED"
-        val INTENT_EBOOK_MODIFIED_PATH = "uk.co.droidinactu.booklib.library.INTENT_EBOOK_MODIFIED_PATH"
+        const val INTENT_EBOOK_MODIFIED = "uk.co.droidinactu.booklib.library.INTENT_EBOOK_MODIFIED"
+        const val INTENT_EBOOK_MODIFIED_PATH = "uk.co.droidinactu.booklib.library.INTENT_EBOOK_MODIFIED_PATH"
         /**
          * Only modification events
          */

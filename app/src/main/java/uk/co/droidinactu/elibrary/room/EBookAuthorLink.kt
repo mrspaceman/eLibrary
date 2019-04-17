@@ -22,7 +22,7 @@ import androidx.room.Index
     ),
     indices = arrayOf(Index(value = ["ebookId", "authorId"]))
 )
-class EBookAuthorLink() {
+class EBookAuthorLink {
 
     @ColumnInfo
     var ebookId: Long = 0

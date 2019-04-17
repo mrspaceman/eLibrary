@@ -36,34 +36,34 @@ class BookLibApplication : Application() {
         lateinit var instance: BookLibApplication
             private set
 
-        val IS_DEBUGGING = true
+        const val IS_DEBUGGING = true
 
         val LINE_SEPARATOR = System.getProperty("line.separator")
         val sdf = DateTimeFormat.forPattern("yyyy-MM-dd")
         val logDataFmt = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS")
-        val simpleDateFmtStrView = "dd-MMM-yyyy"
-        val simpleDateFmtStrDb = "yyyyMMdd"
+        const val simpleDateFmtStrView = "dd-MMM-yyyy"
+        const val simpleDateFmtStrDb = "yyyyMMdd"
 
         val minsFmt = DecimalFormat("#0")
         val kmFmt = DecimalFormat("#0.0")
         val decFmt = DecimalFormat("#0.00")
         val gbp = DecimalFormat("£#0.00")
 
-        val ONE_SECOND = 1000
-        val ONE_MINUTE = 60000
-        val BLE_DEVICE_SCAN_PERIOD: Long = 10000
+        const val ONE_SECOND = 1000
+        const val ONE_MINUTE = 60000
+        const val BLE_DEVICE_SCAN_PERIOD: Long = 10000
     }
 
     fun addFileWatcher(libname: String?, rootdir: String?) {
         if (libname != null && rootdir != null) {
             if (!libraryWatcher.containsKey(libname)) {
-                Log.d(LOG_TAG, "Adding file observer for [" + libname + "] @ [" + rootdir + "]")
+                Log.d(LOG_TAG, "Adding file observer for [$libname] @ [$rootdir]")
                 val fileOb = RecursiveFileObserver(rootdir, CHANGES_ONLY)
                 libraryWatcher[libname] = fileOb
                 fileOb.startWatching()
             }
         } else {
-            Log.d(LOG_TAG, "Already watching for [" + libname + "] @ [" + rootdir + "]")
+            Log.d(LOG_TAG, "Already watching for [$libname] @ [$rootdir]")
         }
     }
 
@@ -168,7 +168,7 @@ class BookLibApplication : Application() {
     }
 
     /* Checks if external storage is available for read and write */
-    fun isExternalStorageWritable(): Boolean {
+    private fun isExternalStorageWritable(): Boolean {
         val state = Environment.getExternalStorageState()
         return Environment.MEDIA_MOUNTED == state
     }
@@ -197,7 +197,7 @@ class BookLibApplication : Application() {
         return extDir.path + File.separator + getApplicationName() + File.separator
     }
 
-    fun getApplicationName(): String {
+    private fun getApplicationName(): String {
         return this.getString(R.string.app_name)
     }
 

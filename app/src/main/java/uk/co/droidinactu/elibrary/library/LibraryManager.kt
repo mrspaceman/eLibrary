@@ -1,5 +1,6 @@
 package uk.co.droidinactu.elibrary.library
 
+import android.annotation.SuppressLint
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
@@ -80,7 +81,7 @@ class LibraryManager {
     }
 
     fun getBook(fullFilename: String): EBook {
-        return getBook(fullFilename, getLibraries().get(0).libraryTitle)
+        return getBook(fullFilename, getLibraries()[0].libraryTitle)
     }
 
     fun getBookFromFilename(fileName: String): EBook {
@@ -99,7 +100,7 @@ class LibraryManager {
         ebookDao.update(ebk)
     }
 
-    fun getBook(fullFilename: String, libname: String): EBook {
+    private fun getBook(fullFilename: String, libname: String): EBook {
         var ebk = ebookDao.getBookFromFullFilename(fullFilename)
         if (ebk == null) {
             ebk = EBook()
@@ -148,7 +149,7 @@ class LibraryManager {
     fun addAuthor(pFirstname: String, pLastname: String): Author? {
         val t = authorDao.getByName(pFirstname, pLastname)
         if (t == null) {
-            var a = Author()
+            val a = Author()
             a.firstname = pFirstname
             a.lastname = pLastname
             val newId = authorDao.insert(a)
@@ -208,9 +209,8 @@ class LibraryManager {
         }
     }
 
-    fun getEbookTagLink(ebookId: Long, tagId: Long): EBookTagLink? {
-        val t = ebookTagDao.getBookTagLink(ebookId, tagId)
-        return t
+    private fun getEbookTagLink(ebookId: Long, tagId: Long): EBookTagLink? {
+        return ebookTagDao.getBookTagLink(ebookId, tagId)
     }
 
     fun addTag(tagstr: String): Tag {
@@ -258,8 +258,7 @@ class LibraryManager {
         return lookupTagsForEBook(ebk)
     }
 
-    fun lookupTagsForEBook(ebk: EBook): List<Tag> {
-        val result = mutableListOf<Tag>()
+    private fun lookupTagsForEBook(ebk: EBook): List<Tag> {
 
 //        if (tagsForEBookQuery == null) {
 //            QueryBuilder<EBookTags, Long> dbQryBld = dbHelper . getEBookTagsDao ().queryBuilder();
@@ -278,34 +277,34 @@ class LibraryManager {
 //        tagsForEBookQuery.setArgumentHolderValue(0, ebk);
 //        return dbHelper.getTagDao().query(tagsForEBookQuery)
 
-        return result
+        return mutableListOf()
     }
     //endregion
 
     /** Library CRUD */
     //region library
     fun getLibrary(): Library {
-        return getLibraries().get(0)
+        return getLibraries()[0]
     }
 
     fun getLibrary(libname: String): Library {
         return libraryDao.getByName(libname)
     }
 
-    fun getLibraryList(): List<String> {
+    private fun getLibraryList(): List<String> {
         val aList = getLibraries()
         val strLst = ArrayList<String>()
         aList.stream().forEach { t -> { strLst.add(t.libraryTitle) } }
         return strLst
     }
 
-    fun getLibraries(): List<Library> {
+    private fun getLibraries(): List<Library> {
         try {
             return libraryDao.getAll()
         } catch (e: Exception) {
             Log.e(LOG_TAG, "Exception getting libraries: ", e)
         }
-        return mutableListOf<Library>()
+        return mutableListOf()
     }
 
     fun refreshLibraries(prgBrHandler: Handler?, handler: Handler?) {
@@ -314,7 +313,7 @@ class LibraryManager {
             scanningInProgress = true
             doAsync {
                 val aList = getLibraries()
-                if (aList.size == 0) {
+                if (aList.isEmpty()) {
                     Log.d(LOG_TAG, "BookLibrary::No Libraries to scan")
                     val completeMessage = handler!!.obtainMessage(64, "")
                     completeMessage.sendToTarget()
@@ -342,7 +341,7 @@ class LibraryManager {
 
     /** EBook Scanning */
     //region scanning
-    fun initiateScan(prgBrHandler: Handler?, handler: Handler?, lib: Library) {
+    private fun initiateScan(prgBrHandler: Handler?, handler: Handler?, lib: Library) {
         Log.d(LOG_TAG, "LibraryManager::initiateScan() Scanning library [" + lib.libraryTitle + "]")
         if (scanLibTask == null || scanLibTask?.taskComplete == true) {
             scanLibTask = LibraryScanTask()
@@ -374,6 +373,7 @@ class LibraryManager {
         }
     }
 
+    @SuppressLint("StaticFieldLeak")
     private inner class LibraryScanTask : AsyncTask<Any, Void, Void>() {
         private lateinit var prgBrHandler: Handler
         private lateinit var msgHndlr: Handler
@@ -390,7 +390,7 @@ class LibraryManager {
             libRootDir = params[2] as String
             libTitle = params[3] as String
             displayScanningNotification(libTitle)
-            Thread.currentThread().name = "LibraryScanTask:" + libTitle
+            Thread.currentThread().name = "LibraryScanTask:$libTitle"
             libraryScanner.readFiles(
                 BookLibApplication.instance.applicationContext,
                 prgBrHandler,
@@ -414,6 +414,7 @@ class LibraryManager {
 
     }
 
+    @SuppressLint("StaticFieldLeak")
     private inner class LibraryCheckLinksTask : AsyncTask<Any, Void, Void>() {
         private var msgHndlr: Handler? = null
         private var libRootDir: String? = null
@@ -495,8 +496,8 @@ class LibraryManager {
     //endregion
 
     companion object {
-        val DB_NAME = "books-db.sqlite"
-        val DB_NAME_ENC = "books-db-encrypted"
-        val CHANNEL_ID = "ScanningChannel"
+        const val DB_NAME = "books-db.sqlite"
+        const val DB_NAME_ENC = "books-db-encrypted"
+        const val CHANNEL_ID = "ScanningChannel"
     }
 }

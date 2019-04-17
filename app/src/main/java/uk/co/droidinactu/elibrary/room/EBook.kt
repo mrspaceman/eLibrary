@@ -76,7 +76,7 @@ class EBook() {
 
 
     val coverImageAsBitmap: Bitmap?
-        get() = if (coverImage != null && coverImage!!.size > 0) {
+        get() = if (coverImage != null && coverImage!!.isNotEmpty()) {
             BitmapFactory.decodeByteArray(coverImage, 0, coverImage!!.size)
         } else null
 
@@ -152,22 +152,22 @@ class EBook() {
 
     fun addAuthors(pAuthors: List<nl.siegmann.epublib.domain.Author>) {
         for (anAuth in pAuthors) {
-            var a = Author()
+            val a = Author()
             a.firstname = anAuth.firstname
             a.lastname = anAuth.lastname
             addAuthor(a)
         }
     }
 
-    fun addAuthor(author: Author) {
+    private fun addAuthor(author: Author) {
         authors.add(author)
     }
 
     companion object {
-        val COLUMN_NAME_FIRSTNAME = "firstname"
-        val COLUMN_NAME_LASTNAME = "lastname"
-        val COLUMN_NAME_WEBSITE = "website"
-        val COLUMN_BOOK_TITLE = "book_title"
-        val COLUMN_FULL_FILE_NAME = "full_file_dir_name"
+        const val COLUMN_NAME_FIRSTNAME = "firstname"
+        const val COLUMN_NAME_LASTNAME = "lastname"
+        const val COLUMN_NAME_WEBSITE = "website"
+        const val COLUMN_BOOK_TITLE = "book_title"
+        const val COLUMN_FULL_FILE_NAME = "full_file_dir_name"
     }
 }
