@@ -5,8 +5,8 @@ import android.app.Service
 import android.content.Intent
 import android.os.IBinder
 import android.util.Log
-import uk.co.droidinactu.elibrary.BookLibApplication
-import uk.co.droidinactu.elibrary.BookLibApplication.Companion.LOG_TAG
+import uk.co.droidinactu.elibrary.library.LibraryManager.Companion.LOG_TAG
+import java.util.*
 
 class FileObserverService : IntentService {
 
@@ -40,12 +40,12 @@ class FileObserverService : IntentService {
 
             if (fileObsAction != null) {
                 when {
-                    fileObsAction.equals("ADD", ignoreCase = true) -> BookLibApplication.instance.addFileWatcher(
+                    fileObsAction.equals("ADD", ignoreCase = true) -> addFileWatcher(
                         libname,
                         rootdir
                     )
                     //BookLibApplication.getInstance().addFileWatcher(libname, rootdir);
-                    fileObsAction.equals("DEL", ignoreCase = true) -> BookLibApplication.instance.delFileWatcher(
+                    fileObsAction.equals("DEL", ignoreCase = true) -> delFileWatcher(
                         libname
                     )
                     //BookLibApplication.getInstance().delFileWatcher(libname);
@@ -53,6 +53,28 @@ class FileObserverService : IntentService {
                 }
             }
         }
+    }
+
+
+    private val libraryWatcher = HashMap<String, RecursiveFileObserver>()
+
+    fun addFileWatcher(libname: String?, rootdir: String?) {
+        if (libname != null && rootdir != null) {
+            if (!libraryWatcher.containsKey(libname)) {
+                Log.d(LOG_TAG, "Adding file observer for [$libname] @ [$rootdir]")
+                val fileOb = RecursiveFileObserver(rootdir, RecursiveFileObserver.CHANGES_ONLY)
+                libraryWatcher[libname] = fileOb
+                fileOb.startWatching()
+            }
+        } else {
+            Log.d(LOG_TAG, "Already watching for [$libname] @ [$rootdir]")
+        }
+    }
+
+    fun delFileWatcher(libname: String) {
+        val fileOb = libraryWatcher[libname]
+        fileOb?.stopWatching()
+        libraryWatcher.remove(libname)
     }
 
 }

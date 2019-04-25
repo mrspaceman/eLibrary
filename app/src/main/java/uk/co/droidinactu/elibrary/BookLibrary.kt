@@ -79,6 +79,10 @@ class BookLibrary : AppCompatActivity() {
         }
     }
 
+    //#region Library Scanning Notification
+
+    //#endregion
+
     // Defines a Handler object that's attached to the UI thread
     private val mHandler = object : Handler(Looper.getMainLooper()) {
         /*

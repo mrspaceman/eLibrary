@@ -12,7 +12,8 @@ import nl.siegmann.epublib.epub.EpubReader
 import org.apache.commons.io.FilenameUtils
 import org.jetbrains.anko.doAsync
 import uk.co.droidinactu.elibrary.BookLibApplication
-import uk.co.droidinactu.elibrary.BookLibApplication.Companion.LOG_TAG
+import uk.co.droidinactu.elibrary.R
+import uk.co.droidinactu.elibrary.library.LibraryManager.Companion.LOG_TAG
 import uk.co.droidinactu.elibrary.room.*
 import java.io.File
 import java.io.FileInputStream
@@ -287,7 +288,7 @@ class LibraryScanner {
         ebk.setCoverImageFromBitmap(
             BitmapFactory.decodeResource(
                 ctx.resources,
-                uk.co.droidinactu.elibrary.R.drawable.generic_book_cover
+                R.drawable.generic_book_cover
             )
         )
 
@@ -307,6 +308,13 @@ class LibraryScanner {
             ebk.addTag(libMgr!!.addTag(Tag.UNCLASSIFIED))
         }
         Log.d(LOG_TAG, "parsing file [filename: " + filename + ", size: " + f.length() + "]")
+
+// FIXME: add when I can work out how
+//        try {
+//            val metadata = TikaAnalysis.extractMetadata(FileInputStream(f))
+//        } catch (e: Throwable) {
+//            Log.e(LOG_TAG, "Apache Tika exception : ${e.localizedMessage}", e)
+//        }
 
         when {
             filename.toLowerCase().endsWith("epub") -> {

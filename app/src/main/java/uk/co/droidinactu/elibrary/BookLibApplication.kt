@@ -17,13 +17,10 @@ import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import uk.co.droidinactu.elibrary.library.FileObserverService
 import uk.co.droidinactu.elibrary.library.LibraryManager
-import uk.co.droidinactu.elibrary.library.RecursiveFileObserver
-import uk.co.droidinactu.elibrary.library.RecursiveFileObserver.Companion.CHANGES_ONLY
 import java.io.File
 import java.io.IOException
 import java.sql.SQLException
 import java.text.DecimalFormat
-import java.util.*
 
 val Context.myApp: BookLibApplication
     get() = applicationContext as BookLibApplication
@@ -54,30 +51,9 @@ class BookLibApplication : Application() {
         const val BLE_DEVICE_SCAN_PERIOD: Long = 10000
     }
 
-    fun addFileWatcher(libname: String?, rootdir: String?) {
-        if (libname != null && rootdir != null) {
-            if (!libraryWatcher.containsKey(libname)) {
-                Log.d(LOG_TAG, "Adding file observer for [$libname] @ [$rootdir]")
-                val fileOb = RecursiveFileObserver(rootdir, CHANGES_ONLY)
-                libraryWatcher[libname] = fileOb
-                fileOb.startWatching()
-            }
-        } else {
-            Log.d(LOG_TAG, "Already watching for [$libname] @ [$rootdir]")
-        }
-    }
-
-    fun delFileWatcher(libname: String) {
-        val fileOb = libraryWatcher[libname]
-        fileOb?.stopWatching()
-        libraryWatcher.remove(libname)
-    }
-
     private var wakeLock: PowerManager.WakeLock? = null
 
     private lateinit var libMgr: LibraryManager
-
-    private val libraryWatcher = HashMap<String, RecursiveFileObserver>()
 
     private lateinit var fileObserverService: FileObserverService
 
@@ -95,7 +71,7 @@ class BookLibApplication : Application() {
 
         libMgr = LibraryManager()
         try {
-            libMgr.open()
+            libMgr.open(applicationContext)
         } catch (pE: SQLException) {
             pE.printStackTrace()
         }
@@ -212,10 +188,11 @@ class BookLibApplication : Application() {
         return false
     }
 
-    fun getAppVersionNbr(packageName: String): Int {
+    @SuppressLint("NewApi")
+    fun getAppVersionNbr(packageName: String): Long {
         try {
             val pInfo = packageManager.getPackageInfo(packageName, PackageManager.GET_META_DATA)
-            return pInfo.versionCode
+            return pInfo.getLongVersionCode()
         } catch (e: PackageManager.NameNotFoundException) {
             e.printStackTrace()
         }

@@ -3,8 +3,7 @@ package uk.co.droidinactu.elibrary.library
 import android.content.Intent
 import android.os.FileObserver
 import android.util.Log
-import uk.co.droidinactu.elibrary.BookLibApplication
-import uk.co.droidinactu.elibrary.BookLibApplication.Companion.LOG_TAG
+import uk.co.droidinactu.elibrary.library.LibraryManager.Companion.LOG_TAG
 import java.io.File
 import java.util.*
 
@@ -65,34 +64,34 @@ class RecursiveFileObserver @JvmOverloads constructor(
             FileObserver.ATTRIB -> Log.d(LOG_TAG, "onEvent() ATTRIB: $path")
             FileObserver.CLOSE_NOWRITE -> Log.d(LOG_TAG, "onEvent() CLOSE_NOWRITE: $path")
             FileObserver.CLOSE_WRITE -> Log.d(LOG_TAG, "onEvent() CLOSE_WRITE: $path")
-            FileObserver.CREATE -> {
-                Log.d(LOG_TAG, "onEvent() CREATE: $path")
-                BookLibApplication.instance.sendBroadcast(localIntent)
-            }
-            FileObserver.DELETE -> {
-                Log.d(LOG_TAG, "onEvent() DELETE: $path")
-                BookLibApplication.instance.sendBroadcast(localIntent)
-            }
-            FileObserver.DELETE_SELF -> {
-                Log.d(LOG_TAG, "onEvent() DELETE_SELF: $path")
-                BookLibApplication.instance.sendBroadcast(localIntent)
-            }
-            FileObserver.MODIFY -> {
-                Log.d(LOG_TAG, "onEvent() MODIFY: $path")
-                BookLibApplication.instance.sendBroadcast(localIntent)
-            }
-            FileObserver.MOVE_SELF -> {
-                Log.d(LOG_TAG, "onEvent() MOVE_SELF: $path")
-                BookLibApplication.instance.sendBroadcast(localIntent)
-            }
-            FileObserver.MOVED_FROM -> {
-                Log.d(LOG_TAG, "onEvent() MOVED_FROM: $path")
-                BookLibApplication.instance.sendBroadcast(localIntent)
-            }
-            FileObserver.MOVED_TO -> {
-                Log.d(LOG_TAG, "onEvent() MOVED_TO: $path")
-                BookLibApplication.instance.sendBroadcast(localIntent)
-            }
+//            FileObserver.CREATE -> {
+//                Log.d(LOG_TAG, "onEvent() CREATE: $path")
+//                BookLibApplication.instance.sendBroadcast(localIntent)
+//            }
+//            FileObserver.DELETE -> {
+//                Log.d(LOG_TAG, "onEvent() DELETE: $path")
+//                BookLibApplication.instance.sendBroadcast(localIntent)
+//            }
+//            FileObserver.DELETE_SELF -> {
+//                Log.d(LOG_TAG, "onEvent() DELETE_SELF: $path")
+//                BookLibApplication.instance.sendBroadcast(localIntent)
+//            }
+//            FileObserver.MODIFY -> {
+//                Log.d(LOG_TAG, "onEvent() MODIFY: $path")
+//                BookLibApplication.instance.sendBroadcast(localIntent)
+//            }
+//            FileObserver.MOVE_SELF -> {
+//                Log.d(LOG_TAG, "onEvent() MOVE_SELF: $path")
+//                BookLibApplication.instance.sendBroadcast(localIntent)
+//            }
+//            FileObserver.MOVED_FROM -> {
+//                Log.d(LOG_TAG, "onEvent() MOVED_FROM: $path")
+//                BookLibApplication.instance.sendBroadcast(localIntent)
+//            }
+//            FileObserver.MOVED_TO -> {
+//                Log.d(LOG_TAG, "onEvent() MOVED_TO: $path")
+//                BookLibApplication.instance.sendBroadcast(localIntent)
+//            }
             FileObserver.OPEN -> Log.d(LOG_TAG, "onEvent() OPEN: $path")
             else -> {
             }

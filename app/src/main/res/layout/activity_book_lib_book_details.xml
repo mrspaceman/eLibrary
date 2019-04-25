@@ -51,20 +51,33 @@
         android:lines="3"
         android:maxLines="3"
         android:padding="2dp"
-        android:text="ebook\ntitle"
+        android:text="filename"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
     <EditText
         android:id="@+id/book_details_author"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/book_details_filename"
+        android:layout_below="@+id/book_details_filepath"
         android:layout_alignStart="@+id/book_details_title"
         android:gravity="center"
         android:lines="3"
         android:maxLines="3"
         android:padding="2dp"
-        android:text="ebook\ntitle"
+        android:text="Author"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+
+    <TextView
+        android:id="@+id/book_details_filepath"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/book_details_filename"
+        android:layout_alignStart="@id/book_details_title"
+        android:gravity="center"
+        android:lines="3"
+        android:maxLines="3"
+        android:padding="2dp"
+        android:text="path"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
     <TextView

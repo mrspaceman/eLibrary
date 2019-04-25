@@ -16,13 +16,14 @@ import uk.co.droidinactu.elibrary.room.FileType
 
 class BookLibBookDetailsActivity : AppCompatActivity() {
 
+    private lateinit var mFilepath: TextView
     private lateinit var dateAddedToLib: TextView
     private lateinit var dateLibEntryMod: TextView
     private lateinit var mCover: BadgedImageView
     private lateinit var mTitle: EditText
     private lateinit var mFilename: EditText
     private lateinit var mAuthor: EditText
-    private lateinit var tagList: ListView
+    private lateinit var mTagList: ListView
     private lateinit var bookFullFileDirName: String
 
 
@@ -39,7 +40,8 @@ class BookLibBookDetailsActivity : AppCompatActivity() {
         mTitle = findViewById(R.id.book_details_title)
         mFilename = findViewById(R.id.book_details_filename)
         mAuthor = findViewById(R.id.book_details_author)
-        tagList = findViewById(R.id.book_details_tags)
+        mTagList = findViewById(R.id.book_details_tags)
+        mFilepath = findViewById(R.id.book_details_filepath)
 
         dateAddedToLib = findViewById(R.id.book_details_added_to_lib)
         dateLibEntryMod = findViewById(R.id.book_details_lib_entry_modified)
@@ -63,6 +65,7 @@ class BookLibBookDetailsActivity : AppCompatActivity() {
     }
 
     private fun updateBookDetails(ebk: EBook) {
+        val ctx = this
         var cvrBmp = ebk.coverImageAsBitmap
         if (cvrBmp == null) {
             cvrBmp = BitmapFactory.decodeResource(resources, R.drawable.generic_book_cover)
@@ -75,10 +78,30 @@ class BookLibBookDetailsActivity : AppCompatActivity() {
         dateLibEntryMod.text = someDate.toString(BookLibApplication.sdf)
 
         mTitle.setText(ebk.bookTitle)
-        mFilename.setText(ebk.fileName)
-        if (ebk.authors.size > 0) {
-            mAuthor.setText(ebk.authors[0].fullName)
+        doAsync {
+            val auths = BookLibApplication.instance.getLibManager().getAuthorsForBook(ebk)
+            val tags = BookLibApplication.instance.getLibManager().getTagsForBook(ebk)
+            uiThread {
+                if (auths != null && auths.size >= 1) {
+                    mAuthor.setText(auths.get(0).fullName)
+                }
+
+                val tagStrs = mutableListOf<String>()
+                for (t in tags) {
+                    tagStrs.add(t.tag)
+                }
+                val tagListAdaptor = ArrayAdapter(
+                    BookLibApplication.instance.applicationContext,
+                    android.R.layout.simple_list_item_1,
+                    android.R.id.text1,
+                    tagStrs
+                )
+                mTagList.adapter = tagListAdaptor
+            }
         }
+
+        mFilepath.setText(ebk.fileDir)
+        mFilename.setText(ebk.fileName)
         mCover.setImageBitmap(cvrBmp)
         val ftypes = ebk.filetypes
         if (ftypes.size == 1) {
@@ -88,15 +111,5 @@ class BookLibBookDetailsActivity : AppCompatActivity() {
             mCover.showBadge(true)
             mCover.setBadgeText("${FileType.EPUB}/${FileType.PDF}")
         }
-        val bookTags = ebk.tags
-        val tagStrs = mutableListOf<String>()
-        for (t in bookTags) {
-            tagStrs.add(t.tag)
-        }
-        val tagListAdaptor = ArrayAdapter(
-            this,
-            android.R.layout.simple_list_item_1, android.R.id.text1, tagStrs
-        )
-        tagList.adapter = tagListAdaptor
     }
 }

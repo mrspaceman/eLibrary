@@ -2,7 +2,6 @@ package uk.co.droidinactu.elibrary.library
 
 import android.annotation.SuppressLint
 import android.app.NotificationManager
-import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.AsyncTask
@@ -12,9 +11,6 @@ import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
-import uk.co.droidinactu.elibrary.BookLibApplication
-import uk.co.droidinactu.elibrary.BookLibApplication.Companion.LOG_TAG
-import uk.co.droidinactu.elibrary.BookLibrary
 import uk.co.droidinactu.elibrary.R
 import uk.co.droidinactu.elibrary.room.*
 import java.io.File
@@ -34,10 +30,11 @@ class LibraryManager {
     private lateinit var authorDao: AuthorDao
     private lateinit var tagDao: TagDao
     private lateinit var libraryDao: LibraryDao
+    private lateinit var ctx: Context
     //endregion
 
-    fun open() {
-        val ctx = BookLibApplication.instance.applicationContext
+    fun open(contex: Context) {
+        ctx = contex
         ebookDao = EBookRoomDatabase.getInstance(ctx)!!.ebookDao()
         ebookAuthorDao = EBookRoomDatabase.getInstance(ctx)!!.ebookAuthorLinkDao()
         ebookTagDao = EBookRoomDatabase.getInstance(ctx)!!.ebookTagLinkDao()
@@ -47,19 +44,19 @@ class LibraryManager {
     }
 
     fun close() {
-        EBookRoomDatabase.getInstance(BookLibApplication.instance.applicationContext)!!.close()
+        EBookRoomDatabase.getInstance(ctx)!!.close()
     }
 
     fun clear() {
         Log.d(LOG_TAG, "clear()")
         for (libname in getLibraryList()) {
             val intent = Intent(
-                BookLibApplication.instance.applicationContext,
+                ctx,
                 FileObserverService::class.java
             )
             intent.putExtra("file_obs_action", "del")
             intent.putExtra("libname", libname)
-            BookLibApplication.instance.applicationContext.startService(intent)
+            ctx.startService(intent)
         }
         ebookDao.clear()
         ebookAuthorDao.clear()
@@ -175,6 +172,10 @@ class LibraryManager {
     fun getAuthors(): List<Author> {
         return authorDao.getAll()
     }
+
+    fun getAuthorsForBook(ebk: EBook): List<Author> {
+        return ebookAuthorDao.getAuthorsForBook(ebk.id)
+    }
     //endregion
 
     /** Tag CRUD */
@@ -255,30 +256,9 @@ class LibraryManager {
     }
 
     fun getTagsForBook(ebk: EBook): List<Tag> {
-        return lookupTagsForEBook(ebk)
+        return ebookTagDao.getTagsForBook(ebk.id)
     }
 
-    private fun lookupTagsForEBook(ebk: EBook): List<Tag> {
-
-//        if (tagsForEBookQuery == null) {
-//            QueryBuilder<EBookTags, Long> dbQryBld = dbHelper . getEBookTagsDao ().queryBuilder();
-//
-//            // this time selecting for the user-id field
-//            dbQryBld.selectColumns(EBookTags.COLUMN_NAME_TAG_ID)
-//            var postSelectArg = new SelectArg ()
-//            dbQryBld.where().eq(EBookTags.COLUMN_NAME_BOOK_ID, postSelectArg)
-//
-//            // build our outer query
-//            QueryBuilder<BookTag, Long> userQb = dbHelper . getTagDao ().queryBuilder()
-//            // where the user-id matches the inner query's user-id field
-//            userQb.where().in(BookTag.COLUMN_NAME_ID, dbQryBld)
-//            tagsForEBookQuery = userQb.prepare()
-//        }
-//        tagsForEBookQuery.setArgumentHolderValue(0, ebk);
-//        return dbHelper.getTagDao().query(tagsForEBookQuery)
-
-        return mutableListOf()
-    }
     //endregion
 
     /** Library CRUD */
@@ -322,7 +302,7 @@ class LibraryManager {
                     val text = "No Libraries to Scan!"
                     val duration = Toast.LENGTH_SHORT
                     uiThread {
-                        val toast = Toast.makeText(BookLibApplication.instance.applicationContext, text, duration)
+                        val toast = Toast.makeText(ctx, text, duration)
                         toast.show()
                     }
                 } else {
@@ -392,7 +372,7 @@ class LibraryManager {
             displayScanningNotification(libTitle)
             Thread.currentThread().name = "LibraryScanTask:$libTitle"
             libraryScanner.readFiles(
-                BookLibApplication.instance.applicationContext,
+                ctx,
                 prgBrHandler,
                 libTitle,
                 libRootDir
@@ -463,29 +443,28 @@ class LibraryManager {
             scanningInProgress = false
             removeScanningNotification("")
         }
-
     }
 
     private fun displayScanningNotification(libname: String) {
-        val resultIntent = Intent(BookLibApplication.instance.applicationContext, BookLibrary::class.java)
-        val resultPendingIntent = PendingIntent.getActivity(
-            BookLibApplication.instance.applicationContext,
-            0,
-            resultIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT
-        )
+//        val resultIntent = Intent(ctx, BookLibrary::class.java)
+//        val resultPendingIntent = PendingIntent.getActivity(
+//            ctx,
+//            0,
+//            resultIntent,
+//            PendingIntent.FLAG_UPDATE_CURRENT
+//        )
 
-        mNotificationBuilder = NotificationCompat.Builder(BookLibApplication.instance.applicationContext, CHANNEL_ID)
+        mNotificationBuilder = NotificationCompat.Builder(ctx, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle("Scanning Library")
             .setContentText("Scan library $libname for pdf and epub books")
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            .setContentIntent(resultPendingIntent)
+            //   .setContentIntent(resultPendingIntent)
             .setProgress(0, 0, true)
         val notification = mNotificationBuilder?.build()
 
         mNotificationManager =
-            BookLibApplication.instance.applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            ctx.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         mNotificationManager?.notify(mNotificationId, notification)
     }
 
@@ -496,6 +475,7 @@ class LibraryManager {
     //endregion
 
     companion object {
+        val LOG_TAG = "BookLibApplication"
         const val DB_NAME = "books-db.sqlite"
         const val DB_NAME_ENC = "books-db-encrypted"
         const val CHANNEL_ID = "ScanningChannel"

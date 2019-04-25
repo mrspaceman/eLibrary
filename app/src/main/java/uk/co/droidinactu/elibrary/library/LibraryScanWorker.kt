@@ -5,7 +5,7 @@ import android.os.Handler
 import android.util.Log
 import androidx.work.Worker
 import androidx.work.WorkerParameters
-import uk.co.droidinactu.elibrary.BookLibApplication.Companion.LOG_TAG
+import uk.co.droidinactu.elibrary.library.LibraryManager.Companion.LOG_TAG
 
 class LibraryScanWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, params) {
 
