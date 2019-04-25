@@ -97,24 +97,30 @@ public class FileManagerProvider extends ContentProvider {
             }
 
             for (String col : projection) {
-                if (col.equals(MediaStore.MediaColumns.DATA)) {
-                    row.add(data);
-                } else if (col.equals(MediaStore.MediaColumns.MIME_TYPE)) {
-                    row.add(mimeType);
-                } else if (col.equals(MediaStore.MediaColumns.DISPLAY_NAME)) {
-                    row.add(displayName);
-                } else if (col.equals(MediaStore.MediaColumns.SIZE)) {
-                    if (size >= 0)
-                        row.add(size);
-                    else {
-                        // According to Android docs for unknown size.
-                        // Standard getLong() won't throw exception and
-                        // value will be 0.
+                switch (col) {
+                    case MediaStore.MediaColumns.DATA:
+                        row.add(data);
+                        break;
+                    case MediaStore.MediaColumns.MIME_TYPE:
+                        row.add(mimeType);
+                        break;
+                    case MediaStore.MediaColumns.DISPLAY_NAME:
+                        row.add(displayName);
+                        break;
+                    case MediaStore.MediaColumns.SIZE:
+                        if (size >= 0)
+                            row.add(size);
+                        else {
+                            // According to Android docs for unknown size.
+                            // Standard getLong() won't throw exception and
+                            // value will be 0.
+                            row.add(null);
+                        }
+                        break;
+                    default:
+                        // Unsupported or unknown columns are filled up with null
                         row.add(null);
-                    }
-                } else {
-                    // Unsupported or unknown columns are filled up with null
-                    row.add(null);
+                        break;
                 }
             }
 

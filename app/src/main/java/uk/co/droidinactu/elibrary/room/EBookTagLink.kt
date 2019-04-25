@@ -7,7 +7,7 @@ import androidx.room.Index
 
 @Entity(
     tableName = "ebooktaglink",
-    primaryKeys = arrayOf("ebookId", "tagId"),
+    primaryKeys = ["ebookId", "tagId"],
     foreignKeys = arrayOf(
         ForeignKey(
             entity = EBook::class,

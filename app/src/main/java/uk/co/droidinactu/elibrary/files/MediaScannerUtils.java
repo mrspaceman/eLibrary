@@ -28,8 +28,7 @@ public abstract class MediaScannerUtils {
         // NOTE: it seemed like overkill having to create a Helper class to
         // avoid VerifyError on 1.6 so that we can use MediaScannerConnection.scanFile()
         // Therefore we just iterate through files and use the compatible-with-every-version broadcast.
-        for (int i = 0; i < files.length; i++)
-            informFileAdded(c, files[i]);
+        for (File file : files) informFileAdded(c, file);
     }
 
     /**

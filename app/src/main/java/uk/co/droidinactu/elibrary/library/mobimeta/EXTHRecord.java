@@ -10,9 +10,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 public class EXTHRecord {
-    public static final int[] booleanTypes = new int[]{404};
-    public static final int[] knownTypes = new int[]{100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 118, 119, 200, 404, 501, 503, 504};
-    public static final String[] knownDesc = new String[]{"author", "publisher", "imprint", "description", "ISBN", "subject", "publishing date", "review", "contributor", "rights", "subject code", "type", "source", "ASIN", "version number", "retail price", "retail price currency", "dictionary short name", "TTS off", "CDE type", "updated title", "ASIN"};
+    private static final int[] booleanTypes = new int[]{404};
+    private static final int[] knownTypes = new int[]{100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 118, 119, 200, 404, 501, 503, 504};
+    private static final String[] knownDesc = new String[]{"author", "publisher", "imprint", "description", "ISBN", "subject", "publishing date", "review", "contributor", "rights", "subject code", "type", "source", "ASIN", "version number", "retail price", "retail price currency", "dictionary short name", "TTS off", "CDE type", "updated title", "ASIN"};
     private static HashMap<Integer, String> typeHash = new HashMap(knownTypes.length);
     private static HashSet<Integer> booleanTypesSet;
 
@@ -32,13 +32,13 @@ public class EXTHRecord {
 
     private byte[] recordType = new byte[4];
     private byte[] recordLength = new byte[4];
-    private byte[] recordData = null;
+    private byte[] recordData;
 
     public EXTHRecord(int recType, String data, String characterEncoding) {
         this(recType, StreamUtils.stringToByteArray(data, characterEncoding));
     }
 
-    public EXTHRecord(int recType, byte[] data) {
+    EXTHRecord(int recType, byte[] data) {
         StreamUtils.intToByteArray(recType, this.recordType);
         int len = data == null ? 0 : data.length;
         StreamUtils.intToByteArray(len + 8, this.recordLength);
@@ -55,7 +55,7 @@ public class EXTHRecord {
         StreamUtils.intToByteArray(this.size(), this.recordLength);
     }
 
-    public EXTHRecord(InputStream in) throws IOException {
+    EXTHRecord(InputStream in) throws IOException {
         MobiCommon.logMessage("*** EXTHRecord ***");
         StreamUtils.readByteArray(in, this.recordType);
         StreamUtils.readByteArray(in, this.recordLength);
@@ -147,11 +147,11 @@ public class EXTHRecord {
         return booleanTypesSet.contains(type);
     }
 
-    public static boolean isKnownType(int type) {
+    private static boolean isKnownType(int type) {
         return typeHash.containsKey(type);
     }
 
-    public static String getDescriptionForType(int type) {
+    private static String getDescriptionForType(int type) {
         return typeHash.get(type);
     }
 
@@ -159,11 +159,11 @@ public class EXTHRecord {
         return this.getDataLength() + 8;
     }
 
-    public int getDataLength() {
+    private int getDataLength() {
         return this.recordData.length;
     }
 
-    public int getRecordType() {
+    int getRecordType() {
         return StreamUtils.byteArrayToInt(this.recordType);
     }
 
@@ -187,7 +187,7 @@ public class EXTHRecord {
         StreamUtils.intToByteArray(value, this.recordData);
     }
 
-    public void setData(String s, String encoding) {
+    void setData(String s, String encoding) {
         this.recordData = StreamUtils.stringToByteArray(s, encoding);
         StreamUtils.intToByteArray(this.size(), this.recordLength);
     }
@@ -204,7 +204,7 @@ public class EXTHRecord {
         return EXTHRecord.getDescriptionForType(StreamUtils.byteArrayToInt(this.recordType));
     }
 
-    public void write(OutputStream out) throws IOException {
+    void write(OutputStream out) throws IOException {
         if (MobiCommon.debug) {
             MobiCommon.logMessage("*** Write EXTHRecord ***");
             MobiCommon.logMessage(StreamUtils.dumpByteArray(this.recordType));

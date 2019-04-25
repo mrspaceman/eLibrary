@@ -126,7 +126,7 @@ public class MobiMeta {
     }
 
     public String getMetaInfo() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("PDB Header\r\n");
         sb.append("----------\r\n");
         sb.append("Name: ");

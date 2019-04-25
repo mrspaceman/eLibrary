@@ -10,13 +10,13 @@ interface EBookAuthorLinkDao {
     @Query("SELECT * FROM ebookauthorlink")
     fun getAll(): List<EBookAuthorLink>
 
-//    @Query("SELECT * FROM ebooks INNER JOIN ebookauthorlink ON ebooks.id=ebookauthorlink.ebookId WHERE ebookauthorlink.authorId=:authorId")
-//    fun getBooksForAuthor(authorId: Int): MutableList<EBookAuthorLink>
-//
-//    @Query(
-//        "SELECT * FROM authors INNER JOIN ebookauthorlink ON authors.id = ebookauthorlink.authorId WHERE ebookauthorlink.ebookId =:ebookId"
-//    )
-//    fun getAuthorsForBook(ebookId: Int): MutableList<EBookAuthorLink>
+    @Query("SELECT * FROM ebooks INNER JOIN ebookauthorlink ON ebooks.id=ebookauthorlink.ebookId WHERE ebookauthorlink.authorId=:authorId")
+    fun getBooksForAuthor(authorId: Long): MutableList<EBookAuthorLink>
+
+    @Query(
+        "SELECT * FROM authors INNER JOIN ebookauthorlink ON authors.id = ebookauthorlink.authorId WHERE ebookauthorlink.ebookId =:ebookId"
+    )
+    fun getAuthorsForBook(ebookId: Long): MutableList<Author>
 
     @Insert
     fun insert(obj: EBookAuthorLink)

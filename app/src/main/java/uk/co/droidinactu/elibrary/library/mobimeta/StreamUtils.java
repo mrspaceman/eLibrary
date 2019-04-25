@@ -84,7 +84,7 @@ public class StreamUtils {
     }
 
     public static String dumpByteArray(byte[] buffer) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("{ ");
         int len = buffer.length;
         int i = 0;

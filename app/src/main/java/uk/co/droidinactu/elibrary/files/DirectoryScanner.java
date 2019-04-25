@@ -19,13 +19,13 @@ public class DirectoryScanner extends Thread {
     /**
      * List of contents is ready.
      */
-    public static final int MESSAGE_SHOW_DIRECTORY_CONTENTS = 500;    // List of contents is ready, obj = DirectoryContents
-    public static final int MESSAGE_SET_PROGRESS = 501;    // Set progress bar, arg1 = current value, arg2 = max value
+    private static final int MESSAGE_SHOW_DIRECTORY_CONTENTS = 500;    // List of contents is ready, obj = DirectoryContents
+    private static final int MESSAGE_SET_PROGRESS = 501;    // Set progress bar, arg1 = current value, arg2 = max value
 
     private static final String TAG = "OIFM_DirScanner";
     // Update progress bar every n files
     static final private int PROGRESS_STEPS = 50;
-    boolean cancelled;
+    private boolean cancelled;
     private File currentDirectory;
     private boolean running = false;
     private String mSdCardPath;
@@ -87,11 +87,13 @@ public class DirectoryScanner extends Thread {
         }
         Log.v(TAG, "Total count=" + totalCount + ")");
 
-        /** Directory container */
+        /* Directory container */
         listDir = new ArrayList<>(totalCount);
-        /** File container */
+
+        /* File container */
         listFile = new ArrayList<>(totalCount);
-        /** External storage container*/
+
+        /* External storage container*/
         listSdCard = new ArrayList<>(3);
     }
 
@@ -170,8 +172,8 @@ public class DirectoryScanner extends Thread {
         // Sort lists
         if (!cancelled) {
             Collections.sort(listSdCard);
-            Collections.sort(listDir, Comparators.getForDirectory(sortBy, ascending));
-            Collections.sort(listFile, Comparators.getForFile(sortBy, ascending));
+            listDir.sort(Comparators.getForDirectory(sortBy, ascending));
+            listFile.sort(Comparators.getForFile(sortBy, ascending));
         }
 
         // Return lists
@@ -256,11 +258,10 @@ class Comparators {
     static Comparator<FileHolder> getForDirectory(int comparator, boolean ascending) {
         switch (comparator) {
             case NAME:
-                return new NameComparator(ascending);
             case SIZE:
-                return new NameComparator(ascending); //Not a bug! Getting directory's size is very slow
             case EXTENSION:
-                return new NameComparator(ascending); // Sorting by name as folders don't have extensions.
+                return new NameComparator(ascending);//Not a bug! Getting directory's size is very slow
+// Sorting by name as folders don't have extensions.
             case LAST_MODIFIED:
                 return new LastModifiedComparator(ascending);
             default:
@@ -271,9 +272,9 @@ class Comparators {
 
 
 abstract class FileHolderComparator implements Comparator<FileHolder> {
-    protected boolean ascending = true;
+    boolean ascending = true;
 
-    public FileHolderComparator(boolean asc) {
+    FileHolderComparator(boolean asc) {
         ascending = asc;
     }
 
@@ -289,7 +290,7 @@ abstract class FileHolderComparator implements Comparator<FileHolder> {
 }
 
 class NameComparator extends FileHolderComparator {
-    public NameComparator(boolean asc) {
+    NameComparator(boolean asc) {
         super(asc);
     }
 
@@ -300,18 +301,18 @@ class NameComparator extends FileHolderComparator {
 }
 
 class SizeComparator extends FileHolderComparator {
-    public SizeComparator(boolean asc) {
+    SizeComparator(boolean asc) {
         super(asc);
     }
 
     @Override
     protected int comp(FileHolder f1, FileHolder f2) {
-        return ((Long) f1.getFile().length()).compareTo(f2.getFile().length());
+        return Long.compare(f1.getFile().length(), f2.getFile().length());
     }
 }
 
 class ExtensionComparator extends FileHolderComparator {
-    public ExtensionComparator(boolean asc) {
+    ExtensionComparator(boolean asc) {
         super(asc);
     }
 
@@ -322,12 +323,12 @@ class ExtensionComparator extends FileHolderComparator {
 }
 
 class LastModifiedComparator extends FileHolderComparator {
-    public LastModifiedComparator(boolean asc) {
+    LastModifiedComparator(boolean asc) {
         super(asc);
     }
 
     @Override
     protected int comp(FileHolder f1, FileHolder f2) {
-        return ((Long) f1.getFile().lastModified()).compareTo(f2.getFile().lastModified());
+        return Long.compare(f1.getFile().lastModified(), f2.getFile().lastModified());
     }
 }

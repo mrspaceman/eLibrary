@@ -92,13 +92,11 @@ class BookListItemAdaptor(private val mBooks: MutableList<EBook>) :
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view), View.OnClickListener,
         PopupMenu.OnMenuItemClickListener {
         private val mOverflowIcon: ImageView
-        internal var mTitle: TextView
-        internal var mCover: BadgedImageView
+        internal var mTitle: TextView = view.findViewById<View>(R.id.book_list_item_title) as TextView
+        internal var mCover: BadgedImageView = view.findViewById<View>(R.id.book_list_item_cover) as BadgedImageView
         internal var ebk: EBook? = null
 
         init {
-            mTitle = view.findViewById<View>(R.id.book_list_item_title) as TextView
-            mCover = view.findViewById<View>(R.id.book_list_item_cover) as BadgedImageView
             view.setOnClickListener(this)
             mOverflowIcon = view.findViewById<View>(R.id.book_list_item_context_menu) as ImageView
             mOverflowIcon.setOnClickListener(this)

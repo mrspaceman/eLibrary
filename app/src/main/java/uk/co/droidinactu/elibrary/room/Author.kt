@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull
 
 @Entity(
     tableName = "authors",
-    indices = arrayOf(Index(value = arrayOf("id"), unique = true))
+    indices = [Index(value = arrayOf("id"), unique = true)]
 )
 class Author {
 

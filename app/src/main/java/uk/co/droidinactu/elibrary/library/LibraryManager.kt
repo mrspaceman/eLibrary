@@ -475,7 +475,7 @@ class LibraryManager {
     //endregion
 
     companion object {
-        val LOG_TAG = "BookLibApplication"
+        const val LOG_TAG = "BookLibApplication"
         const val DB_NAME = "books-db.sqlite"
         const val DB_NAME_ENC = "books-db-encrypted"
         const val CHANNEL_ID = "ScanningChannel"

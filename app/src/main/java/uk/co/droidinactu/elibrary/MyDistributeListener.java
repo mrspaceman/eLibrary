@@ -2,7 +2,6 @@ package uk.co.droidinactu.elibrary;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.net.Uri;
 import com.microsoft.appcenter.distribute.Distribute;
 import com.microsoft.appcenter.distribute.DistributeListener;
@@ -26,26 +25,16 @@ public class MyDistributeListener implements DistributeListener {
         dialogBuilder.setMessage(releaseNotes);
 
         // Mimic default SDK buttons
-        dialogBuilder.setPositiveButton(com.microsoft.appcenter.distribute.R.string.appcenter_distribute_update_dialog_download, new DialogInterface.OnClickListener() {
-
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-
-                // This method is used to tell the SDK what button was clicked
-                Distribute.notifyUpdateAction(UpdateAction.UPDATE);
-            }
+        dialogBuilder.setPositiveButton(com.microsoft.appcenter.distribute.R.string.appcenter_distribute_update_dialog_download, (dialog, which) -> {
+            // This method is used to tell the SDK what button was clicked
+            Distribute.notifyUpdateAction(UpdateAction.UPDATE);
         });
 
         // We can postpone the release only if the update is not mandatory
         if (!releaseDetails.isMandatoryUpdate()) {
-            dialogBuilder.setNegativeButton(com.microsoft.appcenter.distribute.R.string.appcenter_distribute_update_dialog_postpone, new DialogInterface.OnClickListener() {
-
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-
-                    // This method is used to tell the SDK what button was clicked
-                    Distribute.notifyUpdateAction(UpdateAction.POSTPONE);
-                }
+            dialogBuilder.setNegativeButton(com.microsoft.appcenter.distribute.R.string.appcenter_distribute_update_dialog_postpone, (dialog, which) -> {
+                // This method is used to tell the SDK what button was clicked
+                Distribute.notifyUpdateAction(UpdateAction.POSTPONE);
             });
         }
         dialogBuilder.setCancelable(false); // if it's cancelable you should map cancel to postpone, but only for optional updates

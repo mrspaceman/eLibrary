@@ -16,14 +16,12 @@ class BadgeDrawable extends Drawable {
     private static final String TYPEFACE = "sans-serif-black";
     private static final int TYPEFACE_STYLE = Typeface.NORMAL;
     private final Paint paint;
-    private String text;
     private Bitmap bitmap;
     private int width;
     private int height;
 
     BadgeDrawable(Context context, String badgeText, int badgeColor) {
         if (bitmap == null && badgeText != null) {
-            text = badgeText;
             final DisplayMetrics dm = context.getResources().getDisplayMetrics();
             final float density = dm.density;
             final float scaledDensity = dm.scaledDensity;
@@ -34,7 +32,7 @@ class BadgeDrawable extends Drawable {
             final float padding = PADDING * density;
             final float cornerRadius = CORNER_RADIUS * density;
             final Rect textBounds = new Rect();
-            textPaint.getTextBounds(text, 0, text.length(), textBounds);
+            textPaint.getTextBounds(badgeText, 0, badgeText.length(), textBounds);
             height = (int) (padding + textBounds.height() + padding);
             width = (int) (padding + textBounds.width() + padding);
             bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
@@ -45,7 +43,7 @@ class BadgeDrawable extends Drawable {
             canvas.drawRoundRect(0, 0, width, height, cornerRadius, cornerRadius, backgroundPaint);
             // punch out the word ,leaving transparency
             textPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
-            canvas.drawText(text, padding, height - padding, textPaint);
+            canvas.drawText(badgeText, padding, height - padding, textPaint);
         }
         paint = new Paint();
     }

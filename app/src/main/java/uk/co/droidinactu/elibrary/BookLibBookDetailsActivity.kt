@@ -82,8 +82,8 @@ class BookLibBookDetailsActivity : AppCompatActivity() {
             val auths = BookLibApplication.instance.getLibManager().getAuthorsForBook(ebk)
             val tags = BookLibApplication.instance.getLibManager().getTagsForBook(ebk)
             uiThread {
-                if (auths != null && auths.size >= 1) {
-                    mAuthor.setText(auths.get(0).fullName)
+                if (auths!!.isNotEmpty()) {
+                    mAuthor.setText(auths[0].fullName)
                 }
 
                 val tagStrs = mutableListOf<String>()

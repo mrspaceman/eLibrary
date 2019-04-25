@@ -58,7 +58,7 @@ class FileObserverService : IntentService {
 
     private val libraryWatcher = HashMap<String, RecursiveFileObserver>()
 
-    fun addFileWatcher(libname: String?, rootdir: String?) {
+    private fun addFileWatcher(libname: String?, rootdir: String?) {
         if (libname != null && rootdir != null) {
             if (!libraryWatcher.containsKey(libname)) {
                 Log.d(LOG_TAG, "Adding file observer for [$libname] @ [$rootdir]")
@@ -71,7 +71,7 @@ class FileObserverService : IntentService {
         }
     }
 
-    fun delFileWatcher(libname: String) {
+    private fun delFileWatcher(libname: String) {
         val fileOb = libraryWatcher[libname]
         fileOb?.stopWatching()
         libraryWatcher.remove(libname)

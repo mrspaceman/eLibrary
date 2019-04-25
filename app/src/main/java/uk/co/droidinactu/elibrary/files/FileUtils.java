@@ -161,17 +161,7 @@ public class FileUtils {
     public static boolean checkIfZipArchive(File f) {
         int l = f.getName().length();
         // TODO test
-        if (f.isFile() && FileUtils.getExtension(f.getAbsolutePath()).equalsIgnoreCase(".zip"))
-            return true;
-        return false;
-
-        // Old way. REALLY slow. Too slow for realtime action loading.
-//        try {
-//            new ZipFile(f);
-//            return true;
-//        } catch (Exception e){
-//            return false;
-//        }
+        return f.isFile() && FileUtils.getExtension(f.getAbsolutePath()).equalsIgnoreCase(".zip");
     }
 
     /**
@@ -276,7 +266,6 @@ public class FileUtils {
             List<ResolveInfo> activities = c.getPackageManager().queryIntentActivities(intent, 0);
             if (activities.isEmpty() || (activities.size() == 1 && c.getApplicationInfo().packageName.equals(activities.get(0).activityInfo.packageName))) {
                 Toast.makeText(c, R.string.application_not_available, Toast.LENGTH_SHORT).show();
-                return;
             } else {
                 c.startActivity(intent);
             }

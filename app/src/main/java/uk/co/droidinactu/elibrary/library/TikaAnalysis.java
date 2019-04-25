@@ -11,14 +11,12 @@ public class TikaAnalysis {
 
     public static String detectDocType(InputStream stream) throws IOException {
         Tika tika = new Tika();
-        String mediaType = tika.detect(stream);
-        return mediaType;
+        return tika.detect(stream);
     }
 
     public static String extractContent(InputStream stream) throws IOException, TikaException {
         Tika tika = new Tika();
-        String content = tika.parseToString(stream);
-        return content;
+        return tika.parseToString(stream);
     }
 
     public static Metadata extractMetadata(InputStream stream) throws IOException {

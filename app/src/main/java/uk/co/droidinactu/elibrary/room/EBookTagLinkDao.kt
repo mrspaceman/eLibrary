@@ -13,6 +13,11 @@ interface EBookTagLinkDao {
     @Query("SELECT * FROM ebooktaglink WHERE ebookId=:bookId and tagId=:tagId")
     fun getBookTagLink(bookId: Long, tagId: Long): EBookTagLink
 
+    @Query(
+        "SELECT * FROM tags INNER JOIN ebooktaglink ON tags.id = ebooktaglink.ebookId WHERE ebooktaglink.ebookId =:ebookId"
+    )
+    fun getTagsForBook(ebookId: Long): MutableList<Tag>
+
     @Insert
     fun insert(obj: EBookTagLink)
 

@@ -155,7 +155,7 @@ class BookLibrary : AppCompatActivity() {
         toolBarBookLibrary?.setLogo(R.mipmap.ic_launcher)
 
         bookListCurrentReading = findViewById(R.id.dashboard_books_list_reading)
-        val horizontalLayoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        val horizontalLayoutManager = LinearLayoutManager(this, RecyclerView.HORIZONTAL, false)
         bookListCurrentReading?.layoutManager = horizontalLayoutManager
         bookListCurrentReading?.setHasFixedSize(true)
 
@@ -462,7 +462,7 @@ class BookLibrary : AppCompatActivity() {
             val libInfo = findViewById<TextView>(R.id.dashboard_library_info)
             val libTitle = BookLibApplication.instance.getLibManager().getLibrary().libraryTitle
             val nbrBooks = BookLibApplication.instance.getLibManager().getBookCount()
-            val text = getString(R.string.library_contains_x_books, libTitle, nbrBooks)
+            val text = getResources().getQuantityString(R.plurals.library_contains_x_books, nbrBooks)
             uiThread {
                 libInfo.text = text
             }
