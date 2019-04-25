@@ -23,10 +23,9 @@ Adobe PDF reader, Google Books etc...
     * [x] add directory ebook file is in as a tag
     * [x] filter the ebooks displayed by tag selected
     * [x] search for ebooks with a string in the title/bookTags/directory
-
+    * [x] convert to kotlin
 
 ### Todo
-    * [ ] convert to kotlin
     * [ ] Convert to Room DB
     * [ ] download covers/metadata from
         * https://www.librarything.com/services/
@@ -43,7 +42,6 @@ Adobe PDF reader, Google Books etc...
     * [ ] allow marking ebooks as [read|reading|unread|new]
     * [ ] Watch file system for changes to ebook libraries
     * [ ] periodic [daily|weekly] scan of root dirs in background
-
 
 
 ## For debugging:
