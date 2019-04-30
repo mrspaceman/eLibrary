@@ -58,7 +58,7 @@ class BookLibrary : AppCompatActivity() {
     private var bookListTag1IncludeSubTags: Boolean = false
     private var bookListAdaptorCurrReading: BookListItemAdaptor? = null
     private var bookListAdaptorTag1: BookListItemAdaptor? = null
-    private val mLayoutManager: RecyclerView.LayoutManager? = null
+
     private var fab: FloatingActionButton? = null
     private var progressBar: ProgressBar? = null
     private var progressBarLabel: TextView? = null
@@ -431,6 +431,16 @@ class BookLibrary : AppCompatActivity() {
             }
             R.id.action_settings -> {
                 showSettings()
+                return true
+            }
+            R.id.action_checkDb -> {
+                doAsync {
+                    BookLibApplication.instance.getLibManager().checkDb(
+                        mHandler,
+                        mHandlerScanningNotification,
+                        BookLibApplication.instance.getLibManager().getLibrary().libraryTitle
+                    )
+                }
                 return true
             }
             R.id.action_clear_db -> {

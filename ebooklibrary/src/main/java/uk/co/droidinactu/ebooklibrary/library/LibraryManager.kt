@@ -47,6 +47,12 @@ class LibraryManager {
         EBookRoomDatabase.getInstance(ctx)!!.close()
     }
 
+    fun checkDb(msgHndlr:Handler, scanNotificationHndlr:Handler,libRootDir: String) {
+        Log.d(LOG_TAG, "checkDb()")
+        // FIXME : de dupe the database
+        LibraryCheckLinksTask().execute(msgHndlr, scanNotificationHndlr, libRootDir)
+    }
+
     fun clear() {
         Log.d(LOG_TAG, "clear()")
         for (libname in getLibraryList()) {

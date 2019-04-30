@@ -18,6 +18,13 @@
         app:showAsAction="ifRoom" />
 
     <item
+        android:id="@+id/action_checkDb"
+        android:icon="@drawable/ic_database_check_white"
+        android:orderInCategory="100"
+        android:title="@string/action_checkDb"
+        app:showAsAction="ifRoom" />
+
+    <item
         android:id="@+id/action_settings"
         android:icon="@drawable/ic_settings_white_24dp"
         android:orderInCategory="100"

@@ -8,22 +8,6 @@ apply plugin: ("kotlin-android")
 apply plugin: ("kotlin-android-extensions")
 apply plugin: ("kotlin-kapt")
 
-apply plugin: ("checkstyle")
-apply plugin: ("findbugs")
-//apply plugin:("plantuml")
-
-
-task checkstyle(type: Checkstyle) {
-    configFile file("${project.rootDir}/config/quality/checkstyle.xml")
-    configProperties.checkstyleSuppressionsPath = file("${project.rootDir}/config/quality/checkstyle/suppressions.xml").absolutePath
-    source "src"
-    include "**/*.java"
-    exclude "**/gen/**"
-    exclude "build/**"
-    classpath = files()
-}
-
-check.dependsOn "checkstyle"
 
 final BUILD_DATE = new Date().format('yyyy_MM_dd_HHmm')
 
@@ -33,8 +17,44 @@ def getDate() {
     return formattedDate
 }
 
+task dumpdebug {
+    println('dumpdebug - Config Phase')
+    print "name         :"
+    println name
+    print "path         :"
+    println path
+    print "description  :"
+    println description
+    print "projectDir   :"
+    println projectDir
+    print "buildDir     :"
+    println buildDir
+    print "group        :"
+    println group
+    print "version      :"
+    println version
+    print "project.name :"
+    println project.name
+
+    logger.quiet("An info log message which is always logged.")
+    logger.error("An error log message.")
+    logger.warn("A warning log message.")
+    logger.lifecycle("A lifecycle info log message.")
+    logger.info("An info log message.")
+    logger.debug("A debug log message.")
+    logger.trace("A trace log message.")
+}
+
 task timenow {
-    println('Date is : ' + getDate())
+    println('timenow - Config Phase')
+    dependsOn dumpdebug
+    doFirst {
+        println('doFirst Phase')
+    }
+    doLast {
+        println('dolast Phase')
+        println('Date is : ' + getDate())
+    }
 }
 
 android {
@@ -44,7 +64,7 @@ android {
         minSdkVersion 26
         targetSdkVersion 28
         versionCode 1
-        versionName "2019.04"
+        versionName "${elibraryPrjVersion}"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -125,34 +145,10 @@ dependencies {
 
     implementation("com.izikode.izilib:accordionrecycler:0.5")
     implementation("com.github.bmelnychuk:atv:1.2.+")
-
+    
+    implementation 'net.steamcrafted:materialiconlib:1.1.5'
 }
+
 configurations {
     all*.exclude group: 'com.google.guava', module: 'listenablefuture'
 }
-
-print "name         :"
-println name
-print "path         :"
-println path
-print "description  :"
-println description
-print "projectDir   :"
-println projectDir
-print "buildDir     :"
-println buildDir
-print "group        :"
-println group
-print "version      :"
-println version
-print "project.name :"
-println project.name
-
-// logger.quiet("An info log message which is always logged.")
-// logger.error("An error log message.")
-// logger.warn("A warning log message.")
-// logger.lifecycle("A lifecycle info log message.")
-// logger.info("An info log message.")
-// logger.debug("A debug log message.")
-// logger.trace("A trace log message.")
-
