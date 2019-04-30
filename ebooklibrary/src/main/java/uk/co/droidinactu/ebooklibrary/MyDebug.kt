@@ -53,6 +53,7 @@ object MyDebug {
     private var TRACE = false
     private var TRACE_DIRECTORY = "uk.co.droidinactu.booklib.traces"
 
+    @JvmField
     val LOG = LoggerFactory.getLogger("BookLibApplication")
 
     fun startMethodTracing(traceFile: String) {

@@ -79,8 +79,8 @@ android {
             // resource files and BuildConfig aren't rebuilt with each run.
             // If they were dynamic, they would prevent certain benefits of
             // Instant Run as well as Gradle UP-TO-DATE checks.
-            buildConfigField("String", "BUILD_TIME", "\"0\"")
-            resValue("string", "build_time", "0")
+            buildConfigField("String", "BUILD_TIME", "\"${BUILD_DATE}\"")
+            resValue("string", "build_time", "${BUILD_DATE}")
         }
     }
     compileOptions {

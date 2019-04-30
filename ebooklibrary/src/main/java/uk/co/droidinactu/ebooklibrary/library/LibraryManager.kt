@@ -89,13 +89,14 @@ class LibraryManager {
 
     /** EBook CRUB */
     //region ebooks
-    fun addBookToLibrary(libname: String, ebk: EBook) {
+    fun addBookToLibrary(libname: String, ebk: EBook): EBook {
         ebk.inLibraryId = libraryDao.getByName(libname).id
         try {
             val newId = ebookDao.insert(ebk)
         } catch (pE: java.sql.SQLException) {
             MyDebug.LOG.error("Exception adding book to library", pE)
         }
+        return ebookDao.getBookFromFullFilename(ebk.fullFileDirName)
     }
 
     fun getBook(fullFilename: String): EBook {
@@ -402,7 +403,7 @@ class LibraryManager {
             scanNotificationHndlr = params[2] as Handler
             libRootDir = params[3] as String
             libTitle = params[4] as String
-            val completeMessage = scanNotificationHndlr!!.obtainMessage(64, "startscanning:$libTitle")
+            val completeMessage = scanNotificationHndlr.obtainMessage(64, "startscanning:$libTitle")
             completeMessage.sendToTarget()
             Thread.currentThread().name = "LibraryScanTask:$libTitle"
             libraryScanner.readFiles(
@@ -423,7 +424,7 @@ class LibraryManager {
             }
             //     BookLibApplication.instance.copyDbFileToSd(LibraryManager.DB_NAME)
             taskComplete = true
-            val completeMessage = scanNotificationHndlr!!.obtainMessage(64, "stopscanning")
+            val completeMessage = scanNotificationHndlr.obtainMessage(64, "stopscanning")
             completeMessage.sendToTarget()
             checkDb(msgHndlr, scanNotificationHndlr, libRootDir)
         }

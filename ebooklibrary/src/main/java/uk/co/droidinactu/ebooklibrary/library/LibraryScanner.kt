@@ -21,6 +21,7 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
 import java.io.IOException
+import java.sql.SQLException
 import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -47,7 +48,12 @@ class LibraryScanner {
 
     fun readFiles(ctx: Context, prgBrHandler: Handler, libname: String, rootdir: String) {
         MyDebug.LOG.debug("LibraryScanner::readFiles() started")
-        libMgr = LibraryManager()
+        try {
+            libMgr = LibraryManager()
+            libMgr!!.open(ctx)
+        } catch (pE: SQLException) {
+            MyDebug.LOG.error("Exception opening database", pE)
+        }
         this.prgBrHandler = prgBrHandler
         librootdir = rootdir
         findDirs(rootdir)
@@ -255,9 +261,7 @@ class LibraryScanner {
         MyDebug.LOG.debug("LibraryScanner::addEBookToLibraryStorage() started")
         var dbEbk = libMgr!!.getBookFromFullFilename(ebk.fullFileDirName)
         if (dbEbk == null) {
-            libMgr!!.addBookToLibrary(libName, ebk)
-            dbEbk = libMgr!!.getBookCalled(ebk.bookTitle)
-
+            dbEbk =   libMgr!!.addBookToLibrary(libName, ebk)
         } else {
             dbEbk.addFileTypes(ebk.filetypes)
             libMgr!!.updateBook(dbEbk)

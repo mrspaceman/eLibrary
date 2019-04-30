@@ -62,12 +62,12 @@ class BookLibApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         instance = this
-        MyDebug.LOG.errordebug("onCreate(); application being created.")
+        MyDebug.LOG.debug("onCreate(); application being created.")
 
         //     copyDbFileToSd(LibraryManager.DB_NAME)
 
-        libMgr = LibraryManager()
         try {
+            libMgr = LibraryManager()
             libMgr.open(applicationContext)
         } catch (pE: SQLException) {
             pE.printStackTrace()
@@ -115,18 +115,18 @@ class BookLibApplication : Application() {
                 val backupDBPath =
                     sd.path + File.separator + dbName + "-" + someDate.toString(sdfFile)
 
-                MyDebug.LOG.errordebug("copying db file from [$dbPath] to [$backupDBPath]")
+                MyDebug.LOG.debug("copying db file from [$dbPath] to [$backupDBPath]")
                 if (dbPath.exists()) {
                     dbPath.copyTo(File(backupDBPath), true)
-                    MyDebug.LOG.errordebug("Database file backed up to sdcard")
+                    MyDebug.LOG.debug("Database file backed up to sdcard")
                 } else {
-                    MyDebug.LOG.errorerror("Can't find Database file [$dbPath]")
+                    MyDebug.LOG.error("Can't find Database file [$dbPath]")
                 }
             } else {
-                MyDebug.LOG.errorerror("External Storage not writable")
+                MyDebug.LOG.error("External Storage not writable")
             }
         } catch (e: Exception) {
-            MyDebug.LOG.errorerror("Exception backing up database", e)
+            MyDebug.LOG.error("Exception backing up database", e)
         }
     }
 

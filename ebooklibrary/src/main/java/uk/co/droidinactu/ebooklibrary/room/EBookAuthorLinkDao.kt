@@ -3,6 +3,7 @@ package uk.co.droidinactu.ebooklibrary.room
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 
 @Dao
@@ -18,10 +19,10 @@ interface EBookAuthorLinkDao {
     )
     fun getAuthorsForBook(ebookId: Long): MutableList<Author>
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(obj: EBookAuthorLink)
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(vararg objs: EBookAuthorLink)
 
     @Delete

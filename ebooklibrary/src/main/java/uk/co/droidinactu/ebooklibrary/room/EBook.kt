@@ -12,6 +12,7 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import org.jetbrains.annotations.NotNull
 import java.io.ByteArrayOutputStream
+import java.util.*
 
 /**
  * Created by aspela on 31/08/16.
@@ -144,18 +145,25 @@ class EBook() {
         }
     }
 
+    fun removeArrayDuplicates(duplicates: Array<FileType>): Array<FileType> {
+        return Arrays.asList(*duplicates).toSet().toTypedArray()
+    }
+
     fun addFileType(pFiletype: FileType) {
         if (!filetypes.contains(pFiletype)) {
             filetypes.add(pFiletype)
         }
+        filetypes = removeArrayDuplicates(filetypes.toTypedArray()).toMutableList()
     }
 
     fun addFileTypes(pFiletype: MutableList<FileType>) {
         filetypes.addAll(pFiletype)
+        filetypes = removeArrayDuplicates(filetypes.toTypedArray()).toMutableList()
     }
 
     fun addFileType(pFiletype: String) {
         filetypes.add(FileType.valueOf(pFiletype))
+        filetypes = removeArrayDuplicates(filetypes.toTypedArray()).toMutableList()
     }
 
     fun addAuthors(pAuthors: List<nl.siegmann.epublib.domain.Author>) {
