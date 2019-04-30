@@ -6,11 +6,14 @@ import android.content.Context
 import android.content.Intent
 import android.os.AsyncTask
 import android.os.Handler
-import android.util.Log
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
+import uk.co.droidinactu.ebooklibrary.MyDebug
 import uk.co.droidinactu.ebooklibrary.room.*
 import java.io.File
 import java.util.*
@@ -47,14 +50,26 @@ class LibraryManager {
         EBookRoomDatabase.getInstance(ctx)!!.close()
     }
 
-    fun checkDb(msgHndlr:Handler, scanNotificationHndlr:Handler,libRootDir: String) {
-        Log.d(LOG_TAG, "checkDb()")
-        // FIXME : de dupe the database
-        LibraryCheckLinksTask().execute(msgHndlr, scanNotificationHndlr, libRootDir)
+    fun checkDb(msgHndlr: Handler, scanNotificationHndlr: Handler, libRootDir: String) {
+        MyDebug.LOG.debug("checkDb()")
+        var completeMessage = scanNotificationHndlr.obtainMessage(64, "startdbcheck")
+        completeMessage.sendToTarget()
+        doAsync {
+            runBlocking {
+                val job1 = GlobalScope.launch { checkDbTagDeDupe() }
+                val job2 = GlobalScope.launch { checkDbRemoveMissingBooks() }
+
+                job1.join()
+                job2.join()
+
+                completeMessage = scanNotificationHndlr.obtainMessage(64, "stopdbcheck")
+                completeMessage.sendToTarget()
+            }
+        }
     }
 
     fun clear() {
-        Log.d(LOG_TAG, "clear()")
+        MyDebug.LOG.debug("clear()")
         for (libname in getLibraryList()) {
             val intent = Intent(
                 ctx,
@@ -79,7 +94,7 @@ class LibraryManager {
         try {
             val newId = ebookDao.insert(ebk)
         } catch (pE: java.sql.SQLException) {
-            Log.e(LOG_TAG, "Exception adding book to library", pE)
+            MyDebug.LOG.error("Exception adding book to library", pE)
         }
     }
 
@@ -257,6 +272,10 @@ class LibraryManager {
         return tagDao.getAll()
     }
 
+    fun getTagsUnique(): List<Tag> {
+        return tagDao.getAllUnique()
+    }
+
     fun deleteTag(tag: Tag) {
         tagDao.delete(tag)
     }
@@ -288,19 +307,19 @@ class LibraryManager {
         try {
             return libraryDao.getAll()
         } catch (e: Exception) {
-            Log.e(LOG_TAG, "Exception getting libraries: ", e)
+            MyDebug.LOG.error("Exception getting libraries: ", e)
         }
         return mutableListOf()
     }
 
     fun refreshLibraries(prgBrHandler: Handler?, handler: Handler?, scanNotificationHndlr: Handler?) {
-        Log.d(LOG_TAG, "BookLibrary::refreshLibraries()")
+        MyDebug.LOG.debug("BookLibrary::refreshLibraries()")
         if (!scanningInProgress) {
             scanningInProgress = true
             doAsync {
                 val aList = getLibraries()
                 if (aList.isEmpty()) {
-                    Log.d(LOG_TAG, "BookLibrary::No Libraries to scan")
+                    MyDebug.LOG.debug("BookLibrary::No Libraries to scan")
                     val completeMessage = handler!!.obtainMessage(64, "")
                     completeMessage.sendToTarget()
                     scanningInProgress = false
@@ -313,7 +332,7 @@ class LibraryManager {
                     }
                 } else {
                     for (lib in aList) {
-                        Log.d(
+                        MyDebug.LOG.debug(
                             LOG_TAG,
                             "Scanning library [${lib.libraryTitle}] before has [${getBookCount(lib)}] ebooks"
                         )
@@ -328,7 +347,7 @@ class LibraryManager {
     /** EBook Scanning */
     //region scanning
     private fun initiateScan(prgBrHandler: Handler?, handler: Handler?, scanNotificationHndlr: Handler?, lib: Library) {
-        Log.d(LOG_TAG, "LibraryManager::initiateScan() Scanning library [" + lib.libraryTitle + "]")
+        MyDebug.LOG.debug("LibraryManager::initiateScan() Scanning library [" + lib.libraryTitle + "]")
         if (scanLibTask == null || scanLibTask?.taskComplete == true) {
             scanLibTask = LibraryScanTask()
             scanLibTask?.execute(prgBrHandler, handler, scanNotificationHndlr, lib.libraryRootDir, lib.libraryTitle)
@@ -357,9 +376,9 @@ class LibraryManager {
             try {
                 libraryDao.insert(l)
             } catch (pE: java.sql.SQLException) {
-                Log.e(LOG_TAG, "Exception adding library", pE)
+                MyDebug.LOG.error("Exception adding library", pE)
             } catch (pE: Exception) {
-                Log.e(LOG_TAG, "Exception adding library", pE)
+                MyDebug.LOG.error("Exception adding library", pE)
             }
             initiateScan(prgBrHandler, handler, scanNotificationHndlr, l)
         }
@@ -376,7 +395,7 @@ class LibraryManager {
         var taskComplete: Boolean = false
 
         override fun doInBackground(vararg params: Any): Void? {
-            Log.d(LOG_TAG, "LibraryScanTask::doInBackground(" + params[3] as String + ") started")
+            MyDebug.LOG.debug("LibraryScanTask::doInBackground(" + params[3] as String + ") started")
             taskComplete = false
             prgBrHandler = params[0] as Handler
             msgHndlr = params[1] as Handler
@@ -396,7 +415,7 @@ class LibraryManager {
         }
 
         override fun onPostExecute(aVoid: Void) {
-            Log.d(LOG_TAG, "LibraryScanTask::onPostExecute() started")
+            MyDebug.LOG.debug("LibraryScanTask::onPostExecute() started")
             super.onPostExecute(aVoid)
             if (msgHndlr != null) {
                 val completeMessage = msgHndlr.obtainMessage(64, libTitle)
@@ -406,64 +425,54 @@ class LibraryManager {
             taskComplete = true
             val completeMessage = scanNotificationHndlr!!.obtainMessage(64, "stopscanning")
             completeMessage.sendToTarget()
-            LibraryCheckLinksTask().execute(msgHndlr, scanNotificationHndlr, libRootDir)
+            checkDb(msgHndlr, scanNotificationHndlr, libRootDir)
         }
-
     }
 
-    @SuppressLint("StaticFieldLeak")
-    private inner class LibraryCheckLinksTask : AsyncTask<Any, Void, Void>() {
-        private var msgHndlr: Handler? = null
-        private lateinit var scanNotificationHndlr: Handler
-        private var libRootDir: String? = null
-        private val ls = LibraryScanner()
-        private var taskComplete: Boolean = false
+    private fun checkDbTagDeDupe() {
+        MyDebug.LOG.debug("checkDbTagDeDupe()")
+        // Get all tags for library
 
-        override fun doInBackground(vararg params: Any): Void? {
-            taskComplete = false
-            msgHndlr = params[0] as Handler
-            scanNotificationHndlr = params[1] as Handler
-            libRootDir = params[2] as String
-            Thread.currentThread().name = "LibraryCheckLinksTask:"
-            val completeMessage = scanNotificationHndlr.obtainMessage(64, "startdbcheck")
-            completeMessage.sendToTarget()
+        // for each tag (t1)
+        //fetch all duplicate named tags
 
-            val allBooks = getBooks()
+        // for each duplicate tag (t2)
+        // get books for tag (t2)
+        // change link (t2) to point to tag (t1)
+        // remove duplicate tag (t2)
 
-            for (ebk in allBooks) {
-                for (ft in ebk.filetypes) {
-                    if (File(ebk.fullFileDirName + "." + ft).exists()) {
-                        // file exists so we leave it in the library
-                    } else {
-                        Log.e(
-                            LOG_TAG,
-                            "EBook FileTreeNode Not Found so removed from library [" + ebk.fullFileDirName + "]"
-                        )
-                        //FIXME : delete book from db
-                    }
-                }
+        var allTags = getTagsUnique()
+
+
+        allTags = getTags()
+        for (t in allTags) {
+            val booksForTag = getBooksForTag(t, true)
+            if (booksForTag.size < 3) {
+                deleteTag(t)
             }
-
-            val allTags = getTags()
-            for (t in allTags) {
-                val booksForTag = getBooksForTag(t, true)
-                if (booksForTag.size < 3) {
-                    deleteTag(t)
-                }
-            }
-            return null
         }
+    }
 
-        override fun onPostExecute(aVoid: Void) {
-            super.onPostExecute(aVoid)
-            if (msgHndlr != null) {
-                val completeMessage = msgHndlr!!.obtainMessage(64)
-                completeMessage.sendToTarget()
+    private fun checkDbRemoveMissingBooks() {
+        MyDebug.LOG.debug("checkDbRemoveMissingBooks()")
+        //      val completeMessage = scanNotificationHndlr.obtainMessage(64, "startdbcheck")
+        //      completeMessage.sendToTarget()
+
+        val allBooks = getBooks()
+        for (ebk in allBooks) {
+            for (ft in ebk.filetypes) {
+                if (File(ebk.fullFileDirName + "." + ft).exists()) {
+                    // file exists so we leave it in the library
+                } else {
+                    MyDebug.LOG.error(
+                        LOG_TAG,
+                        "EBook FileTreeNode Not Found so removed from library [" + ebk.fullFileDirName + "]"
+                    )
+                    //FIXME : delete book author links
+                    //FIXME : delete book tag links
+                    //FIXME : delete book from db
+                }
             }
-            taskComplete = true
-            scanningInProgress = false
-            val completeMessage = scanNotificationHndlr!!.obtainMessage(64, "stopdbcheck")
-            completeMessage.sendToTarget()
         }
     }
 

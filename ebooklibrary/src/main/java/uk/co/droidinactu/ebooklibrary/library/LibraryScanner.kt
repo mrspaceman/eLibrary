@@ -6,13 +6,12 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Handler
 import android.os.ParcelFileDescriptor
-import android.util.Log
 import com.shockwave.pdfium.PdfiumCore
 import nl.siegmann.epublib.epub.EpubReader
 import org.apache.commons.io.FilenameUtils
 import org.jetbrains.anko.doAsync
+import uk.co.droidinactu.ebooklibrary.MyDebug
 import uk.co.droidinactu.ebooklibrary.R
-import uk.co.droidinactu.ebooklibrary.library.LibraryManager.Companion.LOG_TAG
 import uk.co.droidinactu.ebooklibrary.room.EBook
 import uk.co.droidinactu.ebooklibrary.room.EBookAuthorLink
 import uk.co.droidinactu.ebooklibrary.room.EBookTagLink
@@ -47,7 +46,7 @@ class LibraryScanner {
     private var libMgr: LibraryManager? = null
 
     fun readFiles(ctx: Context, prgBrHandler: Handler, libname: String, rootdir: String) {
-        Log.d(LOG_TAG, "LibraryScanner::readFiles() started")
+        MyDebug.LOG.debug("LibraryScanner::readFiles() started")
         libMgr = LibraryManager()
         this.prgBrHandler = prgBrHandler
         librootdir = rootdir
@@ -64,7 +63,7 @@ class LibraryScanner {
     }
 
     private fun findDirs(dirname: String) {
-        Log.d(LOG_TAG, "LibraryScanner::findDirs() started")
+        MyDebug.LOG.debug("LibraryScanner::findDirs() started")
         var f = File(dirname.trim { it <= ' ' })
         val listOfFiles = f.list()
 
@@ -79,7 +78,7 @@ class LibraryScanner {
     }
 
     private fun findFiles() {
-        Log.d(LOG_TAG, "LibraryScanner::findFiles() started")
+        MyDebug.LOG.debug("LibraryScanner::findFiles() started")
         for (dir in dirnames!!) {
             var f = File(dir.trim { it <= ' ' })
             val listOfFiles = f.list()
@@ -94,7 +93,7 @@ class LibraryScanner {
     }
 
     private fun readFileData(ctx: Context, libname: String) {
-        Log.d(LOG_TAG, "LibraryScanner::readFileData() started")
+        MyDebug.LOG.debug("LibraryScanner::readFileData() started")
         pdfiumCore = PdfiumCore(ctx.applicationContext)
         executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() - 1)
         maxFiles = filenames.size
@@ -106,7 +105,7 @@ class LibraryScanner {
             try {
                 readFile(ctx, libname, filename)
             } catch (e: Exception) {
-                Log.e(LOG_TAG, "Exception reading book file [" + filename + "] " + e.message)
+                MyDebug.LOG.error("Exception reading book file [" + filename + "] " + e.message)
             }
             currReadFiles++
             if (prgBrHandler != null && currReadFiles % 5 == 0) {
@@ -117,7 +116,7 @@ class LibraryScanner {
     }
 
     private fun readEpubMetadata(filename: String, f: File, ebk: EBook) {
-        Log.d(LOG_TAG, "LibraryScanner::readEpubMetadata() started")
+        MyDebug.LOG.debug("LibraryScanner::readEpubMetadata() started")
         ebk.addFileType(FileType.EPUB)
         ebk.bookTitle = (f.name.substring(0, f.name.length - 5))
         ebk.fullFileDirName = ebk.fileDir + File.separator + ebk.bookTitle
@@ -135,18 +134,18 @@ class LibraryScanner {
                 }
                 epubInputStream.close()
             } catch (e: IOException) {
-                Log.e(LOG_TAG, "Failed to read epub details from [" + filename + "] " + e.message)
+                MyDebug.LOG.error("Failed to read epub details from [" + filename + "] " + e.message)
             } catch (npe: NullPointerException) {
-                Log.e(LOG_TAG, "NullPointerException reading epub details from [" + filename + "] " + npe.message)
+                MyDebug.LOG.error("NullPointerException reading epub details from [" + filename + "] " + npe.message)
             }
 
         } else {
-            Log.d(LOG_TAG, "Skipping Large epub [filename: " + filename + ", size: " + f.length() + "]")
+            MyDebug.LOG.debug("Skipping Large epub [filename: " + filename + ", size: " + f.length() + "]")
         }
     }
 
     private fun readPdfMetadata(filename: String, f: File, ebk: EBook) {
-        Log.d(LOG_TAG, "LibraryScanner::readPdfMetadata() started")
+        MyDebug.LOG.debug("LibraryScanner::readPdfMetadata() started")
         ebk.addFileType(FileType.PDF)
         ebk.bookTitle = f.name.substring(0, f.name.length - 4)
         ebk.fullFileDirName = ebk.fileDir + File.separator + ebk.bookTitle
@@ -170,9 +169,9 @@ class LibraryScanner {
             pdfiumCore!!.closeDocument(pdfDocument)
 
         } catch (e: FileNotFoundException) {
-            Log.e(LOG_TAG, "FileNotFoundException reading pdf file [" + filename + "] " + e.message)
+            MyDebug.LOG.error("FileNotFoundException reading pdf file [" + filename + "] " + e.message)
         } catch (e1: IOException) {
-            Log.e(LOG_TAG, "IOException reading pdf file [" + filename + "] " + e1.message)
+            MyDebug.LOG.error("IOException reading pdf file [" + filename + "] " + e1.message)
         }
 
     }
@@ -253,7 +252,7 @@ class LibraryScanner {
 
     @Synchronized
     private fun addEBookToLibraryStorage(libName: String, ebk: EBook) {
-        Log.d(LOG_TAG, "LibraryScanner::addEBookToLibraryStorage() started")
+        MyDebug.LOG.debug("LibraryScanner::addEBookToLibraryStorage() started")
         var dbEbk = libMgr!!.getBookFromFullFilename(ebk.fullFileDirName)
         if (dbEbk == null) {
             libMgr!!.addBookToLibrary(libName, ebk)
@@ -279,7 +278,7 @@ class LibraryScanner {
     }
 
     private fun readFile(ctx: Context, libname: String, filename: String) {
-        Log.d(LOG_TAG, "LibraryScanner::readFile($filename) started")
+        MyDebug.LOG.debug("LibraryScanner::readFile($filename) started")
         val f = File(filename)
 
         val ebk = EBook()
@@ -310,13 +309,13 @@ class LibraryScanner {
         } catch (oob: StringIndexOutOfBoundsException) {
             ebk.addTag(libMgr!!.addTag(Tag.UNCLASSIFIED))
         }
-        Log.d(LOG_TAG, "parsing file [filename: " + filename + ", size: " + f.length() + "]")
+        MyDebug.LOG.debug("parsing file [filename: " + filename + ", size: " + f.length() + "]")
 
 // FIXME: add when I can work out how
 //        try {
 //            val metadata = TikaAnalysis.extractMetadata(FileInputStream(f))
 //        } catch (e: Throwable) {
-//            Log.e(LOG_TAG, "Apache Tika exception : ${e.localizedMessage}", e)
+//             MyDebug.LOG.error( "Apache Tika exception : ${e.localizedMessage}", e)
 //        }
 
         when {
@@ -336,16 +335,16 @@ class LibraryScanner {
     }
 
     fun printPdfInfo(core: PdfiumCore, doc: com.shockwave.pdfium.PdfDocument) {
-        Log.d(LOG_TAG, "LibraryScanner::printPdfInfo() started")
+        MyDebug.LOG.debug("LibraryScanner::printPdfInfo() started")
         val meta = core.getDocumentMeta(doc)
-        Log.d(LOG_TAG, "title = " + meta.title)
-        Log.d(LOG_TAG, "author = " + meta.author)
-        Log.d(LOG_TAG, "subject = " + meta.subject)
-        Log.d(LOG_TAG, "keywords = " + meta.keywords)
-        Log.d(LOG_TAG, "creator = " + meta.creator)
-        Log.d(LOG_TAG, "producer = " + meta.producer)
-        Log.d(LOG_TAG, "creationDate = " + meta.creationDate)
-        Log.d(LOG_TAG, "modDate = " + meta.modDate)
+        MyDebug.LOG.debug("title = " + meta.title)
+        MyDebug.LOG.debug("author = " + meta.author)
+        MyDebug.LOG.debug("subject = " + meta.subject)
+        MyDebug.LOG.debug("keywords = " + meta.keywords)
+        MyDebug.LOG.debug("creator = " + meta.creator)
+        MyDebug.LOG.debug("producer = " + meta.producer)
+        MyDebug.LOG.debug("creationDate = " + meta.creationDate)
+        MyDebug.LOG.debug("modDate = " + meta.modDate)
     }
 
 }

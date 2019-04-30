@@ -12,6 +12,9 @@ interface TagDao {
     @Query("SELECT * FROM tags order by tag")
     fun getAll(): List<Tag>
 
+    @Query("SELECT DISTINCT id,tag,parentTagId FROM tags order by tag")
+    fun getAllUnique(): List<Tag>
+
     @Query(
         "with recursive tc( i ) " +
                 "  as ( select id from tags where id = (:tagid)" +

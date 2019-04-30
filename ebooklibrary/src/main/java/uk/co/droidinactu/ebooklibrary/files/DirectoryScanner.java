@@ -6,7 +6,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
-import android.util.Log;
+import uk.co.droidinactu.ebooklibrary.MyDebug;
 import uk.co.droidinactu.ebooklibrary.R;
 
 import java.io.File;
@@ -66,7 +66,7 @@ public class DirectoryScanner extends Thread {
         init();
 
         if (cancelled) {
-            Log.v(TAG, "Scan aborted while checking files");
+            MyDebug.LOG.error(TAG, "Scan aborted while checking files");
             return;
         }
 
@@ -74,7 +74,7 @@ public class DirectoryScanner extends Thread {
         if (files != null) {
             for (File currentFile : files) {
                 if (cancelled) {
-                    Log.v(TAG, "Scan aborted while checking files");
+                    MyDebug.LOG.error(TAG, "Scan aborted while checking files");
                     return;
                 }
                 progress++;
@@ -120,7 +120,7 @@ public class DirectoryScanner extends Thread {
             }
         } else {
             if (cancelled) {
-                Log.v(TAG, "Scan aborted while checking files");
+                MyDebug.LOG.errorv(TAG, "Scan aborted while checking files");
                 return;
             }
             // show alternative directories
@@ -129,7 +129,7 @@ public class DirectoryScanner extends Thread {
 
         }
 
-        Log.v(TAG, "Sorting results...");
+        MyDebug.LOG.errorv(TAG, "Sorting results...");
         int sortBy = 1;//PreferenceActivity.getSortBy(context);
         boolean ascending = true;//PreferenceActivity.getAscending(context);
 
@@ -142,7 +142,7 @@ public class DirectoryScanner extends Thread {
 
         // Return lists
         if (!cancelled) {
-            Log.v(TAG, "Sending data back to main thread");
+            MyDebug.LOG.errorv(TAG, "Sending data back to main thread");
 
             DirectoryContents contents = new DirectoryContents();
 
@@ -161,10 +161,10 @@ public class DirectoryScanner extends Thread {
     }
 
     private void init() {
-        Log.v(TAG, "Scanning directory " + currentDirectory);
+        MyDebug.LOG.errorv(TAG, "Scanning directory " + currentDirectory);
 
         if (cancelled) {
-            Log.v(TAG, "Scan aborted");
+            MyDebug.LOG.errorv(TAG, "Scan aborted");
             return;
         }
 
@@ -180,11 +180,11 @@ public class DirectoryScanner extends Thread {
         operationStartTime = SystemClock.uptimeMillis();
 
         if (files == null) {
-            Log.v(TAG, "Returned null - inaccessible directory?");
+            MyDebug.LOG.errorv(TAG, "Returned null - inaccessible directory?");
         } else {
             totalCount = files.length;
         }
-        Log.v(TAG, "Total count=" + totalCount + ")");
+        MyDebug.LOG.errorv(TAG, "Total count=" + totalCount + ")");
 
         /* Directory container */
         listDir = new ArrayList<>(totalCount);

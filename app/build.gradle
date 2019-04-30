@@ -140,12 +140,12 @@ dependencies {
 
     implementation("com.izikode.izilib:accordionrecycler:0.5")
 
-    //   implementation("com.google.code.gson:gson:2.8.2")
-    //   implementation("org.slf4j:slf4j-android:1.7.25")
+    implementation 'org.slf4j:slf4j-api:1.7.25'
+    implementation 'com.github.tony19:logback-android:2.0.0'
 
     implementation("com.izikode.izilib:accordionrecycler:0.5")
     implementation("com.github.bmelnychuk:atv:1.2.+")
-    
+
     implementation 'net.steamcrafted:materialiconlib:1.1.5'
 }
 

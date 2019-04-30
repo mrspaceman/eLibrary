@@ -2,10 +2,9 @@ package uk.co.droidinactu.ebooklibrary.library
 
 import android.content.Context
 import android.os.Handler
-import android.util.Log
 import androidx.work.Worker
 import androidx.work.WorkerParameters
-import uk.co.droidinactu.ebooklibrary.library.LibraryManager.Companion.LOG_TAG
+import uk.co.droidinactu.ebooklibrary.MyDebug
 
 class LibraryScanWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, params) {
 
@@ -17,7 +16,7 @@ class LibraryScanWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, pa
     var taskComplete: Boolean = false
 
     override fun doWork(): Result {
-        Log.d(LOG_TAG, "LibraryScanWorker::doWork() started")
+        MyDebug.LOG.debug("LibraryScanWorker::doWork() started")
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 

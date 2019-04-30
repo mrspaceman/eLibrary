@@ -10,7 +10,6 @@ import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
 import android.os.Environment
 import android.os.PowerManager
-import android.util.Log
 import android.util.Patterns
 import org.apache.commons.io.FileUtils
 import org.joda.time.DateTime
@@ -28,8 +27,6 @@ val Context.myApp: BookLibApplication
 class BookLibApplication : Application() {
 
     companion object {
-        val LOG_TAG = BookLibApplication::class.java.simpleName
-
         lateinit var instance: BookLibApplication
             private set
 
@@ -65,7 +62,7 @@ class BookLibApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         instance = this
-        Log.d(LOG_TAG, "onCreate(); application being created.")
+        MyDebug.LOG.errordebug("onCreate(); application being created.")
 
         //     copyDbFileToSd(LibraryManager.DB_NAME)
 
@@ -118,18 +115,18 @@ class BookLibApplication : Application() {
                 val backupDBPath =
                     sd.path + File.separator + dbName + "-" + someDate.toString(sdfFile)
 
-                Log.d(LOG_TAG, "copying db file from [$dbPath] to [$backupDBPath]")
+                MyDebug.LOG.errordebug("copying db file from [$dbPath] to [$backupDBPath]")
                 if (dbPath.exists()) {
                     dbPath.copyTo(File(backupDBPath), true)
-                    Log.d(LOG_TAG, "Database file backed up to sdcard")
+                    MyDebug.LOG.errordebug("Database file backed up to sdcard")
                 } else {
-                    Log.e(LOG_TAG, "Can't find Database file [$dbPath]")
+                    MyDebug.LOG.errorerror("Can't find Database file [$dbPath]")
                 }
             } else {
-                Log.e(LOG_TAG, "External Storage not writable")
+                MyDebug.LOG.errorerror("External Storage not writable")
             }
         } catch (e: Exception) {
-            Log.e(LOG_TAG, "Exception backing up database", e)
+            MyDebug.LOG.errorerror("Exception backing up database", e)
         }
     }
 

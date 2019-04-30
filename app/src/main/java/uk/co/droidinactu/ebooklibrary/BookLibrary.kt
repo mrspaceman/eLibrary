@@ -13,7 +13,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.Message
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -32,7 +31,6 @@ import com.unnamed.b.atv.model.TreeNode
 import com.unnamed.b.atv.view.AndroidTreeView
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
-import uk.co.droidinactu.ebooklibrary.BookLibApplication.Companion.LOG_TAG
 import uk.co.droidinactu.ebooklibrary.library.FileObserverService
 import uk.co.droidinactu.ebooklibrary.library.LibraryManager
 import uk.co.droidinactu.ebooklibrary.library.RecursiveFileObserver.Companion.INTENT_EBOOK_MODIFIED
@@ -49,6 +47,7 @@ class BookLibrary : AppCompatActivity() {
     private val mNotificationIdDbCheck = 15
 
     private val NO_TAG_SELECTED = "<none selected>"
+
     private var libraryScanPndingIntnt: PendingIntent? = null
     private var libraryScanAlarmIntent: Intent? = null
     private var bookListCurrentReading: RecyclerView? = null
@@ -158,7 +157,7 @@ class BookLibrary : AppCompatActivity() {
             doAsync {
                 val bklist = BookLibApplication.instance.getLibManager().getBooks()
                 uiThread {
-                    Log.d(LOG_TAG, "Library [" + libTitle + "] Updated. Now contains [" + bklist.size + "] ebooks")
+                    MyDebug.LOG.debug("Library [" + libTitle + "] Updated. Now contains [" + bklist.size + "] ebooks")
                     progressBarContainer?.visibility = View.GONE
                     updateInfoBar()
                     updateLists()
@@ -171,7 +170,7 @@ class BookLibrary : AppCompatActivity() {
 
     inner class EBookChangedReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            Log.d(LOG_TAG, "EBookChangedReceiver::onReceive()")
+            MyDebug.LOG.debug("EBookChangedReceiver::onReceive()")
             MyDebug.debugIntent(intent)
 
             var ebkPath: String? = ""
@@ -195,6 +194,7 @@ class BookLibrary : AppCompatActivity() {
         }
 
         if (BuildConfig.DEBUG) {
+            MyDebug.LOG.debug("Logging Enabled")
             val appTitle = getString(R.string.app_title)
             val appVerName = ""
             try {
@@ -203,7 +203,7 @@ class BookLibrary : AppCompatActivity() {
                 )
                 supportActionBar!!.title = "$appTitle ($appVerName)"
             } catch (e: Exception) {
-                Log.e(LOG_TAG, "Exception getting app vername")
+                MyDebug.LOG.error("Exception getting app vername")
             }
         } else {
             supportActionBar!!.setTitle(getString(R.string.app_title))
@@ -241,7 +241,7 @@ class BookLibrary : AppCompatActivity() {
 
     private var dialogTagTree: Dialog? = null
     private fun pickTag2(tagToSet: Int) {
-        Log.d(LOG_TAG, "BookLibrary::pickTag2($tagToSet) started")
+        MyDebug.LOG.debug("BookLibrary::pickTag2($tagToSet) started")
         var root = TreeNode.root()
         val ctx = this
 
@@ -288,7 +288,7 @@ class BookLibrary : AppCompatActivity() {
     }
 
     private fun pickTag(tagToSet: Int) {
-        Log.d(LOG_TAG, "BookLibrary::pickTag($tagToSet) started")
+        MyDebug.LOG.debug("BookLibrary::pickTag($tagToSet) started")
         val ctx = this
         doAsync {
             val tglist = BookLibApplication.instance.getLibManager().getTagList()
@@ -327,7 +327,7 @@ class BookLibrary : AppCompatActivity() {
     }
 
     private fun browseForLibrary() {
-        Log.d(LOG_TAG, "BookLibrary::browseForLibrary()")
+        MyDebug.LOG.debug("BookLibrary::browseForLibrary()")
         fab?.isEnabled = false
         val rootdir = "/storage/"
 
@@ -357,7 +357,7 @@ class BookLibrary : AppCompatActivity() {
     }
 
     private fun savePreferences() {
-        val settings = getSharedPreferences(BookLibApplication.LOG_TAG, 0)
+        val settings = getSharedPreferences("BookLibApplication", 0)
         val editor = settings.edit()
         editor.putString("bookListTag1Title", bookListTag1Title?.text.toString())
         editor.putBoolean("bookListTag1IncludeSubTags", bookListTag1IncludeSubTags)
@@ -365,7 +365,7 @@ class BookLibrary : AppCompatActivity() {
     }
 
     private fun updateBookListCurrReading() {
-        Log.d(LOG_TAG, "BookLibrary::updateBookListCurrReading()")
+        MyDebug.LOG.debug("BookLibrary::updateBookListCurrReading()")
         doAsync {
             val bklist = BookLibApplication.instance.getLibManager()
                 .getBooksForTag(Tag.CURRENTLY_READING, false)
@@ -378,7 +378,7 @@ class BookLibrary : AppCompatActivity() {
     }
 
     private fun updateBookListTag1(includeSubTags: Boolean) {
-        Log.d(LOG_TAG, "BookLibrary::updateBookListTag1()")
+        MyDebug.LOG.debug("BookLibrary::updateBookListTag1()")
         if (bookListTag1Title?.text.toString().compareTo(NO_TAG_SELECTED) != 0) {
             doAsync {
                 val bklist = BookLibApplication.instance.getLibManager()
@@ -393,7 +393,7 @@ class BookLibrary : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        Log.d(LOG_TAG, "onStart()")
+        MyDebug.LOG.debug("onStart()")
 //        if (BookLibApplication.instance.getLibManager().getLibraries().size === 0) {
 //            browseForLibrary()
 //        }
@@ -405,6 +405,8 @@ class BookLibrary : AppCompatActivity() {
         val intent =
             Intent(BookLibApplication.instance.applicationContext, FileObserverService::class.java)
         BookLibApplication.instance.applicationContext.startService(intent)
+
+        updateInfoBar()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -414,7 +416,7 @@ class BookLibrary : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        Log.d(LOG_TAG, "onOptionsItemSelected()")
+        MyDebug.LOG.debug("onOptionsItemSelected()")
         // Handle item selection
         when (item.itemId) {
             R.id.action_search -> {
@@ -456,20 +458,20 @@ class BookLibrary : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        Log.d(LOG_TAG, "onPause()")
+        MyDebug.LOG.debug("onPause()")
     }
 
     override fun onResume() {
         super.onResume()
-        Log.d(LOG_TAG, "onResume()")
-        val settings = getSharedPreferences(BookLibApplication.LOG_TAG, 0)
+        MyDebug.LOG.debug("onResume()")
+        val settings = getSharedPreferences("BookLibApplication", 0)
         bookListTag1Title?.text = settings.getString("bookListTag1Title", NO_TAG_SELECTED)
         bookListTag1IncludeSubTags = settings.getBoolean("bookListTag1IncludeSubTags", true)
         updateLists()
     }
 
     private fun rescanLibraries() {
-        Log.d(LOG_TAG, "BookLibrary::rescanLibraries()")
+        MyDebug.LOG.debug("BookLibrary::rescanLibraries()")
         fab?.isEnabled = false
         doAsync {
             val nbrBooks = BookLibApplication.instance.getLibManager().getBookCount()

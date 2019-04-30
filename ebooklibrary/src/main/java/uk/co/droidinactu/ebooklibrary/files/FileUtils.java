@@ -21,8 +21,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
-import android.util.Log;
 import android.widget.Toast;
+import uk.co.droidinactu.ebooklibrary.MyDebug;
 import uk.co.droidinactu.ebooklibrary.R;
 
 import java.io.File;
@@ -259,7 +259,7 @@ public class FileUtils {
         } catch (ActivityNotFoundException | SecurityException e) {
             Toast.makeText(c.getApplicationContext(), R.string.application_not_available, Toast.LENGTH_SHORT).show();
         } catch (RuntimeException e) {
-            Log.d(TAG, "Couldn't open file", e);
+            MyDebug.LOG.debug(TAG, "Couldn't open file", e);
             Toast.makeText(c, "Couldn't open file " + e, Toast.LENGTH_SHORT).show();
         }
     }

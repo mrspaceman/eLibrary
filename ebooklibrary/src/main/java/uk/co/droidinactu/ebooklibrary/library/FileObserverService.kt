@@ -4,8 +4,7 @@ import android.app.IntentService
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
-import android.util.Log
-import uk.co.droidinactu.ebooklibrary.library.LibraryManager.Companion.LOG_TAG
+import uk.co.droidinactu.ebooklibrary.MyDebug
 import java.util.*
 
 class FileObserverService : IntentService {
@@ -15,13 +14,13 @@ class FileObserverService : IntentService {
     constructor(name: String) : super(name)
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Log.d(LOG_TAG, "onStartCommand()")
+        MyDebug.LOG.debug("onStartCommand()")
         onHandleIntent(intent)
         return Service.START_STICKY
     }
 
     override fun onDestroy() {
-        Log.d(LOG_TAG, "onDestroy()")
+        MyDebug.LOG.debug("onDestroy()")
         super.onDestroy()
     }
 
@@ -31,7 +30,7 @@ class FileObserverService : IntentService {
     }
 
     override fun onHandleIntent(pIntent: Intent?) {
-        Log.d(LOG_TAG, "onHandleIntent()")
+        MyDebug.LOG.debug("onHandleIntent()")
         if (pIntent != null) {
             // Gets data from the incoming Intent
             val fileObsAction = pIntent.getStringExtra("file_obs_action")
@@ -49,7 +48,7 @@ class FileObserverService : IntentService {
                         libname
                     )
                     //BookLibApplication.getInstance().delFileWatcher(libname);
-                    else -> Log.d(LOG_TAG, "unknown action [$fileObsAction]")
+                    else -> MyDebug.LOG.debug("unknown action [$fileObsAction]")
                 }
             }
         }
@@ -61,13 +60,13 @@ class FileObserverService : IntentService {
     private fun addFileWatcher(libname: String?, rootdir: String?) {
         if (libname != null && rootdir != null) {
             if (!libraryWatcher.containsKey(libname)) {
-                Log.d(LOG_TAG, "Adding file observer for [$libname] @ [$rootdir]")
+                MyDebug.LOG.debug("Adding file observer for [$libname] @ [$rootdir]")
                 val fileOb = RecursiveFileObserver(rootdir, RecursiveFileObserver.CHANGES_ONLY)
                 libraryWatcher[libname] = fileOb
                 fileOb.startWatching()
             }
         } else {
-            Log.d(LOG_TAG, "Already watching for [$libname] @ [$rootdir]")
+            MyDebug.LOG.debug("Already watching for [$libname] @ [$rootdir]")
         }
     }
 

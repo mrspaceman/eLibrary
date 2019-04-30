@@ -13,21 +13,6 @@
     tools:context="uk.co.droidinactu.ebooklibrary.BookLibBookDetailsActivity">
 
 
-    <uk.co.droidinactu.ebooklibrary.badgedimageview.BadgedImageView
-        android:id="@+id/book_details_cover"
-        android:layout_width="@dimen/book_details_cover_width"
-        android:layout_height="@dimen/book_details_cover_height"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginRight="10dp"
-        android:elevation="10dp"
-        android:padding="5dp"
-        android:src="@drawable/generic_book_cover"
-        app:badgeColor="@color/accent"
-        app:badgeGravity="top|right"
-        app:badgePadding="5dp"
-        app:srcCompat="@drawable/generic_book_cover" />
-
     <EditText
         android:id="@+id/book_details_title"
         android:layout_width="wrap_content"
@@ -67,6 +52,38 @@
         android:text="Author"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
+    <ImageView
+        android:id="@+id/book_details_context_menu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@id/book_details_cover"
+        android:layout_marginTop="6dp"
+        android:padding="2dp"
+        card_view:srcCompat="@drawable/ic_dots_vertical_black_24dp" />
+
+    <ListView
+        android:id="@+id/book_details_tags"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/book_details_cover"
+        android:layout_alignLeft="@id/book_details_cover"
+        android:gravity="center"
+        android:lines="3"
+        android:maxLines="3"
+        android:padding="2dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+
+    <TextView
+        android:id="@+id/book_details_lib_entry_modified"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/book_details_added_to_lib"
+        android:layout_alignLeft="@id/book_details_title"
+        android:gravity="center"
+        android:padding="2dp"
+        android:text="xx yyy zzzz"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+
     <TextView
         android:id="@+id/book_details_filepath"
         android:layout_width="wrap_content"
@@ -91,36 +108,19 @@
         android:text="xx yyy zzzz"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
-    <TextView
-        android:id="@+id/book_details_lib_entry_modified"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@id/book_details_added_to_lib"
-        android:layout_alignLeft="@id/book_details_title"
-        android:gravity="center"
-        android:padding="2dp"
-        android:text="xx yyy zzzz"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
-
-    <ListView
-        android:id="@+id/book_details_tags"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/book_details_cover"
-        android:layout_alignLeft="@id/book_details_cover"
-        android:gravity="center"
-        android:lines="3"
-        android:maxLines="3"
-        android:padding="2dp"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
-
-    <ImageView
-        android:id="@+id/book_details_context_menu"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignEnd="@id/book_details_cover"
-        android:layout_marginTop="6dp"
-        android:padding="2dp"
-        card_view:srcCompat="@drawable/ic_dots_vertical_black_24dp" />
+    <uk.co.droidinactu.ebooklibrary.badgedimageview.BadgedImageView
+        android:id="@+id/book_details_cover"
+        android:layout_width="@dimen/book_details_cover_width"
+        android:layout_height="@dimen/book_details_cover_height"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginRight="10dp"
+        android:elevation="10dp"
+        android:padding="5dp"
+        android:src="@drawable/generic_book_cover"
+        app:badgeColor="@color/accent"
+        app:badgeGravity="top|right"
+        app:badgePadding="5dp"
+        app:srcCompat="@drawable/generic_book_cover" />
 
 </RelativeLayout>

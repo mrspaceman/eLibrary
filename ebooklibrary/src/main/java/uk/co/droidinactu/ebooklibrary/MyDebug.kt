@@ -2,17 +2,16 @@ package uk.co.droidinactu.ebooklibrary
 
 import android.content.Intent
 import android.os.Debug
-import android.util.Log
+import org.slf4j.LoggerFactory
 import java.io.File
 
 /**
  * This class is used to set some debug values used to control tracing.
  *
- *
  * info:
  * <dl>
  *
- * <dt>Log.e</dt>
+ * <dt> MyDebug.LOG.errore</dt>
  * <dd>This is for when bad stuff happens. Use this tag in places like inside a
  * catch statement. You know and error has occurred and therefore you're logging
  * an error.</dd>
@@ -29,7 +28,7 @@ import java.io.File
  * have successfully connected to a server. Basically use it to report
  * successes.</dd>
  * <dt>
- * Log.d</dt>
+ *  MyDebug.LOG.errordebug</dt>
  * <dd>Use this for debugging purposes. If you want to print out a bunch of
  * messages so you can log the exact flow of your program, use this. If you want
  * to keep a log of variable values, use this.</dd>
@@ -54,6 +53,8 @@ object MyDebug {
     private var TRACE = false
     private var TRACE_DIRECTORY = "uk.co.droidinactu.booklib.traces"
 
+    val LOG = LoggerFactory.getLogger("BookLibApplication")
+
     fun startMethodTracing(traceFile: String) {
         if (DEBUGGING && TRACE) {
             Debug.startMethodTracing(TRACE_DIRECTORY + File.separator + traceFile)
@@ -67,15 +68,19 @@ object MyDebug {
     }
 
     fun debugIntent(intent: Intent) {
-        Log.d(BookLibApplication.LOG_TAG, "MyDebug::debugIntent action: " + intent.action!!)
-        Log.d(BookLibApplication.LOG_TAG, "MyDebug::debugIntent component: " + intent.component!!)
+        LOG.debug("MyDebug::debugIntent action: " + intent.action!!)
+        LOG.debug(
+            "MyDebug::debugIntent component: " + intent.component!!
+        )
         val connChgBndle = intent.extras
         if (connChgBndle != null) {
             for (key in connChgBndle.keySet()) {
-                Log.d(BookLibApplication.LOG_TAG, "MyDebug::debugIntent key [" + key + "]: " + connChgBndle.get(key))
+                LOG.debug(
+                    "MyDebug::debugIntent key [" + key + "]: " + connChgBndle.get(key)
+                )
             }
         } else {
-            Log.d(BookLibApplication.LOG_TAG, "MyDebug::debugIntent no extras")
+            LOG.debug("MyDebug::debugIntent no extras")
         }
     }
 
