@@ -198,7 +198,6 @@ class BookLibrary : AppCompatActivity() {
         if (BuildConfig.DEBUG) {
             MyDebug.LOG.debug("Logging Enabled")
             val appTitle = getString(R.string.app_title)
-            val appVerName = ""
             try {
                 val appVerName = BookLibApplication.instance.getAppVersionName(
                     "uk.co.droidinactu.elibrary"
@@ -244,7 +243,6 @@ class BookLibrary : AppCompatActivity() {
     private var dialogTagTree: Dialog? = null
     private fun pickTag2(tagToSet: Int) {
         MyDebug.LOG.debug("BookLibrary::pickTag2($tagToSet) started")
-        var root = TreeNode.root()
         val ctx = this
 
         doAsync {
