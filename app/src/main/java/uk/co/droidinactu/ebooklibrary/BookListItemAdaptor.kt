@@ -13,13 +13,7 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.PopupMenu
-import android.widget.RadioButton
-import android.widget.RadioGroup
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.recyclerview.widget.RecyclerView
 import org.jetbrains.anko.doAsync
 import uk.co.droidinactu.ebooklibrary.badgedimageview.BadgedImageView
@@ -59,7 +53,7 @@ class BookListItemAdaptor(private val mBooks: MutableList<EBook>) :
         viewHolder.mCover.setImageBitmap(cvrBmp)
         if (book.filetypes.size == 1) {
             viewHolder.mCover.showBadge(true)
-            viewHolder.mCover.setBadgeText(book.filetypes[0].toString())
+            viewHolder.mCover.setBadgeText(book.filetypes.first().toString())
         } else {
             viewHolder.mCover.showBadge(true)
             viewHolder.mCover.setBadgeText(FileType.EPUB.toString() + "/" + FileType.PDF)
@@ -120,7 +114,7 @@ class BookListItemAdaptor(private val mBooks: MutableList<EBook>) :
                 if (ftypes != null && ftypes.size > 1) {
                     showFileTypePickerDialog(activity!!)
                 } else {
-                    openBook(activity!!, ftypes?.get(0).toString().toLowerCase())
+                    openBook(activity!!, ftypes?.first().toString().toLowerCase())
                 }
             }
         }

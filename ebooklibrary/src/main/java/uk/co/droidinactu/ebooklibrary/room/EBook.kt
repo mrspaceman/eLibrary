@@ -18,7 +18,7 @@ import java.util.*
 @Fts4
 class EBook() : BaseRoomObj() {
 
-    var filetypes = mutableListOf<FileType>()
+    var filetypes = mutableSetOf<FileType>()
 
     @Ignore
     var authors = mutableListOf<Author>()
@@ -144,17 +144,14 @@ class EBook() : BaseRoomObj() {
         if (!filetypes.contains(pFiletype)) {
             filetypes.add(pFiletype)
         }
-        filetypes = removeArrayDuplicates(filetypes.toTypedArray()).toMutableList()
     }
 
-    fun addFileTypes(pFiletype: MutableList<FileType>) {
+    fun addFileTypes(pFiletype: MutableSet<FileType>) {
         filetypes.addAll(pFiletype)
-        filetypes = removeArrayDuplicates(filetypes.toTypedArray()).toMutableList()
     }
 
     fun addFileType(pFiletype: String) {
         filetypes.add(FileType.valueOf(pFiletype))
-        filetypes = removeArrayDuplicates(filetypes.toTypedArray()).toMutableList()
     }
 
     fun addAuthors(pAuthors: List<nl.siegmann.epublib.domain.Author>) {

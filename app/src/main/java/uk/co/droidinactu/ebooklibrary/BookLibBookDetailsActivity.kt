@@ -106,7 +106,7 @@ class BookLibBookDetailsActivity : AppCompatActivity() {
         val ftypes = ebk.filetypes
         if (ftypes.size == 1) {
             mCover.showBadge(true)
-            mCover.setBadgeText(ftypes[0].toString())
+            mCover.setBadgeText(ftypes.first().toString())
         } else {
             mCover.showBadge(true)
             mCover.setBadgeText("${FileType.EPUB}/${FileType.PDF}")
