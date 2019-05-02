@@ -3,7 +3,6 @@ package uk.co.droidinactu.ebooklibrary.room
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
-import androidx.room.Index
 
 @Entity(
     tableName = "ebooktaglink",
@@ -11,23 +10,22 @@ import androidx.room.Index
     foreignKeys = arrayOf(
         ForeignKey(
             entity = EBook::class,
-            parentColumns = arrayOf("id"),
+            parentColumns = arrayOf(BaseRoomObj.UNIQUE_ID_ROW_NAME),
             childColumns = arrayOf("ebookId")
         ),
         ForeignKey(
             entity = Tag::class,
-            parentColumns = arrayOf("id"),
+            parentColumns = arrayOf(BaseRoomObj.UNIQUE_ID_ROW_NAME),
             childColumns = arrayOf("tagId")
         )
-    ),
-    indices = arrayOf(Index(value = ["ebookId", "tagId"]))
+    )
 )
 class EBookTagLink {
 
     @ColumnInfo
-    var ebookId: Long = 0
+    var ebookId: Int = 0
 
     @ColumnInfo
-    var tagId: Long = 0
+    var tagId: Int = 0
 
 }

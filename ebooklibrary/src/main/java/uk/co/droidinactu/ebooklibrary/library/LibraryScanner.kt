@@ -40,36 +40,34 @@ class LibraryScanner {
     private val pageNum = 0
     private var pdfiumCore: PdfiumCore? = null
     private var executor: ExecutorService? = null
-    private val fileReaderThreads = ArrayList<Thread>()
     private val erdr = EpubReader()
-    private val strngBldr = StringBuilder()
     private var prgBrHandler: Handler? = null
     private var libMgr: LibraryManager? = null
 
-    fun readFiles(ctx: Context, prgBrHandler: Handler, libname: String, rootdir: String) {
-        MyDebug.LOG.debug("LibraryScanner::readFiles() started")
+    fun scanLibraryForEbooks(ctx: Context, prgBrHandler: Handler, libname: String, rootdir: String) {
+//        MyDebug.LOG.debug("LibraryScanner::scanLibraryForEbooks() started")
         try {
             libMgr = LibraryManager()
             libMgr!!.open(ctx)
+            this.prgBrHandler = prgBrHandler
+            librootdir = rootdir
+            findDirs(rootdir)
+            findFiles()
+            dirnames = null
+            readFileData(ctx, libname)
+
+            val intent = Intent(ctx.applicationContext, FileObserverService::class.java)
+            intent.putExtra("file_obs_action", "add")
+            intent.putExtra("libname", libname)
+            intent.putExtra("rootdir", rootdir)
+            ctx.applicationContext.startService(intent)
         } catch (pE: SQLException) {
             MyDebug.LOG.error("Exception opening database", pE)
         }
-        this.prgBrHandler = prgBrHandler
-        librootdir = rootdir
-        findDirs(rootdir)
-        findFiles()
-        dirnames = null
-        readFileData(ctx, libname)
-
-        val intent = Intent(ctx.applicationContext, FileObserverService::class.java)
-        intent.putExtra("file_obs_action", "add")
-        intent.putExtra("libname", libname)
-        intent.putExtra("rootdir", rootdir)
-        ctx.applicationContext.startService(intent)
     }
 
     private fun findDirs(dirname: String) {
-        MyDebug.LOG.debug("LibraryScanner::findDirs() started")
+//        MyDebug.LOG.debug("LibraryScanner::findDirs() started")
         var f = File(dirname.trim { it <= ' ' })
         val listOfFiles = f.list()
 
@@ -84,7 +82,7 @@ class LibraryScanner {
     }
 
     private fun findFiles() {
-        MyDebug.LOG.debug("LibraryScanner::findFiles() started")
+//        MyDebug.LOG.debug("LibraryScanner::findFiles() started")
         for (dir in dirnames!!) {
             var f = File(dir.trim { it <= ' ' })
             val listOfFiles = f.list()
@@ -99,7 +97,7 @@ class LibraryScanner {
     }
 
     private fun readFileData(ctx: Context, libname: String) {
-        MyDebug.LOG.debug("LibraryScanner::readFileData() started")
+//        MyDebug.LOG.debug("LibraryScanner::readFileData() started")
         pdfiumCore = PdfiumCore(ctx.applicationContext)
         executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() - 1)
         maxFiles = filenames.size
@@ -121,8 +119,9 @@ class LibraryScanner {
         }
     }
 
+    //#region read ebook metadata
     private fun readEpubMetadata(filename: String, f: File, ebk: EBook) {
-        MyDebug.LOG.debug("LibraryScanner::readEpubMetadata() started")
+        //       MyDebug.LOG.debug("LibraryScanner::readEpubMetadata() started")
         ebk.addFileType(FileType.EPUB)
         ebk.bookTitle = (f.name.substring(0, f.name.length - 5))
         ebk.fullFileDirName = ebk.fileDir + File.separator + ebk.bookTitle
@@ -151,7 +150,7 @@ class LibraryScanner {
     }
 
     private fun readPdfMetadata(filename: String, f: File, ebk: EBook) {
-        MyDebug.LOG.debug("LibraryScanner::readPdfMetadata() started")
+        //       MyDebug.LOG.debug("LibraryScanner::readPdfMetadata() started")
         ebk.addFileType(FileType.PDF)
         ebk.bookTitle = f.name.substring(0, f.name.length - 4)
         ebk.fullFileDirName = ebk.fileDir + File.separator + ebk.bookTitle
@@ -182,8 +181,7 @@ class LibraryScanner {
 
     }
 
-    //region mobi
-//    private fun readMobiMetadata( filename:String, f:FileTreeNode , ebk:EBook)
+    //   private fun readMobiMetadata( filename:String, f:FileTreeNode , ebk:EBook)
 //    {
     //        ebk.addFileType("mobi");
     //        ebk.setBook_title(f.getName().substring(0, f.getName().length() - 4));
@@ -254,39 +252,40 @@ class LibraryScanner {
     ////                BookLibApplication.e(LOG_TAG + "readMobiMetadata() Error saving file: " + e.getMessage());
     ////            }
     //  }
+
     //endregion
 
     @Synchronized
     private fun addEBookToLibraryStorage(libName: String, ebk: EBook) {
-        MyDebug.LOG.debug("LibraryScanner::addEBookToLibraryStorage() started")
+        MyDebug.LOG.debug("LibraryScanner::addEBookToLibraryStorage(" + ebk.bookTitle + ") started")
         var dbEbk = libMgr!!.getBookFromFullFilename(ebk.fullFileDirName)
         if (dbEbk == null) {
-            dbEbk =   libMgr!!.addBookToLibrary(libName, ebk)
+            dbEbk = libMgr!!.addBookToLibrary(libName, ebk)
         } else {
             dbEbk.addFileTypes(ebk.filetypes)
             libMgr!!.updateBook(dbEbk)
         }
         for (t in ebk.tags) {
             val ebkTg = EBookTagLink()
-            ebkTg.ebookId = dbEbk.id
-            ebkTg.tagId = t.id
+            ebkTg.ebookId = dbEbk.getUniqueId()
+            ebkTg.tagId = t.getUniqueId()
             libMgr?.addEbookTagLink(ebkTg)
         }
         for (a in ebk.authors) {
             val t = libMgr!!.addAuthor(a)
             val ebkAuth = EBookAuthorLink()
-            ebkAuth.ebookId = dbEbk.id
-            ebkAuth.authorId = t!!.id
+            ebkAuth.ebookId = dbEbk.getUniqueId()
+            ebkAuth.authorId = t!!.getUniqueId()
             libMgr?.addEbookAuthorLink(ebkAuth)
         }
     }
 
     private fun readFile(ctx: Context, libname: String, filename: String) {
-        MyDebug.LOG.debug("LibraryScanner::readFile($filename) started")
+        //       MyDebug.LOG.debug("LibraryScanner::readFile($filename) started")
         val f = File(filename)
 
         val ebk = EBook()
-        ebk.inLibraryId = libMgr!!.getLibrary(libname).id
+        ebk.inLibraryRowId = libMgr!!.getLibrary(libname).getUniqueId()
         ebk.fileDir = f.parent
         ebk.fileName = filename.substring(ebk.fileDir.length + 1)
         ebk.fileName = FilenameUtils.removeExtension(filename.substring(ebk.fileDir.length + 1))
@@ -305,7 +304,7 @@ class LibraryScanner {
             var prevBookTag: Tag? = null
             for (s in tagStrs) {
                 val t = libMgr!!.addTag(s)
-                t.parentTagId = prevBookTag?.id
+                t.parentTagId = prevBookTag?.getUniqueId()
                 doAsync { libMgr!!.updateTag(t) }
                 ebk.addTag(t)
                 prevBookTag = t
@@ -336,19 +335,6 @@ class LibraryScanner {
             //readMobiMetadata(filename, f, ebk);
         }
         addEBookToLibraryStorage(libname, ebk)
-    }
-
-    fun printPdfInfo(core: PdfiumCore, doc: com.shockwave.pdfium.PdfDocument) {
-        MyDebug.LOG.debug("LibraryScanner::printPdfInfo() started")
-        val meta = core.getDocumentMeta(doc)
-        MyDebug.LOG.debug("title = " + meta.title)
-        MyDebug.LOG.debug("author = " + meta.author)
-        MyDebug.LOG.debug("subject = " + meta.subject)
-        MyDebug.LOG.debug("keywords = " + meta.keywords)
-        MyDebug.LOG.debug("creator = " + meta.creator)
-        MyDebug.LOG.debug("producer = " + meta.producer)
-        MyDebug.LOG.debug("creationDate = " + meta.creationDate)
-        MyDebug.LOG.debug("modDate = " + meta.modDate)
     }
 
 }

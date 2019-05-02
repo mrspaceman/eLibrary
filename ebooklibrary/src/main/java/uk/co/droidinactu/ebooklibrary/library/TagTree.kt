@@ -6,17 +6,17 @@ import java.util.*
 
 class TagTree {
 
-    private var tagMap: MutableMap<Long, TreeTag> = HashMap()
+    private var tagMap: MutableMap<Int, TreeTag> = HashMap()
     var rootTags: MutableList<TreeTag> = ArrayList()
 
     fun add(t: Tag) {
-        var newT: TreeTag? = null
-        if (tagMap.containsKey(t.id)) {
-            newT = tagMap[t.id]
+        var newT: TreeTag?
+        if (tagMap.containsKey(t.getUniqueId())) {
+            newT = tagMap[t.getUniqueId()]
         } else {
             newT = TreeTag()
             newT.me = t
-            tagMap[t.id] = newT
+            tagMap[t.getUniqueId()] = newT
         }
 
         if (newT!!.me!!.parentTagId == null) {

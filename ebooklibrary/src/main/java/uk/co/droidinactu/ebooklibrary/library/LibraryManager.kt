@@ -21,8 +21,8 @@ import java.util.*
 class LibraryManager {
 
     //region definitions
-    private var scanLibTask: LibraryScanTask? = null
     private var scanningInProgress = false
+    private var scanLibTask: LibraryScanTask? = null
     private var mNotificationManager: NotificationManager? = null
     private var mNotificationBuilder: NotificationCompat.Builder? = null
     private val mNotificationId = 1
@@ -50,7 +50,7 @@ class LibraryManager {
         EBookRoomDatabase.getInstance(ctx)!!.close()
     }
 
-    fun checkDb(msgHndlr: Handler, scanNotificationHndlr: Handler, libRootDir: String) {
+    fun checkDb(msgHndlr: Handler, scanNotificationHndlr: Handler) {
         MyDebug.LOG.debug("checkDb()")
         var completeMessage = scanNotificationHndlr.obtainMessage(64, "startdbcheck")
         completeMessage.sendToTarget()
@@ -87,10 +87,20 @@ class LibraryManager {
         libraryDao.clear()
     }
 
+    fun getAsJson(): String {
+
+        // get books
+        // add tags to books
+        // add authors to books
+        // export books as json
+
+        return "{}"
+    }
+
     /** EBook CRUB */
     //region ebooks
     fun addBookToLibrary(libname: String, ebk: EBook): EBook {
-        ebk.inLibraryId = libraryDao.getByName(libname).id
+        ebk.inLibraryRowId = libraryDao.getByName(libname).getUniqueId()
         try {
             val newId = ebookDao.insert(ebk)
         } catch (pE: java.sql.SQLException) {
@@ -135,7 +145,7 @@ class LibraryManager {
     }
 
     private fun getBookCount(lib: Library): Int {
-        return ebookDao.getCount(lib.id)
+        return ebookDao.getCount(lib.getUniqueId())
     }
 
     fun getBooks(): MutableList<EBook> {
@@ -143,15 +153,15 @@ class LibraryManager {
     }
 
     private fun getBooksForLibrary(lib: Library): MutableList<EBook> {
-        return ebookDao.getAllInLibrary(lib.id)
+        return ebookDao.getAllInLibrary(lib.getUniqueId())
     }
 
-    fun getBooksForTag(tagStr: String, subtags: Boolean): MutableList<EBook> {
-        return ebookDao.getAllForTag(tagDao.getTag(tagStr).id)
+    fun getBooksForTag(tagStr: String): MutableList<EBook> {
+        return ebookDao.getAllForTag(tagDao.getTag(tagStr).getUniqueId())
     }
 
-    fun getBooksForTag(tag: Tag, subtags: Boolean): MutableList<EBook> {
-        return ebookDao.getAllForTag(tag.id)
+    fun getBooksForTag(tag: Tag): MutableList<EBook> {
+        return ebookDao.getAllForTag(tag.getUniqueId())
     }
 
     fun searchBooksMatching(titleStr: String): MutableList<EBook> {
@@ -196,7 +206,7 @@ class LibraryManager {
     }
 
     fun getAuthorsForBook(ebk: EBook): List<Author> {
-        return ebookAuthorDao.getAuthorsForBook(ebk.id)
+        return ebookAuthorDao.getAuthorsForBook(ebk.getUniqueId())
     }
     //endregion
 
@@ -205,11 +215,11 @@ class LibraryManager {
     fun addTagToBook(newTag: String, ebk: EBook?) {
         if (ebk != null) {
             val t = addTag(newTag)
-            var tagBookLink = getEbookTagLink(ebk.id, t.id)
+            var tagBookLink = getEbookTagLink(ebk.getUniqueId(), t.getUniqueId())
             if (tagBookLink == null) {
                 tagBookLink = EBookTagLink()
-                tagBookLink.ebookId = ebk.id
-                tagBookLink.tagId = t.id
+                tagBookLink.ebookId = ebk.getUniqueId()
+                tagBookLink.tagId = t.getUniqueId()
                 try {
                     val newId = ebookTagDao.insert(tagBookLink)
                 } finally {
@@ -232,7 +242,7 @@ class LibraryManager {
         }
     }
 
-    private fun getEbookTagLink(ebookId: Long, tagId: Long): EBookTagLink? {
+    private fun getEbookTagLink(ebookId: Int, tagId: Int): EBookTagLink? {
         return ebookTagDao.getBookTagLink(ebookId, tagId)
     }
 
@@ -242,7 +252,7 @@ class LibraryManager {
             t = Tag()
             t.tag = tagstr
             val newId = tagDao.insert(t)
-            t.id = newId
+            t.setUniqueId(newId)
         }
         return t
     }
@@ -282,7 +292,7 @@ class LibraryManager {
     }
 
     fun getTagsForBook(ebk: EBook): List<Tag> {
-        return ebookTagDao.getTagsForBook(ebk.id)
+        return ebookTagDao.getTagsForBook(ebk.getUniqueId())
     }
 
     //endregion
@@ -313,7 +323,7 @@ class LibraryManager {
         return mutableListOf()
     }
 
-    fun refreshLibraries(prgBrHandler: Handler?, handler: Handler?, scanNotificationHndlr: Handler?) {
+    fun refreshLibraries(prgBrHandler: Handler?, handler: Handler?, scanNotificationHndlr: Handler) {
         MyDebug.LOG.debug("BookLibrary::refreshLibraries()")
         if (!scanningInProgress) {
             scanningInProgress = true
@@ -347,11 +357,15 @@ class LibraryManager {
 
     /** EBook Scanning */
     //region scanning
-    private fun initiateScan(prgBrHandler: Handler?, handler: Handler?, scanNotificationHndlr: Handler?, lib: Library) {
-        MyDebug.LOG.debug("LibraryManager::initiateScan() Scanning library [" + lib.libraryTitle + "]")
+    private fun initiateScan(
+        prgBrHandler: Handler?,
+        msgHndlr: Handler?,
+        scanNotificationHndlr: Handler,
+        lib: Library
+    ) {
         if (scanLibTask == null || scanLibTask?.taskComplete == true) {
             scanLibTask = LibraryScanTask()
-            scanLibTask?.execute(prgBrHandler, handler, scanNotificationHndlr, lib.libraryRootDir, lib.libraryTitle)
+            scanLibTask?.execute(prgBrHandler, msgHndlr, scanNotificationHndlr, lib.libraryRootDir, lib.libraryTitle)
         }
     }
 
@@ -403,10 +417,10 @@ class LibraryManager {
             scanNotificationHndlr = params[2] as Handler
             libRootDir = params[3] as String
             libTitle = params[4] as String
+            Thread.currentThread().name = "LibraryScanTask:$libTitle"
             val completeMessage = scanNotificationHndlr.obtainMessage(64, "startscanning:$libTitle")
             completeMessage.sendToTarget()
-            Thread.currentThread().name = "LibraryScanTask:$libTitle"
-            libraryScanner.readFiles(
+            libraryScanner.scanLibraryForEbooks(
                 ctx,
                 prgBrHandler,
                 libTitle,
@@ -426,7 +440,7 @@ class LibraryManager {
             taskComplete = true
             val completeMessage = scanNotificationHndlr.obtainMessage(64, "stopscanning")
             completeMessage.sendToTarget()
-            checkDb(msgHndlr, scanNotificationHndlr, libRootDir)
+            checkDb(msgHndlr, scanNotificationHndlr)
         }
     }
 
@@ -447,7 +461,7 @@ class LibraryManager {
 
         allTags = getTags()
         for (t in allTags) {
-            val booksForTag = getBooksForTag(t, true)
+            val booksForTag = getBooksForTag(t)
             if (booksForTag.size < 3) {
                 deleteTag(t)
             }

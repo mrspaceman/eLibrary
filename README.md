@@ -24,9 +24,9 @@ Adobe PDF reader, Google Books etc...
     * [x] filter the ebooks displayed by tag selected
     * [x] search for ebooks with a string in the title/bookTags/directory
     * [x] convert to kotlin
+    * [x] Convert to Room DB
 
 ### Todo
-    * [ ] Convert to Room DB
     * [ ] download covers/metadata from
         * https://www.librarything.com/services/
         * https://developers.google.com/books/docs/v1/reference/
@@ -44,9 +44,9 @@ Adobe PDF reader, Google Books etc...
     * [ ] periodic [daily|weekly] scan of root dirs in background
 
 
-## For debugging:
+## For debugging (on tablet):
 
 ```
-adb shell
+adb -s 88c859cacec5cc73 shell
 setprop log.tag.BookLibApplication VERBOSE
 ```

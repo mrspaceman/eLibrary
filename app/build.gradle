@@ -1,13 +1,8 @@
-plugins {
-    id "gradle.site" version "0.6"
-}
-
 apply plugin: "com.android.application"
 
 apply plugin: ("kotlin-android")
 apply plugin: ("kotlin-android-extensions")
 apply plugin: ("kotlin-kapt")
-
 
 final BUILD_DATE = new Date().format('yyyy_MM_dd_HHmm')
 
@@ -84,8 +79,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility '1.8'
+        targetCompatibility '1.8'
     }
     packagingOptions {
         exclude 'META-INF/DEPENDENCIES'
@@ -101,6 +96,7 @@ android {
         exclude 'META-INF/blueprint.handlers'
         exclude 'META-INF/cxf/bus-extensions.txt'
     }
+    buildToolsVersion = '28.0.3'
 }
 
 dependencies {
@@ -108,19 +104,19 @@ dependencies {
     implementation project(":ebooklibrary")
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:$rootProject.kotlinVersion")
-    implementation("androidx.appcompat:appcompat:1.0.2")
-    implementation("androidx.core:core-ktx:1.0.1")
+    implementation('androidx.appcompat:appcompat:1.1.0-alpha04')
+    implementation('androidx.core:core-ktx:1.1.0-alpha05')
     implementation("androidx.constraintlayout:constraintlayout:$rootProject.constraintLayoutVersion")
     implementation("com.google.android.material:material:$rootProject.materialVersion")
     implementation("androidx.appcompat:appcompat:$rootProject.appCompatVersion")
     implementation("androidx.recyclerview:recyclerview:$rootProject.recyclerVersion")
 
-    testImplementation("junit:junit:4.12")
-    androidTestImplementation("androidx.test.ext:junit:1.1.0")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.1.1")
+    testImplementation('junit:junit:4.13-beta-2')
+    androidTestImplementation('androidx.test.ext:junit:1.1.1-alpha05')
+    androidTestImplementation('androidx.test.espresso:espresso-core:3.2.0-alpha05')
 
     implementation("androidx.cardview:cardview:1.0.0")
-    implementation("androidx.recyclerview:recyclerview:1.0.0")
+    implementation('androidx.recyclerview:recyclerview:1.1.0-alpha04')
 
     // Kotlin KTX + coroutines
     implementation("android.arch.work:work-runtime-ktx:$rootProject.androidWorkVersion")
@@ -130,23 +126,17 @@ dependencies {
 
     implementation("org.jetbrains.anko:anko:0.10.8")
 
-
-    implementation("com.github.angads25:filepicker:1.0.2")
     implementation("org.apache.commons:commons-io:1.3.2")
-    implementation("org.apache.commons:commons-csv:1.1")
-    implementation("org.apache.commons:commons-lang3:3.4")
+    implementation('org.apache.commons:commons-csv:1.6')
+    implementation('org.apache.commons:commons-lang3:3.9')
 
     implementation("joda-time:joda-time:2.9.4")
 
-    implementation("com.izikode.izilib:accordionrecycler:0.5")
-
-    implementation 'org.slf4j:slf4j-api:1.7.25'
+    implementation 'org.slf4j:slf4j-api:1.8.0-beta4'
     implementation 'com.github.tony19:logback-android:2.0.0'
 
-    implementation("com.izikode.izilib:accordionrecycler:0.5")
     implementation("com.github.bmelnychuk:atv:1.2.+")
-
-    implementation 'net.steamcrafted:materialiconlib:1.1.5'
+    implementation("com.github.angads25:filepicker:1.0.2")
 }
 
 configurations {

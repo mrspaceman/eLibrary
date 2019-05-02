@@ -42,11 +42,14 @@ import java.util.*
 
 class BookLibrary : AppCompatActivity() {
 
-    private var mNotificationManager: NotificationManager? = null
-    private val mNotificationIdScanning = 14
-    private val mNotificationIdDbCheck = 15
+    companion object {
+        val mNotificationIdScanning = 14
+        val mNotificationIdDbCheck = 15
 
-    private val NO_TAG_SELECTED = "<none selected>"
+        val NO_TAG_SELECTED = "<none selected>"
+    }
+
+    private var mNotificationManager: NotificationManager? = null
 
     private var libraryScanPndingIntnt: PendingIntent? = null
     private var libraryScanAlarmIntent: Intent? = null
@@ -87,6 +90,9 @@ class BookLibrary : AppCompatActivity() {
     object : Handler() {
         override fun handleMessage(msg: Message) {
             val handlerCmd = (msg.obj as String).split(":".toRegex())
+            if (mNotificationManager == null) {
+                mNotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            }
             if (handlerCmd[0].equals("startscanning")) {
                 displayScanningNotification(handlerCmd[1])
             } else if (handlerCmd[0].equals("stopscanning")) {
@@ -100,9 +106,9 @@ class BookLibrary : AppCompatActivity() {
     }
 
     private fun displayScanningNotification(libname: String) {
-        val resultIntent = Intent(this, BookLibrary::class.java)
+        val resultIntent = Intent(BookLibApplication.instance.applicationContext, BookLibrary::class.java)
         val resultPendingIntent = PendingIntent.getActivity(
-            this,
+            BookLibApplication.instance.applicationContext,
             0,
             resultIntent,
             PendingIntent.FLAG_UPDATE_CURRENT
@@ -117,8 +123,6 @@ class BookLibrary : AppCompatActivity() {
             .setProgress(0, 0, true)
         val notification = notificationBuilder?.build()
 
-        mNotificationManager =
-            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         mNotificationManager?.notify(mNotificationIdScanning, notification)
     }
 
@@ -135,8 +139,6 @@ class BookLibrary : AppCompatActivity() {
             .setProgress(0, 0, true)
         val notification = notificationBuilder?.build()
 
-        mNotificationManager =
-            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         mNotificationManager?.notify(mNotificationIdDbCheck, notification)
     }
 
@@ -276,7 +278,7 @@ class BookLibrary : AppCompatActivity() {
             fun onClick(node: TreeNode?, value: Any?) {
                 val childtag = node?.value as TagTree.TreeTag
                 savePreferences()
-                updateBookListTag1(bookListTag1IncludeSubTags)
+                updateBookListTag1()
                 dialogTagTree?.dismiss()
             }
         }
@@ -314,7 +316,7 @@ class BookLibrary : AppCompatActivity() {
                                 bookListTag1Title?.text = selectedFromList
                                 bookListTag1IncludeSubTags = tagLstIncludeSubTags.isChecked
                                 savePreferences()
-                                updateBookListTag1(bookListTag1IncludeSubTags)
+                                updateBookListTag1()
                             }
                             2 -> {
                             }
@@ -368,7 +370,7 @@ class BookLibrary : AppCompatActivity() {
         MyDebug.LOG.debug("BookLibrary::updateBookListCurrReading()")
         doAsync {
             val bklist = BookLibApplication.instance.getLibManager()
-                .getBooksForTag(Tag.CURRENTLY_READING, false)
+                .getBooksForTag(Tag.CURRENTLY_READING)
             bookListAdaptorCurrReading = BookListItemAdaptor(bklist)
             uiThread {
                 bookListCurrentReading?.adapter = bookListAdaptorCurrReading
@@ -377,12 +379,12 @@ class BookLibrary : AppCompatActivity() {
         }
     }
 
-    private fun updateBookListTag1(includeSubTags: Boolean) {
+    private fun updateBookListTag1() {
         MyDebug.LOG.debug("BookLibrary::updateBookListTag1()")
         if (bookListTag1Title?.text.toString().compareTo(NO_TAG_SELECTED) != 0) {
             doAsync {
                 val bklist = BookLibApplication.instance.getLibManager()
-                    .getBooksForTag(bookListTag1Title?.text.toString(), includeSubTags)
+                    .getBooksForTag(bookListTag1Title?.text.toString())
                 bookListAdaptorTag1 = BookListItemAdaptor(bklist)
                 uiThread {
                     bookListTag1?.adapter = bookListAdaptorTag1
@@ -439,8 +441,7 @@ class BookLibrary : AppCompatActivity() {
                 doAsync {
                     BookLibApplication.instance.getLibManager().checkDb(
                         mHandler,
-                        mHandlerScanningNotification,
-                        BookLibApplication.instance.getLibManager().getLibrary().libraryTitle
+                        mHandlerScanningNotification
                     )
                 }
                 return true
@@ -524,7 +525,7 @@ class BookLibrary : AppCompatActivity() {
     private fun updateLists() {
         updateInfoBar()
         updateBookListCurrReading()
-        updateBookListTag1(bookListTag1IncludeSubTags)
+        updateBookListTag1()
     }
 
     private fun updateInfoBar() {
@@ -532,7 +533,11 @@ class BookLibrary : AppCompatActivity() {
             val libInfo = findViewById<TextView>(R.id.dashboard_library_info)
             val libTitle = BookLibApplication.instance.getLibManager().getLibrary().libraryTitle
             val nbrBooks = BookLibApplication.instance.getLibManager().getBookCount()
-            val text = getResources().getQuantityString(R.plurals.library_contains_x_books, nbrBooks)
+            val text = String.format(
+                getResources().getQuantityString(R.plurals.library_contains_x_books, nbrBooks),
+                libTitle,
+                nbrBooks
+            )
             uiThread {
                 libInfo.text = text
             }

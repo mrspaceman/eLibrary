@@ -1,25 +1,16 @@
 package uk.co.droidinactu.ebooklibrary.room
 
 import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
 import androidx.room.Query
 
 @Dao
-interface LibraryDao {
-    @Query("SELECT * FROM libraries")
+interface LibraryDao : BaseDao<Library> {
+    @Query("SELECT *,${BaseRoomObj.UNIQUE_ID_ROW_NAME} FROM libraries")
     fun getAll(): List<Library>
 
-    @Query("SELECT * FROM libraries WHERE libraryTitle = (:libname) LIMIT 1")
+    @Query("SELECT *,${BaseRoomObj.UNIQUE_ID_ROW_NAME} FROM libraries WHERE libraryTitle = (:libname) LIMIT 1")
     fun getByName(libname: String): Library
-
-    @Insert
-    fun insert(obj: Library)
-
-    @Delete
-    fun delete(obj: Library)
 
     @Query("delete FROM libraries")
     fun clear()
-
 }

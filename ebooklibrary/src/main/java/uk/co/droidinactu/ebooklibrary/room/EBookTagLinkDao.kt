@@ -6,26 +6,17 @@ import androidx.room.Insert
 import androidx.room.Query
 
 @Dao
-interface EBookTagLinkDao {
-    @Query("SELECT * FROM ebooktaglink")
+interface EBookTagLinkDao :BaseDao<EBookTagLink>{
+    @Query("SELECT *,${BaseRoomObj.UNIQUE_ID_ROW_NAME} FROM ebooktaglink")
     fun getAll(): List<EBookTagLink>
 
-    @Query("SELECT * FROM ebooktaglink WHERE ebookId=:bookId and tagId=:tagId")
-    fun getBookTagLink(bookId: Long, tagId: Long): EBookTagLink
+    @Query("SELECT *,${BaseRoomObj.UNIQUE_ID_ROW_NAME} FROM ebooktaglink WHERE ebookId=:bookId and tagId=:tagId")
+    fun getBookTagLink(bookId: Int, tagId: Int): EBookTagLink
 
     @Query(
-        "SELECT * FROM tags INNER JOIN ebooktaglink ON tags.id = ebooktaglink.ebookId WHERE ebooktaglink.ebookId =:ebookId"
+        "SELECT *,tags.${BaseRoomObj.UNIQUE_ID_ROW_NAME} FROM tags INNER JOIN ebooktaglink ON tags.${BaseRoomObj.UNIQUE_ID_ROW_NAME} = ebooktaglink.ebookId WHERE ebooktaglink.ebookId =:ebookId"
     )
-    fun getTagsForBook(ebookId: Long): MutableList<Tag>
-
-    @Insert
-    fun insert(obj: EBookTagLink)
-
-    @Insert
-    fun insertAll(vararg objs: EBookTagLink)
-
-    @Delete
-    fun delete(obj: EBookTagLink)
+    fun getTagsForBook(ebookId: Int): MutableList<Tag>
 
     @Query("delete FROM ebooktaglink")
     fun clear()

@@ -9,7 +9,6 @@ import uk.co.droidinactu.ebooklibrary.library.LibraryManager
 
 @Database(
     entities = [EBook::class, Author::class, Tag::class, Library::class, EBookAuthorLink::class, EBookTagLink::class],
-    exportSchema = false,
     version = 1
 )
 @TypeConverters(FiletypeConverter::class)

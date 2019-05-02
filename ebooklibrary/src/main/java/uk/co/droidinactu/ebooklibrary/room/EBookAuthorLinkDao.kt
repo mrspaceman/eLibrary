@@ -1,32 +1,19 @@
 package uk.co.droidinactu.ebooklibrary.room
 
-import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 
 @Dao
-interface EBookAuthorLinkDao {
+interface EBookAuthorLinkDao  :BaseDao<EBookAuthorLink>{
     @Query("SELECT * FROM ebookauthorlink")
     fun getAll(): List<EBookAuthorLink>
 
-    @Query("SELECT * FROM ebooks INNER JOIN ebookauthorlink ON ebooks.id=ebookauthorlink.ebookId WHERE ebookauthorlink.authorId=:authorId")
-    fun getBooksForAuthor(authorId: Long): MutableList<EBookAuthorLink>
+    @Query("SELECT *,ebooks.${BaseRoomObj.UNIQUE_ID_ROW_NAME} FROM ebooks INNER JOIN ebookauthorlink ON ebooks.${BaseRoomObj.UNIQUE_ID_ROW_NAME} = ebookauthorlink.ebookId WHERE ebookauthorlink.authorId=:authorId")
+    fun getBooksForAuthor(authorId: Int): MutableList<EBookAuthorLink>
 
     @Query(
-        "SELECT * FROM authors INNER JOIN ebookauthorlink ON authors.id = ebookauthorlink.authorId WHERE ebookauthorlink.ebookId =:ebookId"
+        "SELECT *,authors.${BaseRoomObj.UNIQUE_ID_ROW_NAME} FROM authors INNER JOIN ebookauthorlink ON authors.${BaseRoomObj.UNIQUE_ID_ROW_NAME} = ebookauthorlink.authorId WHERE ebookauthorlink.ebookId=:ebookId"
     )
-    fun getAuthorsForBook(ebookId: Long): MutableList<Author>
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(obj: EBookAuthorLink)
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAll(vararg objs: EBookAuthorLink)
-
-    @Delete
-    fun delete(obj: EBookAuthorLink)
+    fun getAuthorsForBook(ebookId: Int): MutableList<Author>
 
     @Query("delete FROM ebookauthorlink")
     fun clear()

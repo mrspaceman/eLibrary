@@ -1,15 +1,10 @@
 package uk.co.droidinactu.ebooklibrary.room
 
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.Canvas
-import android.graphics.Matrix
-import android.graphics.Paint
+import android.graphics.*
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Fts4
 import androidx.room.Ignore
-import androidx.room.Index
-import androidx.room.PrimaryKey
 import org.jetbrains.annotations.NotNull
 import java.io.ByteArrayOutputStream
 import java.util.*
@@ -18,10 +13,10 @@ import java.util.*
  * Created by aspela on 31/08/16.
  */
 @Entity(
-    tableName = "ebooks",
-    indices = [Index(value = arrayOf("id"), unique = true)]
+    tableName = "ebooks"
 )
-class EBook() {
+@Fts4
+class EBook() : BaseRoomObj() {
 
     var filetypes = mutableListOf<FileType>()
 
@@ -31,11 +26,8 @@ class EBook() {
     @Ignore
     var tags = mutableListOf<Tag>()
 
-    @PrimaryKey(autoGenerate = true)
-    var id: Long = 0
-
     @ColumnInfo
-    var inLibraryId = -1L
+    var inLibraryRowId: Int = -1
 
     @ColumnInfo
     @NotNull
@@ -83,7 +75,6 @@ class EBook() {
     @ColumnInfo
     var coverImage: ByteArray? = null
 
-
     val coverImageAsBitmap: Bitmap?
         get() = if (coverImage != null && coverImage!!.isNotEmpty()) {
             BitmapFactory.decodeByteArray(coverImage, 0, coverImage!!.size)
@@ -94,7 +85,7 @@ class EBook() {
      * Copy constructor.
      */
     constructor(rhs: EBook) : this() {
-        inLibraryId = rhs.inLibraryId
+        inLibraryRowId = rhs.inLibraryRowId
         fullFileDirName = rhs.fullFileDirName
         fileDir = rhs.fileDir
         fileName = rhs.fileName

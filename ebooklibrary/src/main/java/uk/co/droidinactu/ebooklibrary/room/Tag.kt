@@ -2,23 +2,19 @@ package uk.co.droidinactu.ebooklibrary.room
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
-import androidx.room.Index
-import androidx.room.PrimaryKey
+import androidx.room.Fts4
 
 @Entity(
-    tableName = "tags",
-    indices = [Index(value = arrayOf("id"), unique = true)]
+    tableName = "tags"
 )
-class Tag {
-
-    @PrimaryKey(autoGenerate = true)
-    var id: Long = 0
+@Fts4
+class Tag : BaseRoomObj() {
 
     @ColumnInfo
     var tag: String = ""
 
     @ColumnInfo
-    var parentTagId: Long? = null
+    var parentTagId: Int? = null
 
     override fun toString(): String {
         return tag
