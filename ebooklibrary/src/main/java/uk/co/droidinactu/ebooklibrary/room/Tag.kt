@@ -2,12 +2,10 @@ package uk.co.droidinactu.ebooklibrary.room
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
-import androidx.room.Fts4
 
 @Entity(
     tableName = "tags"
 )
-@Fts4
 class Tag : BaseRoomObj() {
 
     @ColumnInfo

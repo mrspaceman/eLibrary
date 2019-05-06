@@ -9,7 +9,7 @@ abstract class BaseRoomObj {
     }
 
     @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = "rowid")
+    @ColumnInfo(name = UNIQUE_ID_ROW_NAME)
     var id: Int = 0
 
     fun getUniqueId(): Int {

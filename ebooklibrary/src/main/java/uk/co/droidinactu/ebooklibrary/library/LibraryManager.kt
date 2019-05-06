@@ -231,7 +231,12 @@ class LibraryManager {
     fun addEbookTagLink(ebkTg: EBookTagLink) {
         val t = getEbookTagLink(ebkTg.ebookId, ebkTg.tagId)
         if (t == null) {
-            ebookTagDao.insert(ebkTg)
+            try {
+                val retVal = ebookTagDao.insert(ebkTg)
+                //        MyDebug.LOG.debug("LibraryManager::addEbookTagLink() :" + retVal)
+            } catch (e: Exception) {
+                //         MyDebug.LOG.error("LibraryManager::addEbookTagLink() :", e)
+            }
         }
     }
 

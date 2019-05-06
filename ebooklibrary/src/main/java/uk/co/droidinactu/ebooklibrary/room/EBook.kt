@@ -3,7 +3,6 @@ package uk.co.droidinactu.ebooklibrary.room
 import android.graphics.*
 import androidx.room.ColumnInfo
 import androidx.room.Entity
-import androidx.room.Fts4
 import androidx.room.Ignore
 import org.jetbrains.annotations.NotNull
 import java.io.ByteArrayOutputStream
@@ -15,7 +14,6 @@ import java.util.*
 @Entity(
     tableName = "ebooks"
 )
-@Fts4
 class EBook() : BaseRoomObj() {
 
     var filetypes = mutableSetOf<FileType>()
