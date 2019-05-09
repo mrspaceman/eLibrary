@@ -1,8 +1,8 @@
-package uk.co.droidinactu.ebooklibrary.library
+package uk.co.droidinactu.elibrary.library
 
 import android.content.Intent
 import android.os.FileObserver
-import uk.co.droidinactu.ebooklibrary.MyDebug
+import uk.co.droidinactu.elibrary.MyDebug
 import java.io.File
 import java.util.*
 

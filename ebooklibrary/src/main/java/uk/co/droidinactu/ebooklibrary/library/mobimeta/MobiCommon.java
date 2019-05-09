@@ -1,7 +1,7 @@
 /*
  * Decompiled with CFR 0_115.
  */
-package uk.co.droidinactu.ebooklibrary.library.mobimeta;
+package uk.co.droidinactu.elibrary.library.mobimeta;
 
 public class MobiCommon {
     public static boolean debug = false;

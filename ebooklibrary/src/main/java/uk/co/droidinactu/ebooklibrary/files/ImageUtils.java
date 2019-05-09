@@ -1,4 +1,4 @@
-package uk.co.droidinactu.ebooklibrary.files;
+package uk.co.droidinactu.elibrary.files;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;

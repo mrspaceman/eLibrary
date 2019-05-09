@@ -1,4 +1,4 @@
-package uk.co.droidinactu.ebooklibrary
+package uk.co.droidinactu.elibrary
 
 import android.annotation.TargetApi
 import android.app.Activity
@@ -16,18 +16,18 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.recyclerview.widget.RecyclerView
 import org.jetbrains.anko.doAsync
-import uk.co.droidinactu.ebooklibrary.badgedimageview.BadgedImageView
-import uk.co.droidinactu.ebooklibrary.files.FileHolder
-import uk.co.droidinactu.ebooklibrary.files.FileUtils
-import uk.co.droidinactu.ebooklibrary.files.MimeTypes
-import uk.co.droidinactu.ebooklibrary.room.EBook
-import uk.co.droidinactu.ebooklibrary.room.FileType
-import uk.co.droidinactu.ebooklibrary.room.Tag
+import uk.co.droidinactu.elibrary.badgedimageview.BadgedImageView
+import uk.co.droidinactu.elibrary.files.FileHolder
+import uk.co.droidinactu.elibrary.files.FileUtils
+import uk.co.droidinactu.elibrary.files.MimeTypes
+import uk.co.droidinactu.elibrary.room.EBook
+import uk.co.droidinactu.elibrary.room.FileType
+import uk.co.droidinactu.elibrary.room.Tag
 import java.io.File
 
 
 /**
- * An adapter for displaying a list of [uk.co.droidinactu.ebooklibrary.room.EBook] objects.
+ * An adapter for displaying a list of [uk.co.droidinactu.elibrary.room.EBook] objects.
  * Created by aspela on 01/09/16.
  */
 class BookListItemAdaptor(private val mBooks: MutableList<EBook>) :

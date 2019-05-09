@@ -1,4 +1,4 @@
-package uk.co.droidinactu.ebooklibrary.room
+package uk.co.droidinactu.elibrary.room
 
 import android.graphics.*
 import androidx.room.ColumnInfo

@@ -1,4 +1,4 @@
-package uk.co.droidinactu.ebooklibrary.badgedimageview;
+package uk.co.droidinactu.elibrary.badgedimageview;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -9,7 +9,7 @@ import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import androidx.annotation.ColorInt;
-import uk.co.droidinactu.ebooklibrary.R;
+import uk.co.droidinactu.elibrary.R;
 
 public class BadgedImageView extends ForegroundImageView {
     private Drawable badge;

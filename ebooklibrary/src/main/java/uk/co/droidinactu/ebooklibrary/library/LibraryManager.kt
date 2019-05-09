@@ -1,4 +1,4 @@
-package uk.co.droidinactu.ebooklibrary.library
+package uk.co.droidinactu.elibrary.library
 
 import android.annotation.SuppressLint
 import android.app.NotificationManager
@@ -13,8 +13,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
-import uk.co.droidinactu.ebooklibrary.MyDebug
-import uk.co.droidinactu.ebooklibrary.room.*
+import uk.co.droidinactu.elibrary.MyDebug
+import uk.co.droidinactu.elibrary.room.*
 import java.io.File
 import java.util.*
 
@@ -214,7 +214,7 @@ class LibraryManager {
     //region tags
     fun addTagToBook(newTag: String, ebk: EBook?) {
         if (ebk != null) {
-            val t = addTag(newTag)
+            val t = addTag(newTag, null)
             var tagBookLink = getEbookTagLink(ebk.getUniqueId(), t.getUniqueId())
             if (tagBookLink == null) {
                 tagBookLink = EBookTagLink()
@@ -251,11 +251,15 @@ class LibraryManager {
         return ebookTagDao.getBookTagLink(ebookId, tagId)
     }
 
-    fun addTag(tagstr: String): Tag {
-        var t = tagDao.getTag(tagstr)
+    fun addTag(tagstr: String, parentTag: Tag?): Tag {
+        var t: Tag?
+        if (parentTag != null) {
+            t = tagDao.getTag(tagstr, parentTag.id)
+        }
+        t = tagDao.getTag(tagstr)
         if (t == null) {
-            t = Tag()
-            t.tag = tagstr
+            t = Tag(tagstr)
+            t.parentTagId= parentTag?.id
             val newId = tagDao.insert(t)
             t.setUniqueId(newId)
         }
@@ -374,11 +378,11 @@ class LibraryManager {
         }
     }
 
-    fun isScanningInProgress(): Boolean {
+    private fun isScanningInProgress(): Boolean {
         return scanningInProgress
     }
 
-    fun setScanningInProgress(scanningInProgress: Boolean) {
+    private fun setScanningInProgress(scanningInProgress: Boolean) {
         this.scanningInProgress = scanningInProgress
     }
 

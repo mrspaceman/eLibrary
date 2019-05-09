@@ -1,4 +1,4 @@
-package uk.co.droidinactu.ebooklibrary
+package uk.co.droidinactu.elibrary
 
 import android.annotation.SuppressLint
 import android.app.AlarmManager
@@ -10,9 +10,9 @@ import android.content.Intent
 import android.os.Handler
 import android.os.Message
 import androidx.core.app.NotificationCompat
-import uk.co.droidinactu.ebooklibrary.BookLibrary.Companion.mNotificationIdDbCheck
-import uk.co.droidinactu.ebooklibrary.BookLibrary.Companion.mNotificationIdScanning
-import uk.co.droidinactu.ebooklibrary.library.LibraryManager
+import uk.co.droidinactu.elibrary.BookLibrary.Companion.mNotificationIdDbCheck
+import uk.co.droidinactu.elibrary.BookLibrary.Companion.mNotificationIdScanning
+import uk.co.droidinactu.elibrary.library.LibraryManager
 import java.util.*
 
 class LibraryScanAlarmReceiver : BroadcastReceiver() {

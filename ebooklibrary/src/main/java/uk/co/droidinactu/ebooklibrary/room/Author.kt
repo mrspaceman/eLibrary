@@ -1,4 +1,4 @@
-package uk.co.droidinactu.ebooklibrary.room
+package uk.co.droidinactu.elibrary.room
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
@@ -7,7 +7,15 @@ import org.jetbrains.annotations.NotNull
 @Entity(
     tableName = "authors"
 )
-class Author : BaseRoomObj() {
+class Author() : BaseRoomObj() {
+    constructor(firstname: String) : this() {
+        this.firstname = firstname
+    }
+
+    constructor(firstname: String, lastname: String) : this() {
+        this.firstname = firstname
+        this.lastname = lastname
+    }
 
     @ColumnInfo
     @NotNull

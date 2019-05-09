@@ -1,4 +1,4 @@
-package uk.co.droidinactu.ebooklibrary.files;
+package uk.co.droidinactu.elibrary.files;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;

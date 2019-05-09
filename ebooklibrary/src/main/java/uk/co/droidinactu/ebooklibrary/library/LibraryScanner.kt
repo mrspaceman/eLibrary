@@ -1,7 +1,6 @@
-package uk.co.droidinactu.ebooklibrary.library
+package uk.co.droidinactu.elibrary.library
 
 import android.content.Context
-import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Handler
@@ -9,22 +8,19 @@ import android.os.ParcelFileDescriptor
 import com.shockwave.pdfium.PdfiumCore
 import nl.siegmann.epublib.epub.EpubReader
 import org.apache.commons.io.FilenameUtils
-import org.jetbrains.anko.doAsync
-import uk.co.droidinactu.ebooklibrary.MyDebug
-import uk.co.droidinactu.ebooklibrary.R
-import uk.co.droidinactu.ebooklibrary.room.EBook
-import uk.co.droidinactu.ebooklibrary.room.EBookAuthorLink
-import uk.co.droidinactu.ebooklibrary.room.EBookTagLink
-import uk.co.droidinactu.ebooklibrary.room.FileType
-import uk.co.droidinactu.ebooklibrary.room.Tag
+import uk.co.droidinactu.elibrary.MyDebug
+import uk.co.droidinactu.elibrary.R
+import uk.co.droidinactu.elibrary.room.*
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
 import java.io.IOException
+import java.nio.file.Path
+import java.nio.file.Paths
 import java.sql.SQLException
 import java.util.*
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
+import java.util.stream.Collectors
+
 
 /**
  * Created by aspela on 31/08/16.
@@ -35,12 +31,7 @@ class LibraryScanner {
     private var maxFiles = 0
     private var currReadFiles = 0
     private var librootdir = ""
-    private var dirnames: MutableList<String>? = ArrayList()
-    private val filenames = ArrayList<String>()
-    private val pageNum = 0
-    private var pdfiumCore: PdfiumCore? = null
-    private var executor: ExecutorService? = null
-    private val erdr = EpubReader()
+
     private var prgBrHandler: Handler? = null
     private var libMgr: LibraryManager? = null
 
@@ -51,27 +42,32 @@ class LibraryScanner {
             libMgr!!.open(ctx)
             this.prgBrHandler = prgBrHandler
             librootdir = rootdir
-            findDirs(rootdir)
-            findFiles()
-            dirnames = null
-            readFileData(ctx, libname)
+            val dirs = findDirs(rootdir)
 
-            val intent = Intent(ctx.applicationContext, FileObserverService::class.java)
-            intent.putExtra("file_obs_action", "add")
-            intent.putExtra("libname", libname)
-            intent.putExtra("rootdir", rootdir)
-            ctx.applicationContext.startService(intent)
+            var files = dirs
+                .stream()
+                .flatMap { dir -> findFiles(dir).stream() }
+                .collect(Collectors.toList())
+
+            readAllFileData(ctx, libname, files)
+
+//            val intent = Intent(ctx.applicationContext, FileObserverService::class.java)
+//            intent.putExtra("file_obs_action", "add")
+//            intent.putExtra("libname", libname)
+//            intent.putExtra("rootdir", rootdir)
+//            ctx.applicationContext.startService(intent)
         } catch (pE: SQLException) {
             MyDebug.LOG.error("Exception opening database", pE)
         }
     }
 
-    private fun findDirs(dirname: String) {
-//        MyDebug.LOG.debug("LibraryScanner::findDirs() started")
+    private fun findDirs(dirname: String): List<String> {
+        MyDebug.LOG.debug("ReactiveLibraryScanner::findDirs() started")
+        var dirnames = ArrayList<String>()
         var f = File(dirname.trim { it <= ' ' })
         val listOfFiles = f.list()
 
-        dirnames!!.add(dirname)
+        dirnames.add(dirname)
         for (dname in listOfFiles) {
             f = File(dirname + File.separator + dname)
             if (f.isDirectory) {
@@ -79,56 +75,119 @@ class LibraryScanner {
                 findDirs(dirname + File.separator + dname)
             }
         }
+        return dirnames
     }
 
-    private fun findFiles() {
-//        MyDebug.LOG.debug("LibraryScanner::findFiles() started")
-        for (dir in dirnames!!) {
-            var f = File(dir.trim { it <= ' ' })
-            val listOfFiles = f.list()
+    private fun findFiles(dir: String): List<String> {
+        MyDebug.LOG.debug("ReactiveLibraryScanner::findFiles($dir) started")
+        var files = ArrayList<String>()
+        var f = File(dir)
+        val listOfFiles = Arrays.asList(f.list())
 
-            for (filename in listOfFiles) {
+        listOfFiles
+            .stream()
+            .forEach { filename ->
                 f = File(dir + File.separator + filename)
-                if (f.isFile && (filename.toLowerCase().endsWith("epub") || filename.toLowerCase().endsWith("pdf"))) {
-                    filenames.add(dir + File.separator + filename)
+                if (f.isFile && (filename.toString().toLowerCase().endsWith("epub")
+                            || filename.toString().toLowerCase().endsWith("pdf"))
+                ) {
+                    files.add(dir + File.separator + filename)
                 }
             }
-        }
+        return files
     }
 
-    private fun readFileData(ctx: Context, libname: String) {
-//        MyDebug.LOG.debug("LibraryScanner::readFileData() started")
-        pdfiumCore = PdfiumCore(ctx.applicationContext)
-        executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() - 1)
-        maxFiles = filenames.size
+    private fun readAllFileData(ctx: Context, libname: String, files: List<String>) {
+        maxFiles = files.size
         if (prgBrHandler != null && currReadFiles == 0) {
             val completeMessage = prgBrHandler!!.obtainMessage(64, "$libname:$currReadFiles:$maxFiles")
             completeMessage.sendToTarget()
         }
-        for (filename in filenames) {
-            try {
-                readFile(ctx, libname, filename)
-            } catch (e: Exception) {
-                MyDebug.LOG.error("Exception reading book file [" + filename + "] " + e.message)
-            }
-            currReadFiles++
-            if (prgBrHandler != null && currReadFiles % 5 == 0) {
-                val completeMessage = prgBrHandler!!.obtainMessage(64, "$libname:$currReadFiles:$maxFiles")
-                completeMessage.sendToTarget()
-            }
+        files
+            .stream()
+            .parallel()
+            .forEach { file -> readFileData(ctx, libname, File(file)) }
+    }
+
+    private fun readFileData(ctx: Context, libname: String, file: File) {
+//        MyDebug.LOG.debug("LibraryScanner::readFileData() started")
+
+        try {
+            readFileMetaData(ctx, libname, file)
+        } catch (e: Exception) {
+            MyDebug.LOG.error("Exception reading book file [" + file.name + "] " + e.message)
+        }
+        currReadFiles++
+        if (prgBrHandler != null && currReadFiles % 5 == 0) {
+            val completeMessage = prgBrHandler!!.obtainMessage(64, "$libname:$currReadFiles:$maxFiles")
+            completeMessage.sendToTarget()
         }
     }
 
+    private fun readFileMetaData(ctx: Context, libname: String, file: File) {
+        //       MyDebug.LOG.debug("LibraryScanner::readFile($file.absolutePath) started")
+
+        val ebk = EBook()
+        ebk.inLibraryRowId = libMgr!!.getLibrary(libname).getUniqueId()
+        ebk.fileDir = file.parent
+        ebk.fileName = file.absolutePath.substring(ebk.fileDir.length + 1)
+        ebk.fileName = FilenameUtils.removeExtension(file.absolutePath.substring(ebk.fileDir.length + 1))
+        ebk.lastModified = file.lastModified()
+        ebk.setCoverImageFromBitmap(
+            BitmapFactory.decodeResource(
+                ctx.resources,
+                R.drawable.generic_book_cover
+            )
+        )
+
+        try {
+            val prntDir = file.parent.substring(librootdir.length + 1)
+            val prntDirPath: Path = Paths.get(prntDir)
+            var prevBookTag: Tag? = null
+            for (p in prntDirPath) {
+                val t = libMgr!!.addTag(p.toString(), prevBookTag)
+                ebk.addTag(t)
+                prevBookTag = t
+            }
+        } catch (oob: StringIndexOutOfBoundsException) {
+            ebk.addTag(libMgr!!.addTag(Tag.UNCLASSIFIED, null))
+        }
+        MyDebug.LOG.debug("parsing file [filename: " + file.name + ", size: " + file.length() + "]")
+
+// FIXME: add when I can work out how
+//        try {
+//            val metadata = TikaAnalysis.extractMetadata(FileInputStream(f))
+//        } catch (e: Throwable) {
+//             MyDebug.LOG.error( "Apache Tika exception : ${e.localizedMessage}", e)
+//        }
+
+        when {
+            file.name.toLowerCase().endsWith("epub") -> {
+                ebk.addFileType(FileType.EPUB)
+                readEpubMetadata(file, ebk)
+            }
+            file.name.toLowerCase().endsWith("pdf") -> { // create a new renderer
+                ebk.addFileType(FileType.PDF)
+                readPdfMetadata(ctx, file, ebk)
+            }
+            file.name.toLowerCase().endsWith("mobi") -> // create a new renderer
+                ebk.addFileType(FileType.MOBI)
+            //readMobiMetadata(file, ebk);
+        }
+        addEBookToLibraryStorage(libname, ebk)
+    }
+
     //#region read ebook metadata
-    private fun readEpubMetadata(filename: String, f: File, ebk: EBook) {
-        //       MyDebug.LOG.debug("LibraryScanner::readEpubMetadata() started")
+    private fun readEpubMetadata(file: File, ebk: EBook) {
+        //       MyDebug.LOG.debug("LibraryScanner::readEpubMetadata($file.name) started")
         ebk.addFileType(FileType.EPUB)
-        ebk.bookTitle = (f.name.substring(0, f.name.length - 5))
+        ebk.bookTitle = (file.name.substring(0, file.name.length - 5))
         ebk.fullFileDirName = ebk.fileDir + File.separator + ebk.bookTitle
-        val flen = f.length()
+        val flen = file.length()
         if (flen < 24500000) {
             try {
-                val epubInputStream = FileInputStream(filename)
+                val epubInputStream = FileInputStream(file)
+                val erdr = EpubReader()
                 val book = erdr.readEpub(epubInputStream)
 
                 ebk.addAuthors(book.metadata.authors)
@@ -139,28 +198,30 @@ class LibraryScanner {
                 }
                 epubInputStream.close()
             } catch (e: IOException) {
-                MyDebug.LOG.error("Failed to read epub details from [" + filename + "] " + e.message)
+                MyDebug.LOG.error("Failed to read epub details from [" + file.name + "] " + e.message)
             } catch (npe: NullPointerException) {
-                MyDebug.LOG.error("NullPointerException reading epub details from [" + filename + "] " + npe.message)
+                MyDebug.LOG.error("NullPointerException reading epub details from [" + file.name + "] " + npe.message)
             }
 
         } else {
-            MyDebug.LOG.debug("Skipping Large epub [filename: " + filename + ", size: " + f.length() + "]")
+            MyDebug.LOG.debug("Skipping Large epub [filename: " + file.name + ", size: " + file.length() + "]")
         }
     }
 
-    private fun readPdfMetadata(filename: String, f: File, ebk: EBook) {
+    private fun readPdfMetadata(ctx: Context, file: File, ebk: EBook) {
         //       MyDebug.LOG.debug("LibraryScanner::readPdfMetadata() started")
         ebk.addFileType(FileType.PDF)
-        ebk.bookTitle = f.name.substring(0, f.name.length - 4)
+        ebk.bookTitle = file.name.substring(0, file.name.length - 4)
         ebk.fullFileDirName = ebk.fileDir + File.separator + ebk.bookTitle
 
         try {
-            val fileDesc = ParcelFileDescriptor.open(File(filename), ParcelFileDescriptor.MODE_READ_ONLY)
+            val fileDesc = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY)
 
+            var pdfiumCore = PdfiumCore(ctx.applicationContext)
             val pdfDocument = pdfiumCore!!.newDocument(fileDesc)
             val meta = pdfiumCore!!.getDocumentMeta(pdfDocument)
             pdfiumCore!!.openPage(pdfDocument, 0)
+            val pageNum = 0
             val width = pdfiumCore!!.getPageWidthPoint(pdfDocument, pageNum)
             val height = pdfiumCore!!.getPageHeightPoint(pdfDocument, pageNum)
             val bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
@@ -174,13 +235,14 @@ class LibraryScanner {
             pdfiumCore!!.closeDocument(pdfDocument)
 
         } catch (e: FileNotFoundException) {
-            MyDebug.LOG.error("FileNotFoundException reading pdf file [" + filename + "] " + e.message)
+            MyDebug.LOG.error("FileNotFoundException reading pdf file [" + file.name + "] " + e.message)
         } catch (e1: IOException) {
-            MyDebug.LOG.error("IOException reading pdf file [" + filename + "] " + e1.message)
+            MyDebug.LOG.error("IOException reading pdf file [" + file.name + "] " + e1.message)
         }
 
     }
 
+    //#region read mobi metadata
     //   private fun readMobiMetadata( filename:String, f:FileTreeNode , ebk:EBook)
 //    {
     //        ebk.addFileType("mobi");
@@ -252,6 +314,7 @@ class LibraryScanner {
     ////                BookLibApplication.e(LOG_TAG + "readMobiMetadata() Error saving file: " + e.getMessage());
     ////            }
     //  }
+    //endregion Mobi
 
     //endregion
 
@@ -280,61 +343,5 @@ class LibraryScanner {
         }
     }
 
-    private fun readFile(ctx: Context, libname: String, filename: String) {
-        //       MyDebug.LOG.debug("LibraryScanner::readFile($filename) started")
-        val f = File(filename)
-
-        val ebk = EBook()
-        ebk.inLibraryRowId = libMgr!!.getLibrary(libname).getUniqueId()
-        ebk.fileDir = f.parent
-        ebk.fileName = filename.substring(ebk.fileDir.length + 1)
-        ebk.fileName = FilenameUtils.removeExtension(filename.substring(ebk.fileDir.length + 1))
-        ebk.lastModified = f.lastModified()
-        ebk.setCoverImageFromBitmap(
-            BitmapFactory.decodeResource(
-                ctx.resources,
-                R.drawable.generic_book_cover
-            )
-        )
-
-        try {
-            val tagStrs =
-                f.parent.substring(librootdir.length + 1).split(File.separator.toRegex()).dropLastWhile { it.isEmpty() }
-                    .toTypedArray()
-            var prevBookTag: Tag? = null
-            for (s in tagStrs) {
-                val t = libMgr!!.addTag(s)
-                t.parentTagId = prevBookTag?.getUniqueId()
-                doAsync { libMgr!!.updateTag(t) }
-                ebk.addTag(t)
-                prevBookTag = t
-            }
-        } catch (oob: StringIndexOutOfBoundsException) {
-            ebk.addTag(libMgr!!.addTag(Tag.UNCLASSIFIED))
-        }
-        MyDebug.LOG.debug("parsing file [filename: " + filename + ", size: " + f.length() + "]")
-
-// FIXME: add when I can work out how
-//        try {
-//            val metadata = TikaAnalysis.extractMetadata(FileInputStream(f))
-//        } catch (e: Throwable) {
-//             MyDebug.LOG.error( "Apache Tika exception : ${e.localizedMessage}", e)
-//        }
-
-        when {
-            filename.toLowerCase().endsWith("epub") -> {
-                ebk.addFileType(FileType.EPUB)
-                readEpubMetadata(filename, f, ebk)
-            }
-            filename.toLowerCase().endsWith("pdf") -> { // create a new renderer
-                ebk.addFileType(FileType.PDF)
-                readPdfMetadata(filename, f, ebk)
-            }
-            filename.toLowerCase().endsWith("mobi") -> // create a new renderer
-                ebk.addFileType(FileType.MOBI)
-            //readMobiMetadata(filename, f, ebk);
-        }
-        addEBookToLibraryStorage(libname, ebk)
-    }
 
 }

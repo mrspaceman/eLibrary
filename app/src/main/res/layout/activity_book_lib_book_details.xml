@@ -10,7 +10,7 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="uk.co.droidinactu.ebooklibrary.BookLibBookDetailsActivity">
+    tools:context="uk.co.droidinactu.elibrary.BookLibBookDetailsActivity">
 
 
     <EditText
@@ -24,6 +24,7 @@
         android:maxLines="3"
         android:padding="2dp"
         android:text="ebook\ntitle"
+        android:hint="ebook\ntitle"
         android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
     <EditText
@@ -37,6 +38,7 @@
         android:maxLines="3"
         android:padding="2dp"
         android:text="filename"
+        android:hint="filename"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
     <EditText
@@ -50,6 +52,7 @@
         android:maxLines="3"
         android:padding="2dp"
         android:text="Author"
+        android:hint="Author"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
     <ImageView
@@ -66,7 +69,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/book_details_cover"
-        android:layout_alignLeft="@id/book_details_cover"
+        android:layout_alignStart="@id/book_details_cover"
         android:gravity="center"
         android:lines="3"
         android:maxLines="3"
@@ -78,7 +81,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@id/book_details_added_to_lib"
-        android:layout_alignLeft="@id/book_details_title"
+        android:layout_alignStart="@id/book_details_title"
         android:gravity="center"
         android:padding="2dp"
         android:text="xx yyy zzzz"
@@ -101,20 +104,20 @@
         android:id="@+id/book_details_added_to_lib"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/book_details_title"
+        android:layout_alignStart="@+id/book_details_title"
         android:layout_alignBottom="@+id/book_details_cover"
         android:gravity="center"
         android:padding="2dp"
         android:text="xx yyy zzzz"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
-    <uk.co.droidinactu.ebooklibrary.badgedimageview.BadgedImageView
+    <uk.co.droidinactu.elibrary.badgedimageview.BadgedImageView
         android:id="@+id/book_details_cover"
         android:layout_width="@dimen/book_details_cover_width"
         android:layout_height="@dimen/book_details_cover_height"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_marginRight="10dp"
+        android:layout_marginEnd="10dp"
         android:elevation="10dp"
         android:padding="5dp"
         android:src="@drawable/generic_book_cover"

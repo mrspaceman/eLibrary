@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.co.droidinactu.ebooklibrary.files;
+package uk.co.droidinactu.elibrary.files;
 
 /**
  * Provides OpenIntents actions, extras, and categories used by providers.

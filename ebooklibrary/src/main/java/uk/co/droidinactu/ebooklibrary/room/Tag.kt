@@ -1,4 +1,4 @@
-package uk.co.droidinactu.ebooklibrary.room
+package uk.co.droidinactu.elibrary.room
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
@@ -6,7 +6,10 @@ import androidx.room.Entity
 @Entity(
     tableName = "tags"
 )
-class Tag : BaseRoomObj() {
+class Tag() : BaseRoomObj() {
+    constructor(tag: String) : this() {
+        this.tag = tag
+    }
 
     @ColumnInfo
     var tag: String = ""

@@ -1,7 +1,7 @@
-package uk.co.droidinactu.ebooklibrary.library
+package uk.co.droidinactu.elibrary.library
 
 import android.app.Dialog
-import uk.co.droidinactu.ebooklibrary.room.Tag
+import uk.co.droidinactu.elibrary.room.Tag
 import java.util.*
 
 class TagTree {

@@ -1,11 +1,11 @@
-package uk.co.droidinactu.ebooklibrary.room
+package uk.co.droidinactu.elibrary.room
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import uk.co.droidinactu.ebooklibrary.library.LibraryManager
+import uk.co.droidinactu.elibrary.library.LibraryManager
 
 @Database(
     entities = [EBook::class, Author::class, Tag::class, Library::class, EBookAuthorLink::class, EBookTagLink::class],

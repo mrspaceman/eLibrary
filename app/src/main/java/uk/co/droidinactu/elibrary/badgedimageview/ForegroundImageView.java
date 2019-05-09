@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.co.droidinactu.ebooklibrary.badgedimageview;
+package uk.co.droidinactu.elibrary.badgedimageview;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -23,7 +23,7 @@ import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.ViewOutlineProvider;
 import androidx.appcompat.widget.AppCompatImageView;
-import uk.co.droidinactu.ebooklibrary.R;
+import uk.co.droidinactu.elibrary.R;
 
 
 /**

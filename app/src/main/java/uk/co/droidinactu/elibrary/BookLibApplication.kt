@@ -1,4 +1,4 @@
-package uk.co.droidinactu.ebooklibrary
+package uk.co.droidinactu.elibrary
 
 import android.accounts.AccountManager
 import android.annotation.SuppressLint
@@ -14,8 +14,8 @@ import android.util.Patterns
 import org.apache.commons.io.FileUtils
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
-import uk.co.droidinactu.ebooklibrary.library.FileObserverService
-import uk.co.droidinactu.ebooklibrary.library.LibraryManager
+import uk.co.droidinactu.elibrary.library.FileObserverService
+import uk.co.droidinactu.elibrary.library.LibraryManager
 import java.io.File
 import java.io.IOException
 import java.sql.SQLException

@@ -1,4 +1,4 @@
-package uk.co.droidinactu.ebooklibrary.badgedimageview;
+package uk.co.droidinactu.elibrary.badgedimageview;
 
 import android.content.Context;
 import android.graphics.*;

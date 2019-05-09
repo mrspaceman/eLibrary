@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.co.droidinactu.ebooklibrary.files;
+package uk.co.droidinactu.elibrary.files;
 
 import android.content.Context;
 import android.content.pm.PackageManager.NameNotFoundException;

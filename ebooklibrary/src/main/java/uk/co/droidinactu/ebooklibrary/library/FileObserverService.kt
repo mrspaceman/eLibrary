@@ -1,10 +1,10 @@
-package uk.co.droidinactu.ebooklibrary.library
+package uk.co.droidinactu.elibrary.library
 
 import android.app.IntentService
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
-import uk.co.droidinactu.ebooklibrary.MyDebug
+import uk.co.droidinactu.elibrary.MyDebug
 import java.util.*
 
 class FileObserverService : IntentService {

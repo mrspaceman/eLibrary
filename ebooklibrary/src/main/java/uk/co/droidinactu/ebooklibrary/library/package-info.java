@@ -5,4 +5,4 @@
  * Author     : aaspellc
  *
  */
-package uk.co.droidinactu.ebooklibrary.library;
+package uk.co.droidinactu.elibrary.library;

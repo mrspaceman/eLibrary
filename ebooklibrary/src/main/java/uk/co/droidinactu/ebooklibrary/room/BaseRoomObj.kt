@@ -1,4 +1,4 @@
-package uk.co.droidinactu.ebooklibrary.room
+package uk.co.droidinactu.elibrary.room
 
 import androidx.room.ColumnInfo
 import androidx.room.PrimaryKey

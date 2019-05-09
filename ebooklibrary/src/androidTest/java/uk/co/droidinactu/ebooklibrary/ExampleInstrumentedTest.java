@@ -1,4 +1,4 @@
-package uk.co.droidinactu.ebooklibrary;
+package uk.co.droidinactu.elibrary;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

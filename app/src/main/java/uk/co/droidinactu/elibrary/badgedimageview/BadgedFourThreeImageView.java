@@ -14,36 +14,37 @@
  * limitations under the License.
  */
 
-package uk.co.droidinactu.ebooklibrary.badgedimageview;
+package uk.co.droidinactu.elibrary.badgedimageview;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.view.View;
 
 /**
  * A view group that draws a badge drawable on top of it's contents.
  */
-public class BadgedSquareImageView extends BadgedImageView {
-    public BadgedSquareImageView(Context context) {
+public class BadgedFourThreeImageView extends BadgedImageView {
+    public BadgedFourThreeImageView(Context context) {
         super(context);
     }
 
-    public BadgedSquareImageView(Context context, AttributeSet attrs) {
+    public BadgedFourThreeImageView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public BadgedSquareImageView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public BadgedFourThreeImageView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
 
 //    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-//    public BadgedSquareImageView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+//    public BadgedFourThreeImageView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
 //        super(context, attrs, defStyleAttr, defStyleRes);
 //    }
 
     @Override
     protected void onMeasure(int widthSpec, int heightSpec) {
-        super.onMeasure(widthSpec, heightSpec);
-        int fixedSize = Math.min(getMeasuredWidth(), getMeasuredHeight());
-        setMeasuredDimension(fixedSize, fixedSize);
+        int fourThreeHeight = View.MeasureSpec.makeMeasureSpec(View.MeasureSpec.getSize(widthSpec) * 3 / 4,
+                View.MeasureSpec.EXACTLY);
+        super.onMeasure(widthSpec, fourThreeHeight);
     }
 }

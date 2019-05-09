@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.co.droidinactu.ebooklibrary.files;
+package uk.co.droidinactu.elibrary.files;
 
 import android.content.ActivityNotFoundException;
 import android.content.Context;
@@ -22,8 +22,8 @@ import android.content.Intent;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.widget.Toast;
-import uk.co.droidinactu.ebooklibrary.MyDebug;
-import uk.co.droidinactu.ebooklibrary.R;
+import uk.co.droidinactu.elibrary.MyDebug;
+import uk.co.droidinactu.elibrary.R;
 
 import java.io.File;
 import java.util.List;

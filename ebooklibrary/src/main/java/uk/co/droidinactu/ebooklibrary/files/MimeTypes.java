@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package uk.co.droidinactu.ebooklibrary.files;
+package uk.co.droidinactu.elibrary.files;
 
 import android.content.Context;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.XmlResourceParser;
 import android.webkit.MimeTypeMap;
 import org.xmlpull.v1.XmlPullParserException;
-import uk.co.droidinactu.ebooklibrary.R;
+import uk.co.droidinactu.elibrary.R;
 
 import java.io.IOException;
 import java.util.HashMap;

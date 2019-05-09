@@ -1,4 +1,4 @@
-package uk.co.droidinactu.ebooklibrary.room
+package uk.co.droidinactu.elibrary.room
 
 import androidx.room.Dao
 import androidx.room.Insert
@@ -22,8 +22,11 @@ interface TagDao : BaseDao<Tag> {
     )
     fun getAllByParentId(tagid: Int): List<Tag>
 
-    @Query("SELECT *,${BaseRoomObj.UNIQUE_ID_ROW_NAME} FROM tags WHERE tag = (:tagstr) LIMIT 1")
+    @Query("SELECT *,${BaseRoomObj.UNIQUE_ID_ROW_NAME} FROM tags WHERE tag=:tagstr LIMIT 1")
     fun getTag(tagstr: String): Tag
+
+    @Query("SELECT *,${BaseRoomObj.UNIQUE_ID_ROW_NAME} FROM tags WHERE tag=:tagstr AND parentTagId=:parentId LIMIT 1")
+    fun getTag(tagstr: String, parentId:Int): Tag
 
     @Insert
     fun insert(obj: Tag): Long

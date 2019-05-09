@@ -1,4 +1,4 @@
-package uk.co.droidinactu.ebooklibrary
+package uk.co.droidinactu.elibrary
 
 import android.graphics.BitmapFactory
 import android.os.Bundle
@@ -10,9 +10,9 @@ import androidx.appcompat.app.AppCompatActivity
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import org.joda.time.DateTime
-import uk.co.droidinactu.ebooklibrary.badgedimageview.BadgedImageView
-import uk.co.droidinactu.ebooklibrary.room.EBook
-import uk.co.droidinactu.ebooklibrary.room.FileType
+import uk.co.droidinactu.elibrary.badgedimageview.BadgedImageView
+import uk.co.droidinactu.elibrary.room.EBook
+import uk.co.droidinactu.elibrary.room.FileType
 
 class BookLibBookDetailsActivity : AppCompatActivity() {
 
