@@ -76,6 +76,7 @@ android {
             // Instant Run as well as Gradle UP-TO-DATE checks.
             buildConfigField("String", "BUILD_TIME", "\"${BUILD_DATE}\"")
             resValue("string", "build_time", "${BUILD_DATE}")
+            debuggable true
         }
     }
     compileOptions {
@@ -111,10 +112,13 @@ dependencies {
     implementation("androidx.appcompat:appcompat:$rootProject.appCompatVersion")
     implementation("androidx.recyclerview:recyclerview:$rootProject.recyclerVersion")
 
-    implementation 'com.google.firebase:firebase-auth:17.0.0'
-    implementation 'com.google.firebase:firebase-ads:17.2.0'
-
-    implementation 'com.firebaseui:firebase-ui-auth:4.3.1'
+//    implementation 'com.google.android.gms:play-services-identity:16.0.0'
+//
+//    implementation 'com.google.firebase:firebase-auth:17.0.0'
+//    implementation 'com.google.firebase:firebase-ads:17.2.0'
+//    implementation 'com.google.firebase:firebase-core:16.0.9'
+//
+//    implementation 'com.firebaseui:firebase-ui-auth:4.3.1'
 
 //    // Required only if Facebook login support is required
 //    // Find the latest Facebook SDK releases here: https://goo.gl/Ce5L94
@@ -151,11 +155,9 @@ dependencies {
     implementation("com.github.bmelnychuk:atv:1.2.+")
     implementation("com.github.angads25:filepicker:1.0.2")
 
-    implementation 'com.google.firebase:firebase-core:16.0.9'
 }
 
 configurations {
     all*.exclude group: 'com.google.guava', module: 'listenablefuture'
 }
 
-apply plugin: 'com.google.gms.google-services'

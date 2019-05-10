@@ -1,4 +1,4 @@
-package uk.co.droidinactu.elibrary;
+package uk.co.droidinactu.ebooklibrary;
 
 import org.junit.Test;
 

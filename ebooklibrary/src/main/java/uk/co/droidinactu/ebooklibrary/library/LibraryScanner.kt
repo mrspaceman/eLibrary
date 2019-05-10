@@ -8,6 +8,7 @@ import android.os.ParcelFileDescriptor
 import com.shockwave.pdfium.PdfiumCore
 import nl.siegmann.epublib.epub.EpubReader
 import org.apache.commons.io.FilenameUtils
+import uk.co.droidinactu.ebooklibrary.library.FileUtils
 import uk.co.droidinactu.elibrary.MyDebug
 import uk.co.droidinactu.elibrary.R
 import uk.co.droidinactu.elibrary.room.*
@@ -18,9 +19,7 @@ import java.io.IOException
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.sql.SQLException
-import java.util.*
-import java.util.stream.Collectors
-
+import java.util.function.Consumer
 
 /**
  * Created by aspela on 31/08/16.
@@ -30,26 +29,18 @@ class LibraryScanner {
 
     private var maxFiles = 0
     private var currReadFiles = 0
-    private var librootdir = ""
 
     private var prgBrHandler: Handler? = null
     private var libMgr: LibraryManager? = null
 
     fun scanLibraryForEbooks(ctx: Context, prgBrHandler: Handler, libname: String, rootdir: String) {
-//        MyDebug.LOG.debug("LibraryScanner::scanLibraryForEbooks() started")
+        MyDebug.LOG.debug("LibraryScanner::scanLibraryForEbooks() started")
         try {
             libMgr = LibraryManager()
             libMgr!!.open(ctx)
             this.prgBrHandler = prgBrHandler
-            librootdir = rootdir
-            val dirs = findDirs(rootdir)
 
-            var files = dirs
-                .stream()
-                .flatMap { dir -> findFiles(dir).stream() }
-                .collect(Collectors.toList())
-
-            readAllFileData(ctx, libname, files)
+            readAllFileData(ctx, libname, FileUtils.getFileList(rootdir), rootdir)
 
 //            val intent = Intent(ctx.applicationContext, FileObserverService::class.java)
 //            intent.putExtra("file_obs_action", "add")
@@ -61,59 +52,21 @@ class LibraryScanner {
         }
     }
 
-    private fun findDirs(dirname: String): List<String> {
-        MyDebug.LOG.debug("ReactiveLibraryScanner::findDirs() started")
-        var dirnames = ArrayList<String>()
-        var f = File(dirname.trim { it <= ' ' })
-        val listOfFiles = f.list()
-
-        dirnames.add(dirname)
-        for (dname in listOfFiles) {
-            f = File(dirname + File.separator + dname)
-            if (f.isDirectory) {
-                dirnames!!.add(dirname + File.separator + dname)
-                findDirs(dirname + File.separator + dname)
-            }
-        }
-        return dirnames
-    }
-
-    private fun findFiles(dir: String): List<String> {
-        MyDebug.LOG.debug("ReactiveLibraryScanner::findFiles($dir) started")
-        var files = ArrayList<String>()
-        var f = File(dir)
-        val listOfFiles = Arrays.asList(f.list())
-
-        listOfFiles
-            .stream()
-            .forEach { filename ->
-                f = File(dir + File.separator + filename)
-                if (f.isFile && (filename.toString().toLowerCase().endsWith("epub")
-                            || filename.toString().toLowerCase().endsWith("pdf"))
-                ) {
-                    files.add(dir + File.separator + filename)
-                }
-            }
-        return files
-    }
-
-    private fun readAllFileData(ctx: Context, libname: String, files: List<String>) {
+    private fun readAllFileData(ctx: Context, libname: String, files: List<String>, rootdir: String) {
         maxFiles = files.size
         if (prgBrHandler != null && currReadFiles == 0) {
             val completeMessage = prgBrHandler!!.obtainMessage(64, "$libname:$currReadFiles:$maxFiles")
             completeMessage.sendToTarget()
         }
-        files
-            .stream()
-            .parallel()
-            .forEach { file -> readFileData(ctx, libname, File(file)) }
+
+        files.forEach(Consumer<String> { readFileData(ctx, libname, File(it), rootdir) })
     }
 
-    private fun readFileData(ctx: Context, libname: String, file: File) {
+    private fun readFileData(ctx: Context, libname: String, file: File, rootdir: String) {
 //        MyDebug.LOG.debug("LibraryScanner::readFileData() started")
 
         try {
-            readFileMetaData(ctx, libname, file)
+            readFileMetaData(ctx, libname, file, rootdir)
         } catch (e: Exception) {
             MyDebug.LOG.error("Exception reading book file [" + file.name + "] " + e.message)
         }
@@ -124,7 +77,7 @@ class LibraryScanner {
         }
     }
 
-    private fun readFileMetaData(ctx: Context, libname: String, file: File) {
+    private fun readFileMetaData(ctx: Context, libname: String, file: File, rootdir: String) {
         //       MyDebug.LOG.debug("LibraryScanner::readFile($file.absolutePath) started")
 
         val ebk = EBook()
@@ -141,7 +94,7 @@ class LibraryScanner {
         )
 
         try {
-            val prntDir = file.parent.substring(librootdir.length + 1)
+            val prntDir = file.parent.substring(rootdir.length + 1)
             val prntDirPath: Path = Paths.get(prntDir)
             var prevBookTag: Tag? = null
             for (p in prntDirPath) {

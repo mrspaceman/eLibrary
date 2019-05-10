@@ -78,7 +78,6 @@ class BookLibApplication : Application() {
         return libMgr
     }
 
-
     /**
      * (non-Javadoc)
      *

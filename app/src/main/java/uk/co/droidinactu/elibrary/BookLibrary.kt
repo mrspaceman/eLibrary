@@ -1,7 +1,10 @@
 package uk.co.droidinactu.elibrary
 
 import android.annotation.SuppressLint
-import android.app.*
+import android.app.AlarmManager
+import android.app.Dialog
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -20,13 +23,10 @@ import androidx.core.app.NotificationCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.firebase.ui.auth.AuthUI
-import com.firebase.ui.auth.IdpResponse
 import com.github.angads25.filepicker.model.DialogConfigs
 import com.github.angads25.filepicker.model.DialogProperties
 import com.github.angads25.filepicker.view.FilePickerDialog
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.firebase.auth.FirebaseAuth
 import com.unnamed.b.atv.model.TreeNode
 import com.unnamed.b.atv.view.AndroidTreeView
 import org.jetbrains.anko.doAsync
@@ -50,7 +50,7 @@ class BookLibrary : AppCompatActivity() {
     }
 
     private val RC_SIGN_IN: Int = 8191
-    private lateinit var mAuth :FirebaseAuth
+    //  private lateinit var mAuth :FirebaseAuth
 
     private var mNotificationManager: NotificationManager? = null
 
@@ -243,64 +243,66 @@ class BookLibrary : AppCompatActivity() {
         fab?.setOnClickListener { browseForLibrary() }
     }
 
-    private fun checkFirebaseUser() {
-        mAuth = FirebaseAuth.getInstance()
-        val currentUser = mAuth.getCurrentUser()
-        if (currentUser == null) {
-            firebaseSignin()
-        } else {
-            // Name, email address, and profile photo Url
-            var name = currentUser.getDisplayName()
-            var email = currentUser.getEmail()
-            var photoUrl = currentUser.getPhotoUrl()
-
-            // Check if user's email is verified
-            var emailVerified = currentUser.isEmailVerified()
-
-            // The user's ID, unique to the Firebase project. Do NOT use this value to
-            // authenticate with your backend server, if you have one. Use
-            // FirebaseUser.getIdToken() instead.
-            var uid = currentUser.getUid()
-        }
-    }
-
-    fun firebaseSignin() {
-        // Choose authentication providers
-        val providers = arrayListOf(
-            AuthUI.IdpConfig.EmailBuilder().build(),
-            AuthUI.IdpConfig.GoogleBuilder().build()
-            //    AuthUI.IdpConfig.FacebookBuilder().build(),
-            //    AuthUI.IdpConfig.TwitterBuilder().build()
-        )
-
-        // Create and launch sign-in intent
-        startActivityForResult(
-            AuthUI.getInstance()
-                .createSignInIntentBuilder()
-                .setAvailableProviders(providers)
-                .build(),
-            RC_SIGN_IN
-        )
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (requestCode == RC_SIGN_IN) {
-            val response = IdpResponse.fromResultIntent(data)
-
-            if (resultCode == Activity.RESULT_OK) {
-                // Successfully signed in
-                val user = FirebaseAuth.getInstance().currentUser
-                // ...
-            } else {
-                // Sign in failed. If response is null the user canceled the
-                // sign-in flow using the back button. Otherwise check
-                // response.getError().getErrorCode() and handle the error.
-                // ...
-            }
-        }
-    }
+    //#region Firebase
+//    private fun checkFirebaseUser() {
+//        mAuth = FirebaseAuth.getInstance()
+//        val currentUser = mAuth.getCurrentUser()
+//        if (currentUser == null) {
+//            firebaseSignin()
+//        } else {
+//            // Name, email address, and profile photo Url
+//            var name = currentUser.getDisplayName()
+//            var email = currentUser.getEmail()
+//            var photoUrl = currentUser.getPhotoUrl()
+//
+//            // Check if user's email is verified
+//            var emailVerified = currentUser.isEmailVerified()
+//
+//            // The user's ID, unique to the Firebase project. Do NOT use this value to
+//            // authenticate with your backend server, if you have one. Use
+//            // FirebaseUser.getIdToken() instead.
+//            var uid = currentUser.getUid()
+//        }
+//    }
+//
+//    fun firebaseSignin() {
+//        // Choose authentication providers
+//        val providers = arrayListOf(
+//            AuthUI.IdpConfig.EmailBuilder().build(),
+//            AuthUI.IdpConfig.GoogleBuilder().build()
+//            //    AuthUI.IdpConfig.FacebookBuilder().build(),
+//            //    AuthUI.IdpConfig.TwitterBuilder().build()
+//        )
+//
+//        // Create and launch sign-in intent
+//        startActivityForResult(
+//            AuthUI.getInstance()
+//                .createSignInIntentBuilder()
+//                .setAvailableProviders(providers)
+//                .build(),
+//            RC_SIGN_IN
+//        )
+//    }
+//
+//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+//        super.onActivityResult(requestCode, resultCode, data)
+//
+//        if (requestCode == RC_SIGN_IN) {
+//            val response = IdpResponse.fromResultIntent(data)
+//
+//            if (resultCode == Activity.RESULT_OK) {
+//                // Successfully signed in
+//                val user = FirebaseAuth.getInstance().currentUser
+//                // ...
+//            } else {
+//                // Sign in failed. If response is null the user canceled the
+//                // sign-in flow using the back button. Otherwise check
+//                // response.getError().getErrorCode() and handle the error.
+//                // ...
+//            }
+//        }
+//    }
+    //#endregion
 
     private var dialogTagTree: Dialog? = null
     private fun pickTag2(tagToSet: Int) {
@@ -457,7 +459,7 @@ class BookLibrary : AppCompatActivity() {
         super.onStart()
         MyDebug.LOG.debug("onStart()")
         // Check if user is signed in (non-null) and update UI accordingly.
-        checkFirebaseUser()
+//        checkFirebaseUser()
 
 //        if (BookLibApplication.instance.getLibManager().getLibraries().size === 0) {
 //            browseForLibrary()
