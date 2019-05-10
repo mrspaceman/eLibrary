@@ -20,11 +20,11 @@
         android:layout_alignTop="@id/book_details_cover"
         android:layout_toEndOf="@id/book_details_cover"
         android:gravity="center"
+        android:hint="ebook\ntitle"
         android:lines="3"
         android:maxLines="3"
         android:padding="2dp"
         android:text="ebook\ntitle"
-        android:hint="ebook\ntitle"
         android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
     <EditText
@@ -34,11 +34,11 @@
         android:layout_below="@id/book_details_title"
         android:layout_alignStart="@id/book_details_title"
         android:gravity="center"
+        android:hint="filename"
         android:lines="3"
         android:maxLines="3"
         android:padding="2dp"
         android:text="filename"
-        android:hint="filename"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
     <EditText
@@ -48,11 +48,11 @@
         android:layout_below="@+id/book_details_filepath"
         android:layout_alignStart="@+id/book_details_title"
         android:gravity="center"
+        android:hint="Author"
         android:lines="3"
         android:maxLines="3"
         android:padding="2dp"
         android:text="Author"
-        android:hint="Author"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
     <ImageView

@@ -19,6 +19,7 @@ abstract class BaseRoomObj {
     fun setUniqueId(newId: Int) {
         id = newId
     }
+
     fun setUniqueId(newId: Long) {
         id = newId as Int
     }

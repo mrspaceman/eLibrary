@@ -4,6 +4,7 @@ import android.graphics.*
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Ignore
+import androidx.room.TypeConverters
 import org.jetbrains.annotations.NotNull
 import java.io.ByteArrayOutputStream
 import java.util.*
@@ -16,13 +17,18 @@ import java.util.*
 )
 class EBook() : BaseRoomObj() {
 
+    @TypeConverters(FiletypeConverter::class)
     var filetypes = mutableSetOf<FileType>()
 
     @Ignore
     var authors = mutableListOf<Author>()
 
     @Ignore
-    var tags = mutableListOf<Tag>()
+    var tags = mutableSetOf<Tag>()
+
+    @TypeConverters(EBookMetadataConverter::class)
+    @ColumnInfo
+    var metadata = HashMap<String, String>()
 
     @ColumnInfo
     var inLibraryRowId: Int = -1
@@ -161,8 +167,21 @@ class EBook() : BaseRoomObj() {
         }
     }
 
-    private fun addAuthor(author: Author) {
+    fun addAuthor(author: Author) {
         authors.add(author)
+    }
+
+    fun addAuthor(author: String) {
+        if (author.contains(" ")) {
+            val authornames = author.split(" ")
+            authors.add(Author(authornames[0], authornames[1]))
+        } else {
+            authors.add(Author(author))
+        }
+    }
+
+    fun addMetadataEntry(name: String, value: String) {
+        metadata.put(name, value)
     }
 
     companion object {

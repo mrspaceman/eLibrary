@@ -25,7 +25,6 @@ import uk.co.droidinactu.elibrary.room.FileType
 import uk.co.droidinactu.elibrary.room.Tag
 import java.io.File
 
-
 /**
  * An adapter for displaying a list of [uk.co.droidinactu.elibrary.room.EBook] objects.
  * Created by aspela on 01/09/16.

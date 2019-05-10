@@ -21,7 +21,6 @@ import java.util.*
 class LibraryManager {
 
     //region definitions
-    private var scanningInProgress = false
     private var scanLibTask: LibraryScanTask? = null
     private var mNotificationManager: NotificationManager? = null
     private var mNotificationBuilder: NotificationCompat.Builder? = null
@@ -259,7 +258,7 @@ class LibraryManager {
         t = tagDao.getTag(tagstr)
         if (t == null) {
             t = Tag(tagstr)
-            t.parentTagId= parentTag?.id
+            t.parentTagId = parentTag?.id
             val newId = tagDao.insert(t)
             t.setUniqueId(newId)
         }
@@ -334,28 +333,26 @@ class LibraryManager {
 
     fun refreshLibraries(prgBrHandler: Handler?, handler: Handler?, scanNotificationHndlr: Handler) {
         MyDebug.LOG.debug("BookLibrary::refreshLibraries()")
-        if (!scanningInProgress) {
-            scanningInProgress = true
-            doAsync {
-                val aList = getLibraries()
-                if (aList.isEmpty()) {
-                    MyDebug.LOG.debug("BookLibrary::No Libraries to scan")
-                    val completeMessage = handler!!.obtainMessage(64, "")
-                    completeMessage.sendToTarget()
-                    scanningInProgress = false
+        doAsync {
+            val aList = getLibraries()
+            if (aList.isEmpty()) {
+                MyDebug.LOG.debug("BookLibrary::No Libraries to scan")
+                val completeMessage = handler!!.obtainMessage(64, "")
+                completeMessage.sendToTarget()
 
-                    val text = "No Libraries to Scan!"
-                    val duration = Toast.LENGTH_SHORT
+                val text = "No Libraries to Scan!"
+                val duration = Toast.LENGTH_SHORT
+                uiThread {
+                    val toast = Toast.makeText(ctx, text, duration)
+                    toast.show()
+                }
+            } else {
+                for (lib in aList) {
+                    MyDebug.LOG.debug(
+                        LOG_TAG,
+                        "Scanning library [${lib.libraryTitle}] before has [${getBookCount(lib)}] ebooks"
+                    )
                     uiThread {
-                        val toast = Toast.makeText(ctx, text, duration)
-                        toast.show()
-                    }
-                } else {
-                    for (lib in aList) {
-                        MyDebug.LOG.debug(
-                            LOG_TAG,
-                            "Scanning library [${lib.libraryTitle}] before has [${getBookCount(lib)}] ebooks"
-                        )
                         initiateScan(prgBrHandler, handler, scanNotificationHndlr, lib)
                     }
                 }
@@ -374,17 +371,16 @@ class LibraryManager {
     ) {
         if (scanLibTask == null || scanLibTask?.taskComplete == true) {
             scanLibTask = LibraryScanTask()
-            scanLibTask?.execute(prgBrHandler, msgHndlr, scanNotificationHndlr, lib.libraryRootDir, lib.libraryTitle)
+            scanLibTask?.execute(
+                prgBrHandler,
+                msgHndlr,
+                scanNotificationHndlr,
+                lib.libraryRootDir,
+                lib.libraryTitle
+            )
         }
     }
 
-    private fun isScanningInProgress(): Boolean {
-        return scanningInProgress
-    }
-
-    private fun setScanningInProgress(scanningInProgress: Boolean) {
-        this.scanningInProgress = scanningInProgress
-    }
 
     fun addLibrary(
         prgBrHandler: Handler,
@@ -404,7 +400,9 @@ class LibraryManager {
             } catch (pE: Exception) {
                 MyDebug.LOG.error("Exception adding library", pE)
             }
-            initiateScan(prgBrHandler, handler, scanNotificationHndlr, l)
+            uiThread {
+                initiateScan(prgBrHandler, handler, scanNotificationHndlr, l)
+            }
         }
     }
 

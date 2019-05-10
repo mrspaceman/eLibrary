@@ -2,15 +2,21 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "f580eaa9fcc1fdbe60934fa6cc66030b",
+    "identityHash": "809f1a3d6a129d3a5b48c54ae77e6d5c",
     "entities": [
       {
         "tableName": "ebooks",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`filetypes` TEXT NOT NULL, `inLibraryRowId` INTEGER NOT NULL, `fullFileDirName` TEXT NOT NULL, `fileDir` TEXT NOT NULL, `fileName` TEXT NOT NULL, `rating` INTEGER NOT NULL, `addedToLibrary` INTEGER NOT NULL, `lastModified` INTEGER NOT NULL, `lastRefreshed` INTEGER NOT NULL, `lastOpened` INTEGER NOT NULL, `publicationDate` INTEGER NOT NULL, `bookTitle` TEXT NOT NULL, `bookSummary` TEXT NOT NULL, `bookIsbn` TEXT NOT NULL, `bookSeries` TEXT NOT NULL, `bookSeriesIdx` INTEGER NOT NULL, `coverImage` BLOB, `rowid` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`filetypes` TEXT NOT NULL, `metadata` TEXT NOT NULL, `inLibraryRowId` INTEGER NOT NULL, `fullFileDirName` TEXT NOT NULL, `fileDir` TEXT NOT NULL, `fileName` TEXT NOT NULL, `rating` INTEGER NOT NULL, `addedToLibrary` INTEGER NOT NULL, `lastModified` INTEGER NOT NULL, `lastRefreshed` INTEGER NOT NULL, `lastOpened` INTEGER NOT NULL, `publicationDate` INTEGER NOT NULL, `bookTitle` TEXT NOT NULL, `bookSummary` TEXT NOT NULL, `bookIsbn` TEXT NOT NULL, `bookSeries` TEXT NOT NULL, `bookSeriesIdx` INTEGER NOT NULL, `coverImage` BLOB, `rowid` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)",
         "fields": [
           {
             "fieldPath": "filetypes",
             "columnName": "filetypes",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "metadata",
+            "columnName": "metadata",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -350,7 +356,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"f580eaa9fcc1fdbe60934fa6cc66030b\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"809f1a3d6a129d3a5b48c54ae77e6d5c\")"
     ]
   }
 }

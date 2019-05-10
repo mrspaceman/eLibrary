@@ -26,7 +26,7 @@ interface TagDao : BaseDao<Tag> {
     fun getTag(tagstr: String): Tag
 
     @Query("SELECT *,${BaseRoomObj.UNIQUE_ID_ROW_NAME} FROM tags WHERE tag=:tagstr AND parentTagId=:parentId LIMIT 1")
-    fun getTag(tagstr: String, parentId:Int): Tag
+    fun getTag(tagstr: String, parentId: Int): Tag
 
     @Insert
     fun insert(obj: Tag): Long

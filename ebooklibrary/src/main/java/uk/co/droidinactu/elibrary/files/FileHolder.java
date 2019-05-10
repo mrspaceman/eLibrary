@@ -32,13 +32,6 @@ public class FileHolder implements Parcelable, Comparable<FileHolder> {
         mMimeType = MimeTypes.getInstance().getMimeType(f.getName());
     }
 
-    /**
-     * Parse the extension from the filename of the mFile member.
-     */
-    private String parseExtension() {
-        return FileUtils.getExtension(mFile.getName()).toLowerCase();
-    }
-
     public FileHolder(File f, boolean isDirectory) {
         mFile = f;
         mExtension = parseExtension();
@@ -67,6 +60,13 @@ public class FileHolder implements Parcelable, Comparable<FileHolder> {
         } else {
             mIsDirectory = (directoryFlag == 1);
         }
+    }
+
+    /**
+     * Parse the extension from the filename of the mFile member.
+     */
+    private String parseExtension() {
+        return FileUtils.getExtension(mFile.getName()).toLowerCase();
     }
 
     /**

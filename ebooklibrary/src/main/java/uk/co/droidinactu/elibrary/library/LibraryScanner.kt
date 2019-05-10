@@ -8,9 +8,9 @@ import android.os.ParcelFileDescriptor
 import com.shockwave.pdfium.PdfiumCore
 import nl.siegmann.epublib.epub.EpubReader
 import org.apache.commons.io.FilenameUtils
-import uk.co.droidinactu.ebooklibrary.library.FileUtils
 import uk.co.droidinactu.elibrary.MyDebug
 import uk.co.droidinactu.elibrary.R
+import uk.co.droidinactu.elibrary.files.FileUtils
 import uk.co.droidinactu.elibrary.room.*
 import java.io.File
 import java.io.FileInputStream
@@ -27,9 +27,7 @@ import java.util.function.Consumer
 
 class LibraryScanner {
 
-    private var maxFiles = 0
     private var currReadFiles = 0
-
     private var prgBrHandler: Handler? = null
     private var libMgr: LibraryManager? = null
 
@@ -53,18 +51,16 @@ class LibraryScanner {
     }
 
     private fun readAllFileData(ctx: Context, libname: String, files: List<String>, rootdir: String) {
-        maxFiles = files.size
+        files.size
         if (prgBrHandler != null && currReadFiles == 0) {
-            val completeMessage = prgBrHandler!!.obtainMessage(64, "$libname:$currReadFiles:$maxFiles")
+            val completeMessage = prgBrHandler!!.obtainMessage(64, "$libname:$currReadFiles:${files.size}")
             completeMessage.sendToTarget()
         }
-
-        files.forEach(Consumer<String> { readFileData(ctx, libname, File(it), rootdir) })
+        files.forEach(Consumer<String> { readFileData(ctx, libname, File(it), rootdir, files.size) })
     }
 
-    private fun readFileData(ctx: Context, libname: String, file: File, rootdir: String) {
+    private fun readFileData(ctx: Context, libname: String, file: File, rootdir: String, maxFiles: Int) {
 //        MyDebug.LOG.debug("LibraryScanner::readFileData() started")
-
         try {
             readFileMetaData(ctx, libname, file, rootdir)
         } catch (e: Exception) {
@@ -107,13 +103,6 @@ class LibraryScanner {
         }
         MyDebug.LOG.debug("parsing file [filename: " + file.name + ", size: " + file.length() + "]")
 
-// FIXME: add when I can work out how
-//        try {
-//            val metadata = TikaAnalysis.extractMetadata(FileInputStream(f))
-//        } catch (e: Throwable) {
-//             MyDebug.LOG.error( "Apache Tika exception : ${e.localizedMessage}", e)
-//        }
-
         when {
             file.name.toLowerCase().endsWith("epub") -> {
                 ebk.addFileType(FileType.EPUB)
@@ -127,10 +116,35 @@ class LibraryScanner {
                 ebk.addFileType(FileType.MOBI)
             //readMobiMetadata(file, ebk);
         }
+        // addMetadataToEbook(ebk, file)
         addEBookToLibraryStorage(libname, ebk)
     }
 
     //#region read ebook metadata
+//    val parser = AutoDetectParser()
+//    val handler = BodyContentHandler(-1)
+//    val context = ParseContext()
+//    var metadata = Metadata()
+
+    fun addMetadataToEbook(ebk: EBook, file: File) {
+//        try {
+//            val inputstream = FileInputStream(file)
+//            parser.parse(inputstream, handler, metadata, context)
+//
+//            //add ebook metadata
+//            for (name in metadata.names()) {
+//                ebk.addMetadataEntry(name.toLowerCase(), metadata.get(name))
+//                if (name.toLowerCase().contains("title") && metadata.get(name).trim().length > 1) {
+//                    ebk.bookTitle = metadata.get(name)
+//                } else if (name.toLowerCase().contains("author")) {
+//                    ebk.addAuthor(metadata.get(name))
+//                }
+//            }
+//        } catch (e: Throwable) {
+//            MyDebug.LOG.error("Apache Tika exception [${ebk.bookTitle}] : ${e.localizedMessage}", e)
+//        }
+    }
+
     private fun readEpubMetadata(file: File, ebk: EBook) {
         //       MyDebug.LOG.debug("LibraryScanner::readEpubMetadata($file.name) started")
         ebk.addFileType(FileType.EPUB)
@@ -295,6 +309,5 @@ class LibraryScanner {
             libMgr?.addEbookAuthorLink(ebkAuth)
         }
     }
-
 
 }

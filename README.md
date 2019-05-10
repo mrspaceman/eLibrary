@@ -1,7 +1,3 @@
-# ebookmgr
-
-[![AppCentreBuild](https://build.appcenter.ms/v0.1/apps/6603308e-b77f-4403-ad2a-0b4ffa3f963a/branches/master/badge)](https://build.appcenter.ms/v0.1/apps/6603308e-b77f-4403-ad2a-0b4ffa3f963a/branches/master/badge)
-
 ## Android EBook Library Manager
 
 Allow you to manage your ebook collection directly on your android device.
@@ -50,4 +46,18 @@ Adobe PDF reader, Google Books etc...
 adb -s 88c859cacec5cc73 shell setprop log.tag.BookLibApplication VERBOSE
 adb -s 88c859cacec5cc73 shell setprop debug.firebase.analytics.app uk.co.droidinactu.elibrary
 adb -s 88c859cacec5cc73 shell setprop log.tag.FA VERBOSE
+
+adb -s 88c859cacec5cc73 shell
+
+setprop log.tag.BookLibApplication VERBOSE
+setprop debug.firebase.analytics.app uk.co.droidinactu.elibrary
+setprop log.tag.FA VERBOSE
+
+
+getprop log.tag.BookLibApplication
+
+getprop debug.firebase.analytics.app
+
+getprop log.tag.FA
+
 ```

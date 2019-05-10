@@ -1,4 +1,4 @@
-package uk.co.droidinactu.ebooklibrary;
+package uk.co.droidinactu.elibrary;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import org.junit.Test;

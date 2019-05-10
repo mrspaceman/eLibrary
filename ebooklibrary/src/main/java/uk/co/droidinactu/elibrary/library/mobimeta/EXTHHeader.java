@@ -26,32 +26,6 @@ public class EXTHHeader {
         this.setRecordList(list);
     }
 
-    public void recomputeFields() {
-        StreamUtils.intToByteArray(this.size(), this.headerLength);
-        StreamUtils.intToByteArray(this.recordList.size(), this.recordCount);
-    }
-
-    public int size() {
-        int dataSize = this.dataSize();
-        return 12 + dataSize + this.paddingSize(dataSize);
-    }
-
-    protected int dataSize() {
-        int size = 0;
-        for (EXTHRecord rec : this.recordList) {
-            size += rec.size();
-        }
-        return size;
-    }
-
-    protected int paddingSize(int dataSize) {
-        int paddingSize = dataSize % 4;
-        if (paddingSize != 0) {
-            paddingSize = 4 - paddingSize;
-        }
-        return paddingSize;
-    }
-
     public EXTHHeader(InputStream in) throws IOException {
         MobiCommon.logMessage("*** EXTHHeader ***");
         StreamUtils.readByteArray(in, this.identifier);
@@ -78,6 +52,32 @@ public class EXTHHeader {
             StreamUtils.readByte(in);
             ++i2;
         }
+    }
+
+    public void recomputeFields() {
+        StreamUtils.intToByteArray(this.size(), this.headerLength);
+        StreamUtils.intToByteArray(this.recordList.size(), this.recordCount);
+    }
+
+    public int size() {
+        int dataSize = this.dataSize();
+        return 12 + dataSize + this.paddingSize(dataSize);
+    }
+
+    protected int dataSize() {
+        int size = 0;
+        for (EXTHRecord rec : this.recordList) {
+            size += rec.size();
+        }
+        return size;
+    }
+
+    protected int paddingSize(int dataSize) {
+        int paddingSize = dataSize % 4;
+        if (paddingSize != 0) {
+            paddingSize = 4 - paddingSize;
+        }
+        return paddingSize;
     }
 
     public List<EXTHRecord> getRecordList() {

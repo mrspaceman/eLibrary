@@ -1,12 +1,10 @@
 package uk.co.droidinactu.elibrary.room
 
 import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
 import androidx.room.Query
 
 @Dao
-interface EBookTagLinkDao :BaseDao<EBookTagLink>{
+interface EBookTagLinkDao : BaseDao<EBookTagLink> {
     @Query("SELECT *,${BaseRoomObj.UNIQUE_ID_ROW_NAME} FROM ebooktaglink")
     fun getAll(): List<EBookTagLink>
 

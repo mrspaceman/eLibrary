@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package uk.co.droidinactu.elibrary.files;
 
 import android.content.ActivityNotFoundException;
@@ -26,7 +25,14 @@ import uk.co.droidinactu.elibrary.MyDebug;
 import uk.co.droidinactu.elibrary.R;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Peli
@@ -235,15 +241,15 @@ public class FileUtils {
      *
      * @param fileholder The holder of the file to open.
      */
-    public static void openFile(FileHolder fileholder, Context c) {
+    public static void openFile(uk.co.droidinactu.elibrary.files.FileHolder fileholder, Context c) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
 
-        Uri data = FileManagerProvider.getUriForFile(fileholder.getFile().getAbsolutePath());
+        Uri data = uk.co.droidinactu.elibrary.files.FileManagerProvider.getUriForFile(fileholder.getFile().getAbsolutePath());
         String type = fileholder.getMimeType();
 
         if ("*/*".equals(type)) {
             intent.setData(data);
-            intent.putExtra(FileManagerIntents.EXTRA_FROM_OI_FILEMANAGER, true);
+            intent.putExtra(uk.co.droidinactu.elibrary.files.FileManagerIntents.EXTRA_FROM_OI_FILEMANAGER, true);
         } else {
             intent.setDataAndType(data, type);
         }
@@ -295,5 +301,23 @@ public class FileUtils {
             }
             file = parentFile;
         }
+    }
+
+    public static List<String> getFileList(String rootdir) {
+        try (Stream<Path> walk = Files.walk(Paths.get(rootdir))) {
+
+            List<String> result = walk
+                    .filter(f ->
+                            Files.isRegularFile((f)) &&
+                                    (f.toString().toLowerCase().endsWith("pdf") ||
+                                            f.toString().toLowerCase().endsWith("epub")))
+                    .map(x -> x.toString()).collect(Collectors.toList());
+
+            return result;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return new ArrayList<>();
     }
 }

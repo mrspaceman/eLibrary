@@ -10,7 +10,6 @@ package uk.co.droidinactu.elibrary.library
 import io.reactivex.Observable
 import io.reactivex.Observer
 import uk.co.droidinactu.elibrary.room.EBook
-import java.io.File
 
 /*
  * Copyright 2019 (C) Andy Aspell-Clark
@@ -19,7 +18,7 @@ import java.io.File
  * Author     : aaspellc
  *
  */
-class ReactiveFileMetadataReader: Observable<EBook>() {
+class ReactiveFileMetadataReader : Observable<EBook>() {
 
     override fun subscribeActual(observer: Observer<in EBook>?) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.

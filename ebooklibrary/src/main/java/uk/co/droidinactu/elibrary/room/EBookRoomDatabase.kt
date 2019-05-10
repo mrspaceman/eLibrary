@@ -4,14 +4,12 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import androidx.room.TypeConverters
 import uk.co.droidinactu.elibrary.library.LibraryManager
 
 @Database(
     entities = [EBook::class, Author::class, Tag::class, Library::class, EBookAuthorLink::class, EBookTagLink::class],
     version = 1
 )
-@TypeConverters(FiletypeConverter::class)
 abstract class EBookRoomDatabase : RoomDatabase() {
 
     abstract fun ebookDao(): EBookDao

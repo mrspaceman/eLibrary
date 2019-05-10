@@ -1,9 +1,10 @@
 package uk.co.droidinactu.elibrary.room
 
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Query
 
 @Dao
-interface EBookAuthorLinkDao  :BaseDao<EBookAuthorLink>{
+interface EBookAuthorLinkDao : BaseDao<EBookAuthorLink> {
     @Query("SELECT * FROM ebookauthorlink")
     fun getAll(): List<EBookAuthorLink>
 

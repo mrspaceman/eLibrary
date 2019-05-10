@@ -55,14 +55,6 @@ public class EXTHRecord {
         StreamUtils.intToByteArray(this.size(), this.recordLength);
     }
 
-    private static boolean isKnownType(int type) {
-        return typeHash.containsKey(type);
-    }
-
-    private static String getDescriptionForType(int type) {
-        return typeHash.get(type);
-    }
-
     EXTHRecord(InputStream in) throws IOException {
         MobiCommon.logMessage("*** EXTHRecord ***");
         StreamUtils.readByteArray(in, this.recordType);
@@ -149,6 +141,14 @@ public class EXTHRecord {
                 }
             }
         }
+    }
+
+    private static boolean isKnownType(int type) {
+        return typeHash.containsKey(type);
+    }
+
+    private static String getDescriptionForType(int type) {
+        return typeHash.get(type);
     }
 
     public static boolean isBooleanType(int type) {
