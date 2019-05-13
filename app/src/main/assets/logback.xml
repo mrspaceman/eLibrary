@@ -1,0 +1,28 @@
+<configuration>
+    <appender name="logcat" class="ch.qos.logback.classic.android.LogcatAppender">
+        <encoder>
+            <pattern>[%-20thread] %msg</pattern>
+        </encoder>
+        <tagEncoder>
+            <pattern>%logger{12}</pattern>
+        </tagEncoder>
+    </appender>
+
+    <!-- Create a file appender for a log in the application's data directory -->
+    <appender name="file" class="ch.qos.logback.core.FileAppender">
+        <!--        <file>/data/data/uk.co.droidinactu.elibrary/log/debug.log</file>-->
+        <file>/sdcard/documents/droidinactu-elibrary-debug.log</file>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="uk.co.droidinactu" additivity="false" level="VERBOSE">
+        <appender-ref ref="file" />
+    </logger>
+
+    <root level="VERBOSE">
+        <appender-ref ref="logcat" />
+        <appender-ref ref="file" />
+    </root>
+</configuration>

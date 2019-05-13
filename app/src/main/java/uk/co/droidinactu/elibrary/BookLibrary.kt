@@ -27,18 +27,17 @@ import com.github.angads25.filepicker.model.DialogConfigs
 import com.github.angads25.filepicker.model.DialogProperties
 import com.github.angads25.filepicker.view.FilePickerDialog
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.unnamed.b.atv.model.TreeNode
-import com.unnamed.b.atv.view.AndroidTreeView
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
-import uk.co.droidinactu.elibrary.library.FileObserverService
-import uk.co.droidinactu.elibrary.library.LibraryManager
-import uk.co.droidinactu.elibrary.library.RecursiveFileObserver.Companion.INTENT_EBOOK_MODIFIED
-import uk.co.droidinactu.elibrary.library.RecursiveFileObserver.Companion.INTENT_EBOOK_MODIFIED_PATH
-import uk.co.droidinactu.elibrary.library.TagTree
-import uk.co.droidinactu.elibrary.room.Tag
+import uk.co.droidinactu.ebooklib.MyDebug
+import uk.co.droidinactu.ebooklib.library.FileObserverService
+import uk.co.droidinactu.ebooklib.library.LibraryManager
+import uk.co.droidinactu.ebooklib.library.RecursiveFileObserver.Companion.INTENT_EBOOK_MODIFIED
+import uk.co.droidinactu.ebooklib.library.RecursiveFileObserver.Companion.INTENT_EBOOK_MODIFIED_PATH
+import uk.co.droidinactu.ebooklib.room.EBook
 import java.io.File
 import java.util.*
+import java.util.stream.Collectors
 
 class BookLibrary : AppCompatActivity() {
 
@@ -202,9 +201,7 @@ class BookLibrary : AppCompatActivity() {
             MyDebug.LOG.debug("Logging Enabled")
             val appTitle = getString(R.string.app_title)
             try {
-                val appVerName = BookLibApplication.instance.getAppVersionName(
-                    "uk.co.droidinactu.elibrary"
-                )
+                val appVerName = BookLibApplication.instance.getAppVersionName()
                 supportActionBar!!.title = "$appTitle ($appVerName)"
             } catch (e: Exception) {
                 MyDebug.LOG.error("Exception getting app vername")
@@ -304,70 +301,25 @@ class BookLibrary : AppCompatActivity() {
 //    }
     //#endregion
 
-    private var dialogTagTree: Dialog? = null
-    private fun pickTag2(tagToSet: Int) {
-        MyDebug.LOG.debug("BookLibrary::pickTag2($tagToSet) started")
-        val ctx = this
-
-        doAsync {
-            val tgTree = BookLibApplication.instance.getLibManager().getTagTree()
-
-            val root = TreeNode.root()
-            val parent = TreeNode("Tags")
-
-            for (t in tgTree.rootTags) {
-                addTagToTree(parent, t)
-            }
-            root.addChild(parent)
-
-            uiThread {
-                val tView = AndroidTreeView(ctx, root)
-                dialogTagTree = Dialog(ctx)
-                dialogTagTree?.setContentView(R.layout.tag_list_tree_dialog)
-                dialogTagTree?.setTitle("Pick an EBook tag")
-                val ll = findViewById<LinearLayout>(R.id.tag_list_tree)
-                ll.addView(tView.view)
-                //   dialogTagTree?.setContentView(tView.getView())
-                dialogTagTree?.setTitle("Pick an EBook tag")
-                dialogTagTree?.show()
-            }
-        }
-    }
-
-    private fun addTagToTree(parent: TreeNode, tag: TagTree.TreeTag) {
-        val child = TreeNode(tag.me)
-        child.clickListener = TreeNode.TreeNodeClickListener { treeNode: TreeNode, any: Any ->
-            fun onClick(node: TreeNode?, value: Any?) {
-                val childtag = node?.value as TagTree.TreeTag
-                savePreferences()
-                updateBookListTag1()
-                dialogTagTree?.dismiss()
-            }
-        }
-        parent.addChild(child)
-
-        for (t in tag.children) {
-            addTagToTree(child, t)
-        }
-    }
 
     private fun pickTag(tagToSet: Int) {
         MyDebug.LOG.debug("BookLibrary::pickTag($tagToSet) started")
         val ctx = this
         doAsync {
-            val tglist = BookLibApplication.instance.getLibManager().getTagList()
-            //tglist.remove(BookTag.CURRENTLY_READING)
+            val tglist =
+                BookLibApplication.instance.getLibManager().getTags().stream().sorted().collect(Collectors.toList())
+            //tglist.remove(EBook.CURRENTLY_READING)
 
             uiThread {
                 val dialog = Dialog(ctx)
                 dialog.setContentView(R.layout.tag_list_picker_dialog)
                 dialog.setTitle("Pick an EBook tag")
-
-                // set the custom dialog components - text, image and button
                 val tagLstIncludeSubTags = dialog.findViewById<View>(R.id.tag_list_picker_include_subtags) as CheckBox
-                tagLstIncludeSubTags.isChecked = true
                 val tagLstPickerList = dialog.findViewById<View>(R.id.tag_list_picker_list) as ListView
                 val adapter = ArrayAdapter(ctx, android.R.layout.simple_list_item_1, android.R.id.text1, tglist)
+
+                // set the custom dialog components - text, image and button
+                tagLstIncludeSubTags.isChecked = true
                 tagLstPickerList.adapter = adapter
 
                 tagLstPickerList.onItemClickListener =
@@ -432,7 +384,7 @@ class BookLibrary : AppCompatActivity() {
         MyDebug.LOG.debug("BookLibrary::updateBookListCurrReading()")
         doAsync {
             val bklist = BookLibApplication.instance.getLibManager()
-                .getBooksForTag(Tag.CURRENTLY_READING)
+                .getBooksForTag(EBook.TAG_CURRENTLY_READING)
             bookListAdaptorCurrReading = BookListItemAdaptor(bklist)
             uiThread {
                 bookListCurrentReading?.adapter = bookListAdaptorCurrReading

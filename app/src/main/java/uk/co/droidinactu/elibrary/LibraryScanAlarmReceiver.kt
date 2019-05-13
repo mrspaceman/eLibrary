@@ -10,9 +10,10 @@ import android.content.Intent
 import android.os.Handler
 import android.os.Message
 import androidx.core.app.NotificationCompat
+import uk.co.droidinactu.ebooklib.MyDebug
+import uk.co.droidinactu.ebooklib.library.LibraryManager
 import uk.co.droidinactu.elibrary.BookLibrary.Companion.mNotificationIdDbCheck
 import uk.co.droidinactu.elibrary.BookLibrary.Companion.mNotificationIdScanning
-import uk.co.droidinactu.elibrary.library.LibraryManager
 import java.util.*
 
 class LibraryScanAlarmReceiver : BroadcastReceiver() {

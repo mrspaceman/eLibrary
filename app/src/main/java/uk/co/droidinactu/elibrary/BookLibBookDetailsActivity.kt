@@ -10,9 +10,9 @@ import androidx.appcompat.app.AppCompatActivity
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import org.joda.time.DateTime
+import uk.co.droidinactu.ebooklib.room.EBook
+import uk.co.droidinactu.ebooklib.room.FileType
 import uk.co.droidinactu.elibrary.badgedimageview.BadgedImageView
-import uk.co.droidinactu.elibrary.room.EBook
-import uk.co.droidinactu.elibrary.room.FileType
 
 class BookLibBookDetailsActivity : AppCompatActivity() {
 
@@ -56,16 +56,13 @@ class BookLibBookDetailsActivity : AppCompatActivity() {
         val libMgr = BookLibApplication.instance.getLibManager()
         doAsync {
             val ebk = libMgr.getBook(bookFullFileDirName)
-            if (ebk != null) {
-                uiThread {
-                    updateBookDetails(ebk)
-                }
+            uiThread {
+                updateBookDetails(ebk)
             }
         }
     }
 
     private fun updateBookDetails(ebk: EBook) {
-        val ctx = this
         var cvrBmp = ebk.coverImageAsBitmap
         if (cvrBmp == null) {
             cvrBmp = BitmapFactory.decodeResource(resources, R.drawable.generic_book_cover)
@@ -80,15 +77,14 @@ class BookLibBookDetailsActivity : AppCompatActivity() {
         mTitle.setText(ebk.bookTitle)
         doAsync {
             val auths = BookLibApplication.instance.getLibManager().getAuthorsForBook(ebk)
-            val tags = BookLibApplication.instance.getLibManager().getTagsForBook(ebk)
             uiThread {
-                if (auths!!.isNotEmpty()) {
+                if (auths.isNotEmpty()) {
                     mAuthor.setText(auths[0].fullName)
                 }
 
                 val tagStrs = mutableListOf<String>()
-                for (t in tags) {
-                    tagStrs.add(t.tag)
+                for (t in ebk.tags) {
+                    tagStrs.add(t)
                 }
                 val tagListAdaptor = ArrayAdapter(
                     BookLibApplication.instance.applicationContext,

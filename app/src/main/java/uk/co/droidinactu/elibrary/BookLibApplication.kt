@@ -14,8 +14,9 @@ import android.util.Patterns
 import org.apache.commons.io.FileUtils
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
-import uk.co.droidinactu.elibrary.library.FileObserverService
-import uk.co.droidinactu.elibrary.library.LibraryManager
+import uk.co.droidinactu.ebooklib.MyDebug
+import uk.co.droidinactu.ebooklib.library.FileObserverService
+import uk.co.droidinactu.ebooklib.library.LibraryManager
 import java.io.File
 import java.io.IOException
 import java.sql.SQLException
@@ -195,7 +196,7 @@ class BookLibApplication : Application() {
         return -1
     }
 
-    fun getAppVersionName(packageName: String): String {
+    fun getAppVersionName(): String {
         try {
             val pInfo = packageManager.getPackageInfo(getPackageName(), PackageManager.GET_META_DATA)
             return pInfo.versionName

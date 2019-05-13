@@ -16,17 +16,16 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.recyclerview.widget.RecyclerView
 import org.jetbrains.anko.doAsync
+import uk.co.droidinactu.ebooklib.files.FileHolder
+import uk.co.droidinactu.ebooklib.files.FileUtils
+import uk.co.droidinactu.ebooklib.files.MimeTypes
+import uk.co.droidinactu.ebooklib.room.EBook
+import uk.co.droidinactu.ebooklib.room.FileType
 import uk.co.droidinactu.elibrary.badgedimageview.BadgedImageView
-import uk.co.droidinactu.elibrary.files.FileHolder
-import uk.co.droidinactu.elibrary.files.FileUtils
-import uk.co.droidinactu.elibrary.files.MimeTypes
-import uk.co.droidinactu.elibrary.room.EBook
-import uk.co.droidinactu.elibrary.room.FileType
-import uk.co.droidinactu.elibrary.room.Tag
 import java.io.File
 
 /**
- * An adapter for displaying a list of [uk.co.droidinactu.elibrary.room.EBook] objects.
+ * An adapter for displaying a list of [uk.co.droidinactu.ebooklib.room.EBook] objects.
  * Created by aspela on 01/09/16.
  */
 class BookListItemAdaptor(private val mBooks: MutableList<EBook>) :
@@ -62,11 +61,6 @@ class BookListItemAdaptor(private val mBooks: MutableList<EBook>) :
     override fun getItemCount(): Int {
         return mBooks.size
     }
-
-    //    @Override
-    //    public long getItemId(int position) {
-    //        return mBooks.get(position).getFull_file_dir_name();
-    //    }
 
     fun addBook(book: EBook, position: Int) {
         val handler = Handler()
@@ -149,10 +143,8 @@ class BookListItemAdaptor(private val mBooks: MutableList<EBook>) :
         private fun openBook(ctx: Context, selectedFileType: String) {
             doAsync {
                 try {
-                    BookLibApplication.instance.getLibManager().addTagToBook(
-                        Tag.CURRENTLY_READING,
-                        ebk
-                    )
+                    ebk!!.addTag(EBook.TAG_CURRENTLY_READING)
+                    BookLibApplication.instance.getLibManager().updateBook(ebk!!)
                 } finally {
                 }
                 MimeTypes.initInstance(ctx)

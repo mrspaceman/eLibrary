@@ -6,7 +6,7 @@
     android:installLocation="preferExternal">
 
     <application
-        android:name=".BookLibApplication"
+        android:name="uk.co.droidinactu.elibrary.BookLibApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -16,11 +16,11 @@
         dist:ignore="AllowBackup,GoogleAppIndexingWarning"
         tools:ignore="GoogleAppIndexingWarning">
         <activity
-            android:name=".BookLibBookDetailsActivity"
+            android:name="uk.co.droidinactu.elibrary.BookLibBookDetailsActivity"
             android:label="@string/title_activity_book_lib_book_details"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".BookLibrary"
+            android:name="uk.co.droidinactu.elibrary.BookLibrary"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -30,7 +30,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".BookLibSearchActivity"
+            android:name="uk.co.droidinactu.elibrary.BookLibSearchActivity"
             android:label="@string/title_activity_book_lib_search"
             android:theme="@style/AppTheme.NoActionBar" />
 
@@ -45,7 +45,7 @@
         </provider>
 
         <service
-            android:name=".library.FileObserverService"
+            android:name="uk.co.droidinactu.elibrary.library.FileObserverService"
             android:enabled="true"
             android:exported="true">
             <intent-filter>

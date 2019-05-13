@@ -25,7 +25,6 @@ import android.view.ViewOutlineProvider;
 import androidx.appcompat.widget.AppCompatImageView;
 import uk.co.droidinactu.elibrary.R;
 
-
 /**
  * An extension to {@link AppCompatImageView} which has a foreground drawable.
  */
