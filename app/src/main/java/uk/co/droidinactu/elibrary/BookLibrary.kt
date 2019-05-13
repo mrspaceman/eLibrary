@@ -314,12 +314,10 @@ class BookLibrary : AppCompatActivity() {
                 val dialog = Dialog(ctx)
                 dialog.setContentView(R.layout.tag_list_picker_dialog)
                 dialog.setTitle("Pick an EBook tag")
-                val tagLstIncludeSubTags = dialog.findViewById<View>(R.id.tag_list_picker_include_subtags) as CheckBox
                 val tagLstPickerList = dialog.findViewById<View>(R.id.tag_list_picker_list) as ListView
                 val adapter = ArrayAdapter(ctx, android.R.layout.simple_list_item_1, android.R.id.text1, tglist)
 
                 // set the custom dialog components - text, image and button
-                tagLstIncludeSubTags.isChecked = true
                 tagLstPickerList.adapter = adapter
 
                 tagLstPickerList.onItemClickListener =
@@ -328,7 +326,6 @@ class BookLibrary : AppCompatActivity() {
                         when (tagToSet) {
                             1 -> {
                                 bookListTag1Title?.text = selectedFromList
-                                bookListTag1IncludeSubTags = tagLstIncludeSubTags.isChecked
                                 savePreferences()
                                 updateBookListTag1()
                             }
@@ -439,6 +436,18 @@ class BookLibrary : AppCompatActivity() {
         MyDebug.LOG.debug("onOptionsItemSelected()")
         // Handle item selection
         when (item.itemId) {
+            R.id.action_flutter -> {
+//                var flutterView = Flutter.createView(
+//                    this,
+//                    getLifecycle(),
+//                    "route1"
+//                )
+//                var layout = FrameLayout.LayoutParams(600, 800)
+//                layout.leftMargin = 100
+//                layout.topMargin = 200Ó
+//                addContentView(flutterView, layout)
+                return true
+            }
             R.id.action_search -> {
                 val i = Intent(this, BookLibSearchActivity::class.java)
                 val b = Bundle()

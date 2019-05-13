@@ -1,4 +1,3 @@
 include ':ebooklibrary'
 include(":app")
 rootProject.name = "ELibrary"
-

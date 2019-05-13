@@ -4,6 +4,14 @@
     tools:context="uk.co.droidinactu.booklib.Dashboard">
 
     <item
+        android:id="@+id/action_flutter"
+        android:icon="@drawable/ic_search_white_24dp"
+        android:orderInCategory="80"
+        android:title="@string/action_flutter"
+        app:showAsAction="ifRoom" />
+
+
+    <item
         android:id="@+id/action_search"
         android:icon="@drawable/ic_search_white_24dp"
         android:orderInCategory="80"
