@@ -12,16 +12,6 @@
     tools:context=".BookLibrary"
     tools:showIn="@layout/activity_main">
 
-    <Button
-        android:id="@+id/dashboard_books_list_tag1_title"
-        style="@style/tag_button_style"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/dashboard_books_list_reading"
-        android:layout_alignParentStart="true"
-        android:layout_marginTop="5dp"
-        android:text="Tag" />
-
     <LinearLayout
         android:id="@+id/dashboard_toolbar"
         android:layout_width="match_parent"
@@ -38,6 +28,53 @@
             android:textColor="@color/primary_light"
             android:textSize="24sp" />
     </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/dashboard_tags_list"
+        android:layout_width="200dp"
+        android:layout_height="fill_parent"
+        android:layout_below="@+id/dashboard_toolbar"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true" />
+
+    <TextView
+        android:id="@+id/dashboard_books_list_reading_title"
+        style="@style/tag_button_style"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/dashboard_toolbar"
+        android:layout_marginTop="2dp"
+        android:layout_toRightOf="@+id/dashboard_tags_list"
+        android:text="Recently Read" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/dashboard_books_list_reading"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/dashboard_books_list_reading_title"
+        android:layout_alignStart="@+id/dashboard_books_list_reading_title"
+        android:layout_alignParentEnd="true"
+        android:minHeight="225dp" />
+
+    <Button
+        android:id="@+id/dashboard_books_list_tag"
+        style="@style/tag_button_style"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/dashboard_books_list_reading"
+        android:layout_alignStart="@+id/dashboard_books_list_reading_title"
+        android:layout_marginTop="5dp"
+        android:text="Tag" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/dashboard_books_list"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_above="@+id/dashboard_books_list_progressbar_container"
+        android:layout_below="@+id/dashboard_books_list_tag"
+        android:layout_alignStart="@+id/dashboard_books_list_reading_title"
+        android:layout_alignParentEnd="true" />
+
 
     <RelativeLayout
         android:id="@+id/dashboard_books_list_progressbar_container"
@@ -74,33 +111,5 @@
             android:background="#00000000"
             android:text="sample" />
     </RelativeLayout>
-
-    <TextView
-        android:id="@+id/dashboard_books_list_reading_title"
-        style="@style/tag_button_style"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/dashboard_toolbar"
-        android:layout_alignParentStart="true"
-        android:layout_marginTop="2dp"
-        android:text="Recently Read" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/dashboard_books_list_tag1"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_above="@+id/dashboard_books_list_progressbar_container"
-        android:layout_below="@+id/dashboard_books_list_tag1_title"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/dashboard_books_list_reading"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/dashboard_books_list_reading_title"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:minHeight="225dp" />
 
 </RelativeLayout>

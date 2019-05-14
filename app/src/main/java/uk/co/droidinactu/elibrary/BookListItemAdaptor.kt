@@ -20,8 +20,6 @@ import uk.co.droidinactu.ebooklib.files.FileHolder
 import uk.co.droidinactu.ebooklib.files.FileUtils
 import uk.co.droidinactu.ebooklib.files.MimeTypes
 import uk.co.droidinactu.ebooklib.room.EBook
-import uk.co.droidinactu.ebooklib.room.FileType
-import uk.co.droidinactu.elibrary.badgedimageview.BadgedImageView
 import java.io.File
 
 /**
@@ -49,13 +47,13 @@ class BookListItemAdaptor(private val mBooks: MutableList<EBook>) :
         viewHolder.ebk = book
         viewHolder.mTitle.text = book.bookTitle
         viewHolder.mCover.setImageBitmap(cvrBmp)
-        if (book.filetypes.size == 1) {
-            viewHolder.mCover.showBadge(true)
-            viewHolder.mCover.setBadgeText(book.filetypes.first().toString())
-        } else {
-            viewHolder.mCover.showBadge(true)
-            viewHolder.mCover.setBadgeText(FileType.EPUB.toString() + "/" + FileType.PDF)
-        }
+//        if (book.filetypes.size == 1) {
+//            viewHolder.mCover.showBadge(true)
+//            viewHolder.mCover.setBadgeText(book.filetypes.first().toString())
+//        } else {
+//            viewHolder.mCover.showBadge(true)
+//            viewHolder.mCover.setBadgeText(FileType.EPUB.toString() + "/" + FileType.PDF)
+//        }
     }
 
     override fun getItemCount(): Int {
@@ -86,7 +84,7 @@ class BookListItemAdaptor(private val mBooks: MutableList<EBook>) :
         PopupMenu.OnMenuItemClickListener {
         private val mOverflowIcon: ImageView
         internal var mTitle: TextView = view.findViewById<View>(R.id.book_list_item_title) as TextView
-        internal var mCover: BadgedImageView = view.findViewById<View>(R.id.book_list_item_cover) as BadgedImageView
+        internal var mCover: ImageView = view.findViewById<View>(R.id.book_list_item_cover) as ImageView
         internal var ebk: EBook? = null
 
         init {

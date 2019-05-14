@@ -1,15 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/tag_list_item"
-    android:layout_width="wrap_content"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/tag_list_item_card"
+    android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="10dp">
+    android:layout_gravity="center"
+    android:clickable="true"
+    android:foreground="?android:attr/selectableItemBackground"
+    app:cardUseCompatPadding="true"
+    card_view:cardCornerRadius="3dp"
+    card_view:cardElevation="4dp">
 
-    <TextView
-        android:id="@+id/tag_list_item_title"
-        android:layout_width="match_parent"
+    <LinearLayout
+        android:id="@+id/tag_list_item"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Tag" />
+        android:orientation="vertical">
 
-</LinearLayout>
+        <TextView
+            android:id="@+id/tag_list_item_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Tag" />
+
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

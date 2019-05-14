@@ -2,24 +2,19 @@ package uk.co.droidinactu.elibrary
 
 import android.graphics.BitmapFactory
 import android.os.Bundle
-import android.widget.ArrayAdapter
-import android.widget.EditText
-import android.widget.ListView
-import android.widget.TextView
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import org.joda.time.DateTime
 import uk.co.droidinactu.ebooklib.room.EBook
-import uk.co.droidinactu.ebooklib.room.FileType
-import uk.co.droidinactu.elibrary.badgedimageview.BadgedImageView
 
 class BookLibBookDetailsActivity : AppCompatActivity() {
 
     private lateinit var mFilepath: TextView
     private lateinit var dateAddedToLib: TextView
     private lateinit var dateLibEntryMod: TextView
-    private lateinit var mCover: BadgedImageView
+    private lateinit var mCover: ImageView
     private lateinit var mTitle: EditText
     private lateinit var mFilename: EditText
     private lateinit var mAuthor: EditText
@@ -100,12 +95,12 @@ class BookLibBookDetailsActivity : AppCompatActivity() {
         mFilename.setText(ebk.fileName)
         mCover.setImageBitmap(cvrBmp)
         val ftypes = ebk.filetypes
-        if (ftypes.size == 1) {
-            mCover.showBadge(true)
-            mCover.setBadgeText(ftypes.first().toString())
-        } else {
-            mCover.showBadge(true)
-            mCover.setBadgeText("${FileType.EPUB}/${FileType.PDF}")
-        }
+//        if (ftypes.size == 1) {
+//            mCover.showBadge(true)
+//            mCover.setBadgeText(ftypes.first().toString())
+//        } else {
+//            mCover.showBadge(true)
+//            mCover.setBadgeText("${FileType.EPUB}/${FileType.PDF}")
+//        }
     }
 }

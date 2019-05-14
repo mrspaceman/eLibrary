@@ -20,7 +20,7 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.NotificationCompat
-import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.github.angads25.filepicker.model.DialogConfigs
@@ -56,12 +56,14 @@ class BookLibrary : AppCompatActivity() {
     private var libraryScanPndingIntnt: PendingIntent? = null
     private var libraryScanAlarmIntent: Intent? = null
     private var bookListCurrentReading: RecyclerView? = null
-    private var bookListTag1: RecyclerView? = null
+    private lateinit var tagList: RecyclerView
+    private lateinit var bookList: RecyclerView
     private var toolBarBookLibrary: Toolbar? = null
     private var bookListTag1Title: Button? = null
     private var bookListTag1IncludeSubTags: Boolean = false
     private var bookListAdaptorCurrReading: BookListItemAdaptor? = null
-    private var bookListAdaptorTag1: BookListItemAdaptor? = null
+    private var bookListAdaptor: BookListItemAdaptor? = null
+    private var tagListAdaptor: TagListItemAdaptor? = null
 
     private var fab: FloatingActionButton? = null
     private var progressBar: ProgressBar? = null
@@ -84,6 +86,14 @@ class BookLibrary : AppCompatActivity() {
             progressBar?.max = max
             progressBarLabel?.text = prgMsg
             updateInfoBar()
+        }
+    }
+    private val tagSelectedHandler = @SuppressLint("HandlerLeak")
+    object : Handler() {
+        override fun handleMessage(msg: Message) {
+            val selectedTag = msg.obj as String
+            bookListTag1Title?.setText(selectedTag)
+            updateBookList()
         }
     }
 
@@ -217,15 +227,22 @@ class BookLibrary : AppCompatActivity() {
         bookListCurrentReading?.layoutManager = horizontalLayoutManager
         bookListCurrentReading?.setHasFixedSize(true)
 
-        val gridLayoutManager = GridLayoutManager(this, 4)
-        bookListTag1Title = findViewById(R.id.dashboard_books_list_tag1_title)
-        bookListTag1 = findViewById(R.id.dashboard_books_list_tag1)
-        bookListTag1?.layoutManager = gridLayoutManager
-        bookListTag1?.setHasFixedSize(true)
+        //    val bkListLayoutManager = GridLayoutManager(this, 4)
+        val bkListLayoutManager = LinearLayoutManager(this)
+        bookListTag1Title = findViewById(R.id.dashboard_books_list_tag)
+        bookList = findViewById(R.id.dashboard_books_list)
+        bookList.layoutManager = bkListLayoutManager
+        bookList.setHasFixedSize(true)
         bookListTag1Title?.setOnClickListener {
             //pickTag2(1);
             pickTag(1)
         }
+
+        tagList = findViewById(R.id.dashboard_tags_list)
+        val tagListLayoutManager = LinearLayoutManager(this)
+        tagList.layoutManager = tagListLayoutManager
+        tagList.setHasFixedSize(true)
+        tagList.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
 
         progressBarContainer = findViewById(R.id.dashboard_books_list_progressbar_container)
         progressBarContainer?.visibility = View.GONE
@@ -327,7 +344,8 @@ class BookLibrary : AppCompatActivity() {
                             1 -> {
                                 bookListTag1Title?.text = selectedFromList
                                 savePreferences()
-                                updateBookListTag1()
+                                updateBookList()
+                                updateTagList()
                             }
                             2 -> {
                             }
@@ -390,16 +408,27 @@ class BookLibrary : AppCompatActivity() {
         }
     }
 
-    private fun updateBookListTag1() {
-        MyDebug.LOG.debug("BookLibrary::updateBookListTag1()")
+    private fun updateBookList() {
+        MyDebug.LOG.debug("BookLibrary::updateBookList()")
         if (bookListTag1Title?.text.toString().compareTo(NO_TAG_SELECTED) != 0) {
             doAsync {
                 val bklist = BookLibApplication.instance.getLibManager()
                     .getBooksForTag(bookListTag1Title?.text.toString())
-                bookListAdaptorTag1 = BookListItemAdaptor(bklist)
+                bookListAdaptor = BookListItemAdaptor(bklist)
                 uiThread {
-                    bookListTag1?.adapter = bookListAdaptorTag1
+                    bookList.adapter = bookListAdaptor
                 }
+            }
+        }
+    }
+
+    private fun updateTagList() {
+        MyDebug.LOG.debug("BookLibrary::updateTagList()")
+        doAsync {
+            val taglist = BookLibApplication.instance.getLibManager().getTags()
+            tagListAdaptor = TagListItemAdaptor(taglist, tagSelectedHandler)
+            uiThread {
+                tagList.adapter = tagListAdaptor
             }
         }
     }
@@ -552,7 +581,8 @@ class BookLibrary : AppCompatActivity() {
     private fun updateLists() {
         updateInfoBar()
         updateBookListCurrReading()
-        updateBookListTag1()
+        updateBookList()
+        updateTagList()
     }
 
     private fun updateInfoBar() {

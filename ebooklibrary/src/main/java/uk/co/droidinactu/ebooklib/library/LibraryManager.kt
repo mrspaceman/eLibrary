@@ -202,7 +202,7 @@ class LibraryManager : Observable() {
     /** Tag CRUD */
     //region tags
 
-    fun getTags(): List<String> {
+    fun getTags(): MutableList<String> {
         var alltags: List<String> = ebookDao.getAllTags()
 //        var tagList = HashSet<String>()
 //        for (s in alltags) {
