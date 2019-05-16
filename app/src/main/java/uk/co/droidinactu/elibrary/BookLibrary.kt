@@ -49,7 +49,6 @@ class BookLibrary : AppCompatActivity() {
     }
 
     private val RC_SIGN_IN: Int = 8191
-    //  private lateinit var mAuth :FirebaseAuth
 
     private var mNotificationManager: NotificationManager? = null
 
@@ -203,6 +202,15 @@ class BookLibrary : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         toolBarBookLibrary = findViewById(R.id.toolbar)
+        bookListCurrentReading = findViewById(R.id.dashboard_books_list_reading)
+        bookListTag1Title = findViewById(R.id.dashboard_books_list_tag)
+        bookList = findViewById(R.id.dashboard_books_list)
+        tagList = findViewById(R.id.dashboard_tags_list)
+        progressBarContainer = findViewById(R.id.dashboard_books_list_progressbar_container)
+        progressBar = findViewById(R.id.dashboard_books_list_progressbar)
+        progressBarLabel = findViewById(R.id.dashboard_books_list_progressbar_label)
+        fab = findViewById(R.id.fab)
+
         if (toolBarBookLibrary != null) {
             setSupportActionBar(toolBarBookLibrary)
         }
@@ -222,15 +230,12 @@ class BookLibrary : AppCompatActivity() {
         toolBarBookLibrary?.setSubtitle(R.string.app_subtitle)
         toolBarBookLibrary?.setLogo(R.mipmap.ic_launcher)
 
-        bookListCurrentReading = findViewById(R.id.dashboard_books_list_reading)
         val horizontalLayoutManager = LinearLayoutManager(this, RecyclerView.HORIZONTAL, false)
         bookListCurrentReading?.layoutManager = horizontalLayoutManager
         bookListCurrentReading?.setHasFixedSize(true)
 
         //    val bkListLayoutManager = GridLayoutManager(this, 4)
         val bkListLayoutManager = LinearLayoutManager(this)
-        bookListTag1Title = findViewById(R.id.dashboard_books_list_tag)
-        bookList = findViewById(R.id.dashboard_books_list)
         bookList.layoutManager = bkListLayoutManager
         bookList.setHasFixedSize(true)
         bookListTag1Title?.setOnClickListener {
@@ -238,85 +243,112 @@ class BookLibrary : AppCompatActivity() {
             pickTag(1)
         }
 
-        tagList = findViewById(R.id.dashboard_tags_list)
         val tagListLayoutManager = LinearLayoutManager(this)
         tagList.layoutManager = tagListLayoutManager
         tagList.setHasFixedSize(true)
         tagList.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
 
-        progressBarContainer = findViewById(R.id.dashboard_books_list_progressbar_container)
         progressBarContainer?.visibility = View.GONE
 
-        progressBar = findViewById(R.id.dashboard_books_list_progressbar)
         progressBar?.visibility = View.INVISIBLE
         progressBar?.scaleY = 4f
-        progressBarLabel = findViewById(R.id.dashboard_books_list_progressbar_label)
         progressBarLabel?.text = ""
 
-        fab = findViewById(R.id.fab)
         fab?.setOnClickListener { browseForLibrary() }
     }
 
-    //#region Firebase
-//    private fun checkFirebaseUser() {
-//        mAuth = FirebaseAuth.getInstance()
-//        val currentUser = mAuth.getCurrentUser()
-//        if (currentUser == null) {
-//            firebaseSignin()
-//        } else {
-//            // Name, email address, and profile photo Url
-//            var name = currentUser.getDisplayName()
-//            var email = currentUser.getEmail()
-//            var photoUrl = currentUser.getPhotoUrl()
-//
-//            // Check if user's email is verified
-//            var emailVerified = currentUser.isEmailVerified()
-//
-//            // The user's ID, unique to the Firebase project. Do NOT use this value to
-//            // authenticate with your backend server, if you have one. Use
-//            // FirebaseUser.getIdToken() instead.
-//            var uid = currentUser.getUid()
+    override fun onStart() {
+        super.onStart()
+        MyDebug.LOG.debug("onStart()")
+        // Check if user is signed in (non-null) and update UI accordingly.
+//        checkFirebaseUser()
+
+//        if (BookLibApplication.instance.getLibManager().getLibraries().size === 0) {
+//            browseForLibrary()
 //        }
-//    }
-//
-//    fun firebaseSignin() {
-//        // Choose authentication providers
-//        val providers = arrayListOf(
-//            AuthUI.IdpConfig.EmailBuilder().build(),
-//            AuthUI.IdpConfig.GoogleBuilder().build()
-//            //    AuthUI.IdpConfig.FacebookBuilder().build(),
-//            //    AuthUI.IdpConfig.TwitterBuilder().build()
-//        )
-//
-//        // Create and launch sign-in intent
-//        startActivityForResult(
-//            AuthUI.getInstance()
-//                .createSignInIntentBuilder()
-//                .setAvailableProviders(providers)
-//                .build(),
-//            RC_SIGN_IN
-//        )
-//    }
-//
-//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-//        super.onActivityResult(requestCode, resultCode, data)
-//
-//        if (requestCode == RC_SIGN_IN) {
-//            val response = IdpResponse.fromResultIntent(data)
-//
-//            if (resultCode == Activity.RESULT_OK) {
-//                // Successfully signed in
-//                val user = FirebaseAuth.getInstance().currentUser
-//                // ...
-//            } else {
-//                // Sign in failed. If response is null the user canceled the
-//                // sign-in flow using the back button. Otherwise check
-//                // response.getError().getErrorCode() and handle the error.
-//                // ...
-//            }
-//        }
-//    }
-    //#endregion
+        BookLibApplication.instance.registerReceiver(
+            ebkChngdListener,
+            IntentFilter(INTENT_EBOOK_MODIFIED)
+        )
+
+        val intent =
+            Intent(BookLibApplication.instance.applicationContext, FileObserverService::class.java)
+        BookLibApplication.instance.applicationContext.startService(intent)
+
+        updateInfoBar()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        val inflater = menuInflater
+        inflater.inflate(R.menu.menu_booklib, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        MyDebug.LOG.debug("onOptionsItemSelected()")
+        // Handle item selection
+        when (item.itemId) {
+            R.id.action_flutter -> {
+//                var flutterView = Flutter.createView(
+//                    this,
+//                    getLifecycle(),
+//                    "route1"
+//                )
+//                var layout = FrameLayout.LayoutParams(600, 800)
+//                layout.leftMargin = 100
+//                layout.topMargin = 200Ó
+//                addContentView(flutterView, layout)
+                return true
+            }
+            R.id.action_search -> {
+                val i = Intent(this, BookLibSearchActivity::class.java)
+                val b = Bundle()
+                b.putInt("key", 1) //Your id
+                i.putExtras(b) //Put your id to your next Intent
+                startActivity(i)
+                return true
+            }
+            R.id.action_refresh -> {
+                rescanLibraries()
+                return true
+            }
+            R.id.action_settings -> {
+                showSettings()
+                return true
+            }
+            R.id.action_checkDb -> {
+                doAsync {
+                    BookLibApplication.instance.getLibManager().checkDb(
+                        mHandler,
+                        mHandlerScanningNotification
+                    )
+                }
+                return true
+            }
+            R.id.action_clear_db -> {
+                doAsync {
+                    BookLibApplication.instance.getLibManager().clear()
+                }
+                Toast.makeText(this, "Database cleared", Toast.LENGTH_LONG).show()
+                return true
+            }
+            else -> return super.onOptionsItemSelected(item)
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        MyDebug.LOG.debug("onPause()")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        MyDebug.LOG.debug("onResume()")
+        val settings = getSharedPreferences("BookLibApplication", 0)
+        bookListTag1Title?.text = settings.getString("bookListTag1Title", NO_TAG_SELECTED)
+        bookListTag1IncludeSubTags = settings.getBoolean("bookListTag1IncludeSubTags", true)
+        updateLists()
+    }
 
 
     private fun pickTag(tagToSet: Int) {
@@ -391,7 +423,6 @@ class BookLibrary : AppCompatActivity() {
         val settings = getSharedPreferences("BookLibApplication", 0)
         val editor = settings.edit()
         editor.putString("bookListTag1Title", bookListTag1Title?.text.toString())
-        editor.putBoolean("bookListTag1IncludeSubTags", bookListTag1IncludeSubTags)
         editor.apply()
     }
 
@@ -400,7 +431,7 @@ class BookLibrary : AppCompatActivity() {
         doAsync {
             val bklist = BookLibApplication.instance.getLibManager()
                 .getBooksForTag(EBook.TAG_CURRENTLY_READING)
-            bookListAdaptorCurrReading = BookListItemAdaptor(bklist)
+            bookListAdaptorCurrReading = BookListItemAdaptor(this@BookLibrary, bklist)
             uiThread {
                 bookListCurrentReading?.adapter = bookListAdaptorCurrReading
                 setupShortcuts()
@@ -414,7 +445,7 @@ class BookLibrary : AppCompatActivity() {
             doAsync {
                 val bklist = BookLibApplication.instance.getLibManager()
                     .getBooksForTag(bookListTag1Title?.text.toString())
-                bookListAdaptor = BookListItemAdaptor(bklist)
+                bookListAdaptor = BookListItemAdaptor(this@BookLibrary, bklist)
                 uiThread {
                     bookList.adapter = bookListAdaptor
                 }
@@ -431,100 +462,6 @@ class BookLibrary : AppCompatActivity() {
                 tagList.adapter = tagListAdaptor
             }
         }
-    }
-
-    override fun onStart() {
-        super.onStart()
-        MyDebug.LOG.debug("onStart()")
-        // Check if user is signed in (non-null) and update UI accordingly.
-//        checkFirebaseUser()
-
-//        if (BookLibApplication.instance.getLibManager().getLibraries().size === 0) {
-//            browseForLibrary()
-//        }
-        BookLibApplication.instance.registerReceiver(
-            ebkChngdListener,
-            IntentFilter(INTENT_EBOOK_MODIFIED)
-        )
-
-        val intent =
-            Intent(BookLibApplication.instance.applicationContext, FileObserverService::class.java)
-        BookLibApplication.instance.applicationContext.startService(intent)
-
-        updateInfoBar()
-    }
-
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        val inflater = menuInflater
-        inflater.inflate(R.menu.menu_booklib, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        MyDebug.LOG.debug("onOptionsItemSelected()")
-        // Handle item selection
-        when (item.itemId) {
-            R.id.action_flutter -> {
-//                var flutterView = Flutter.createView(
-//                    this,
-//                    getLifecycle(),
-//                    "route1"
-//                )
-//                var layout = FrameLayout.LayoutParams(600, 800)
-//                layout.leftMargin = 100
-//                layout.topMargin = 200Ó
-//                addContentView(flutterView, layout)
-                return true
-            }
-            R.id.action_search -> {
-                val i = Intent(this, BookLibSearchActivity::class.java)
-                val b = Bundle()
-                b.putInt("key", 1) //Your id
-                i.putExtras(b) //Put your id to your next Intent
-                startActivity(i)
-                return true
-            }
-            R.id.action_refresh -> {
-                rescanLibraries()
-                return true
-            }
-            R.id.action_settings -> {
-                showSettings()
-                return true
-            }
-            R.id.action_checkDb -> {
-                doAsync {
-                    BookLibApplication.instance.getLibManager().checkDb(
-                        mHandler,
-                        mHandlerScanningNotification
-                    )
-                }
-                return true
-            }
-            R.id.action_clear_db -> {
-                doAsync {
-                    BookLibApplication.instance.getLibManager().clear()
-                }
-                Toast.makeText(this, "Database cleared", Toast.LENGTH_LONG).show()
-                return true
-            }
-            else -> return super.onOptionsItemSelected(item)
-        }
-    }
-
-    override fun onPause() {
-        super.onPause()
-        MyDebug.LOG.debug("onPause()")
-    }
-
-    override fun onResume() {
-        super.onResume()
-        MyDebug.LOG.debug("onResume()")
-        val settings = getSharedPreferences("BookLibApplication", 0)
-        bookListTag1Title?.text = settings.getString("bookListTag1Title", NO_TAG_SELECTED)
-        bookListTag1IncludeSubTags = settings.getBoolean("bookListTag1IncludeSubTags", true)
-        updateLists()
     }
 
     private fun rescanLibraries() {
@@ -579,7 +516,6 @@ class BookLibrary : AppCompatActivity() {
     }
 
     private fun updateLists() {
-        updateInfoBar()
         updateBookListCurrReading()
         updateBookList()
         updateTagList()

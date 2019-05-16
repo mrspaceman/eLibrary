@@ -248,11 +248,11 @@ class LibraryManager : Observable() {
     }
 
     fun refreshLibraries(prgBrHandler: Handler?, handler: Handler?, scanNotificationHndlr: Handler) {
-        MyDebug.LOG.debug("BookLibrary::refreshLibraries()")
+        MyDebug.LOG.debug("LibraryManager::refreshLibraries()")
         doAsync {
             val aList = getLibraries()
             if (aList.isEmpty()) {
-                MyDebug.LOG.debug("BookLibrary::No Libraries to scan")
+                MyDebug.LOG.debug("LibraryManager::No Libraries to scan")
                 val completeMessage = handler!!.obtainMessage(64, "")
                 completeMessage.sendToTarget()
 
@@ -367,6 +367,7 @@ class LibraryManager : Observable() {
         }
     }
 
+
     private fun checkDbRemoveMissingBooks() {
         MyDebug.LOG.debug("checkDbRemoveMissingBooks()")
         //      val completeMessage = scanNotificationHndlr.obtainMessage(64, "startdbcheck")
@@ -383,7 +384,6 @@ class LibraryManager : Observable() {
                         "EBook FileTreeNode Not Found so removed from library [" + ebk.fullFileDirName + "]"
                     )
                     //FIXME : delete book author links
-                    //FIXME : delete book tag links
                     //FIXME : delete book from db
                 }
             }

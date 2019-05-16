@@ -51,7 +51,7 @@ class BookLibSearchActivity : AppCompatActivity() {
                 val bklist = BookLibApplication.instance.getLibManager()
                     .searchBooksMatching(txtSearchText?.text.toString())
                 uiThread {
-                    bkListSearchAdaptor = BookListItemAdaptor(bklist)
+                    bkListSearchAdaptor = BookListItemAdaptor(this@BookLibSearchActivity, bklist)
                     bkListSearch?.adapter = bkListSearchAdaptor
                 }
             }

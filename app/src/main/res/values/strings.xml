@@ -115,4 +115,7 @@
     </string-array>
     <string-array name="multi_select_list_preference_default_value" />
     <string name="title_activity_book_library_flutter">BookLibraryFlutter</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

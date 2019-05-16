@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_alignParentStart="true"
+    android:layout_alignParentTop="true"
+    android:layout_alignParentEnd="true"
+    android:layout_alignParentBottom="true">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/AppTheme.PopupOverlay" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+
+    <LinearLayout
+        android:id="@+id/dashboard_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/primary"
+        android:orientation="horizontal"
+        android:padding="10dip">
+
+        <TextView
+            android:id="@+id/dashboard_library_info"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="@color/primary_light"
+            android:textSize="24sp" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/frag_bk_list_progressbar_container"
+        android:layout_below="@+id/dashboard_toolbar"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        tools:context=".BookLibrary2" />
+
+
+    <RelativeLayout
+        android:id="@+id/frag_bk_list_progressbar_container"
+        android:layout_width="match_parent"
+        android:layout_height="40dip"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:maxHeight="40dp"
+        android:minHeight="40dp">
+
+        <ProgressBar
+            android:id="@+id/frag_bk_list_progressbar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignStart="@id/dashboard_books_list_progressbar"
+            android:layout_alignTop="@id/dashboard_books_list_progressbar"
+            android:layout_alignEnd="@id/dashboard_books_list_progressbar"
+            android:layout_alignBottom="@id/dashboard_books_list_progressbar"
+            android:paddingTop="5dp"
+            android:progress="50" />
+
+        <TextView
+            android:id="@+id/frag_bk_list_progressbar_label"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@id/dashboard_books_list_progressbar"
+            android:layout_alignStart="@id/dashboard_books_list_progressbar"
+            android:layout_alignEnd="@id/dashboard_books_list_progressbar"
+            android:layout_alignBottom="@id/dashboard_books_list_progressbar"
+            android:background="#00000000"
+            android:text="sample" />
+    </RelativeLayout>
+
+</RelativeLayout>
