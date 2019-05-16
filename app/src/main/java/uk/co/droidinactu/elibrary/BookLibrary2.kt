@@ -15,11 +15,15 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import uk.co.droidinactu.ebooklib.MyDebug
 import uk.co.droidinactu.ebooklib.room.EBook
+import uk.co.droidinactu.elibrary.data.InfoBarViewModel
+import uk.co.droidinactu.elibrary.data.LibraryInfo
 
 class BookLibrary2 : AppCompatActivity(), BookListFragment.OnBookActionListener {
     // #region fragment communication
@@ -36,7 +40,7 @@ class BookLibrary2 : AppCompatActivity(), BookListFragment.OnBookActionListener 
     }
 // #endregion
 
-
+    private lateinit var model: InfoBarViewModel
     private var toolBarBookLibrary: Toolbar? = null
     private var progressBar: ProgressBar? = null
     private var progressBarLabel: TextView? = null
@@ -66,9 +70,9 @@ class BookLibrary2 : AppCompatActivity(), BookListFragment.OnBookActionListener 
         override fun handleMessage(msg: Message) {
             val libTitle = msg.obj as String
             doAsync {
-                val bklist = BookLibApplication.instance.getLibManager().getBooks()
+                val bkCount = BookLibApplication.instance.getLibManager().getBookCount()
                 uiThread {
-                    MyDebug.LOG.debug("Library [" + libTitle + "] Updated. Now contains [" + bklist.size + "] ebooks")
+                    MyDebug.LOG.debug("Library [" + libTitle + "] Updated. Now contains [" + bkCount + "] ebooks")
                     progressBarContainer?.visibility = View.GONE
                     updateInfoBar()
                     fab?.isEnabled = true
@@ -101,7 +105,13 @@ class BookLibrary2 : AppCompatActivity(), BookListFragment.OnBookActionListener 
             toolBarBookLibrary?.setSubtitle(R.string.app_subtitle)
             toolBarBookLibrary?.setLogo(R.mipmap.ic_launcher)
         }
-        updateInfoBar()
+
+        // Create a ViewModel the first time the system calls an activity's onCreate() method.
+        // Re-created activities receive the same MyViewModel instance created by the first activity.
+        model = ViewModelProviders.of(this).get(InfoBarViewModel::class.java)
+        model.getInfo().observe(this, Observer<LibraryInfo> { books ->
+            updateInfoBar()
+        })
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -189,17 +199,17 @@ class BookLibrary2 : AppCompatActivity(), BookListFragment.OnBookActionListener 
     private fun updateInfoBar() {
         doAsync {
             val libInfo = findViewById<TextView>(R.id.dashboard_library_info)
-            val libTitle = BookLibApplication.instance.getLibManager().getLibrary().libraryTitle
-            val nbrBooks = BookLibApplication.instance.getLibManager().getBookCount()
-            val text = String.format(
-                getResources().getQuantityString(R.plurals.library_contains_x_books, nbrBooks),
-                libTitle,
-                nbrBooks
-            )
-            uiThread {
-                libInfo.text = text
+            val libInfoData = model.getInfo().value
+            if (libInfoData != null) {
+                val text = String.format(
+                    getResources().getQuantityString(R.plurals.library_contains_x_books, libInfoData.nbrBooks),
+                    libInfoData.libTitle,
+                    libInfoData.nbrBooks
+                )
+                uiThread {
+                    libInfo.text = text
+                }
             }
         }
     }
-
 }

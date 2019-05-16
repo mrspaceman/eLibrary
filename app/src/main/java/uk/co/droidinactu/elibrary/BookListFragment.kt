@@ -16,6 +16,8 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.core.app.NotificationCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -28,6 +30,7 @@ import org.jetbrains.anko.uiThread
 import uk.co.droidinactu.ebooklib.MyDebug
 import uk.co.droidinactu.ebooklib.library.LibraryManager
 import uk.co.droidinactu.ebooklib.room.EBook
+import uk.co.droidinactu.elibrary.data.BookListViewModel
 import java.io.File
 import java.util.stream.Collectors
 
@@ -48,6 +51,7 @@ private const val ARG_PARAM2 = "param2"
 class BookListFragment : Fragment() {
     // #region fragment communication
     internal var callback: OnBookActionListener? = null
+    private lateinit var model: BookListViewModel
 
     fun setOnBookActionListener(callback: OnBookActionListener) {
         this.callback = callback
@@ -252,6 +256,13 @@ class BookListFragment : Fragment() {
         progressBarLabel?.text = ""
 
         fab?.setOnClickListener { browseForLibrary() }
+
+        // Create a ViewModel the first time the system calls an activity's onCreate() method.
+        // Re-created activities receive the same MyViewModel instance created by the first activity.
+        model = ViewModelProviders.of(this).get(BookListViewModel::class.java)
+        model.getBooks().observe(this, Observer<List<EBook>> { books ->
+            updateLists()
+        })
     }
 
     override fun onAttach(context: Context) {
