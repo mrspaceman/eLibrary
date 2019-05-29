@@ -368,7 +368,7 @@ class BookListFragment : Fragment() {
             doAsync {
                 val bklist = BookLibApplication.instance.getLibManager()
                     .getBooksForTag(bookListTag1Title?.text.toString())
-                bookListAdaptor = BookListItemAdaptor(BookLibApplication.instance.applicationContext, bklist)
+                bookListAdaptor = BookListItemAdaptor(context.applicationContext, bklist)
                 uiThread {
                     bookList.adapter = bookListAdaptor
                 }

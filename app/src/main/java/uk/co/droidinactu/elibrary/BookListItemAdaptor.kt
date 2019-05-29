@@ -1,17 +1,14 @@
 package uk.co.droidinactu.elibrary
 
 import android.annotation.TargetApi
-import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.os.Handler
-import android.view.LayoutInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.*
+import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.RecyclerView
 import org.jetbrains.anko.doAsync
 import uk.co.droidinactu.ebooklib.files.FileHolder
@@ -110,7 +107,13 @@ class BookListItemAdaptor(private val ctx: Context, private val mBooks: MutableL
         }
 
         private fun showFileTypePickerDialog() {
-            val dialog = Dialog(ctx)
+
+            val fm = getFragmentManager()
+            val editNameDialogFragment = EditNameDialogFragment.newInstance("Some Title")
+            editNameDialogFragment.show(fm, "fragment_edit_name")
+
+
+            val dialog = EBookFormatPickerDialog(ebk)
             dialog.setContentView(R.layout.filetype_picker_dialog)
             dialog.setTitle("Pick an EBook Type to Open")
 
@@ -159,5 +162,40 @@ class BookListItemAdaptor(private val ctx: Context, private val mBooks: MutableL
         }
     }
 
+    class EBookFormatPickerDialogFragment : DialogFragment() {
+
+        lateinit var mEditText: EditText
+        lateinit var ebk: EBook
+
+        fun EBookFormatPickerDialogFragment() {
+            ebk = ebook
+            val frag = EditNameDialogFragment()
+            val args = new Bundle ()
+            args.putString("title", title)
+            frag.setArguments(args)
+            return frag
+        }
+
+        fun onCreateView(
+            inflater: LayoutInflater, container: ViewGroup,
+            savedInstanceState: Bundle
+        ): View {
+            return inflater.inflate(R.layout.filetype_picker_dialog, container)
+        }
+
+        fun onViewCreated(view: View, savedInstanceState: Bundle) {
+            super.onViewCreated(view, savedInstanceState);
+            // Get field from view
+            mEditText = (EditText) view . findViewById (R.id.txt_your_name);
+            // Fetch arguments from bundle and set title
+            String title = getArguments ().getString("title", "Enter Name");
+            getDialog().setTitle(title);
+            // Show soft keyboard automatically and request focus to field
+            mEditText.requestFocus();
+            getDialog().getWindow().setSoftInputMode(
+                WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE
+            );
+        }
+    }
 
 }

@@ -224,7 +224,10 @@ class LibraryManager : Observable() {
     /** Library CRUD */
     //region library
     fun getLibrary(): Library {
-        return getLibraries()[0]
+        if (getLibraries().size > 0) {
+            return getLibraries()[0]
+        }
+        return Library()
     }
 
     fun getLibrary(libname: String): Library {

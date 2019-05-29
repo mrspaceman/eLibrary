@@ -10,6 +10,8 @@ package uk.co.droidinactu.elibrary.data
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.uiThread
 import uk.co.droidinactu.elibrary.BookLibApplication
 
 /*
@@ -33,7 +35,13 @@ class InfoBarViewModel : ViewModel() {
 
     private fun loadEBooks() {
         val libInfo = LibraryInfo()
-        libInfo.libTitle = BookLibApplication.instance.getLibManager().getLibrary().libraryTitle
-        libInfo.nbrBooks = BookLibApplication.instance.getLibManager().getBookCount()
+        doAsync {
+            val libTitle = BookLibApplication.instance.getLibManager().getLibrary().libraryTitle
+            val nbrBooks = BookLibApplication.instance.getLibManager().getBookCount()
+            uiThread {
+                libInfo.libTitle = libTitle
+                libInfo.nbrBooks = nbrBooks
+            }
+        }
     }
 }
