@@ -1,6 +1,9 @@
 package uk.co.droidinactu.elibrary
 
 import android.annotation.SuppressLint
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
@@ -15,30 +18,107 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.core.app.NotificationCompat
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import com.github.angads25.filepicker.model.DialogConfigs
+import com.github.angads25.filepicker.model.DialogProperties
+import com.github.angads25.filepicker.view.FilePickerDialog
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import uk.co.droidinactu.ebooklib.MyDebug
+import uk.co.droidinactu.ebooklib.library.LibraryManager
 import uk.co.droidinactu.ebooklib.room.EBook
 import uk.co.droidinactu.elibrary.data.InfoBarViewModel
 import uk.co.droidinactu.elibrary.data.LibraryInfo
+import java.io.File
 
 class BookLibrary2 : AppCompatActivity(), BookListFragment.OnBookActionListener {
+
     // #region fragment communication
-    override fun OnBookOpen(ebk: EBook) {
+    override fun onBookOpen(ebk: EBook) {
         supportFragmentManager.beginTransaction()
             .replace(R.id.container, BookSearchFragment.newInstance("test1", "test2"))
             .commitNow()
     }
 
-    override fun OnBookDetails(ebk: EBook) {
+    override fun onBookDetails(ebk: EBook) {
         supportFragmentManager.beginTransaction()
             .replace(R.id.container, BookDetailsFragment.newInstance("test1", "test2"))
             .commitNow()
     }
-// #endregion
+
+    override fun onBrowseForLibrary() {
+        browseForLibrary()
+    }
+    // #endregion
+
+    //#region Library Scanning Notification
+    private val mHandlerScanningNotification = @SuppressLint("HandlerLeak")
+    object : Handler() {
+        override fun handleMessage(msg: Message) {
+            val handlerCmd = (msg.obj as String).split(":".toRegex())
+            if (mNotificationManager == null) {
+                mNotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            }
+            if (handlerCmd[0].equals("startscanning")) {
+                displayScanningNotification(handlerCmd[1])
+            } else if (handlerCmd[0].equals("stopscanning")) {
+                removeScanningNotification()
+            } else if (handlerCmd[0].equals("startdbCheck")) {
+                displayDbCheckNotification()
+            } else if (handlerCmd[0].equals("stopdbcheck")) {
+                removeDbCheckNotification()
+            }
+        }
+    }
+
+    private fun displayScanningNotification(libname: String) {
+        val resultIntent = Intent(applicationContext, BookLibrary::class.java)
+        val resultPendingIntent = PendingIntent.getActivity(
+            BookLibApplication.instance.applicationContext,
+            0,
+            resultIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT
+        )
+
+        var notificationBuilder = NotificationCompat.Builder(applicationContext, LibraryManager.CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_notification)
+            .setContentTitle("Scanning Library")
+            .setContentText("Scan library $libname for ebooks")
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setContentIntent(resultPendingIntent)
+            .setProgress(0, 0, true)
+        val notification = notificationBuilder?.build()
+
+        mNotificationManager?.notify(BookLibrary.mNotificationIdScanning, notification)
+    }
+
+    private fun removeScanningNotification() {
+        mNotificationManager?.cancel(BookLibrary.mNotificationIdScanning)
+    }
+
+    private fun displayDbCheckNotification() {
+        var notificationBuilder = NotificationCompat.Builder(applicationContext, LibraryManager.CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_notification)
+            .setContentTitle("Checking Library for consistency")
+            .setContentText("Checking Library for consistency")
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setProgress(0, 0, true)
+        val notification = notificationBuilder?.build()
+
+        mNotificationManager?.notify(BookLibrary.mNotificationIdDbCheck, notification)
+    }
+
+    private fun removeDbCheckNotification() {
+        mNotificationManager?.cancel(BookLibrary.mNotificationIdDbCheck)
+    }
+
+    //#endregion
+
+    private var mNotificationManager: NotificationManager? = null
 
     private lateinit var model: InfoBarViewModel
     private var toolBarBookLibrary: Toolbar? = null
@@ -115,6 +195,12 @@ class BookLibrary2 : AppCompatActivity(), BookListFragment.OnBookActionListener 
         })
     }
 
+    override fun onAttachFragment(fragment: Fragment) {
+        if (fragment is BookListFragment) {
+            fragment.setOnBookActionListener(this)
+        }
+    }
+
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         val inflater = menuInflater
         inflater.inflate(R.menu.menu_booklib, menu)
@@ -173,20 +259,50 @@ class BookLibrary2 : AppCompatActivity(), BookListFragment.OnBookActionListener 
         }
     }
 
+    private fun browseForLibrary() {
+        MyDebug.LOG.debug("BookLibrary::browseForLibrary()")
+        fab?.isEnabled = false
+        val rootdir = "/storage/"
+
+        val properties = DialogProperties()
+        properties.selection_mode = DialogConfigs.SINGLE_MODE
+        properties.selection_type = DialogConfigs.DIR_SELECT
+        properties.root = File(DialogConfigs.DEFAULT_DIR)
+        properties.root = File(rootdir)
+        properties.extensions = null
+
+        val dialog = FilePickerDialog(this@BookLibrary2, properties)
+        dialog.setDialogSelectionListener { files ->
+            if (files.isNotEmpty()) {
+                val fileBits = files[0].split("/".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+                val libraryName = fileBits[fileBits.size - 1]
+                progressBar?.max = 2500
+                progressBar?.progress = 0
+                progressBar?.visibility = View.VISIBLE
+                progressBarContainer?.visibility = View.VISIBLE
+                doAsync {
+                    BookLibApplication.instance.getLibManager()
+                        .addLibrary(prgBrHandler, mHandler, mHandlerScanningNotification, libraryName, files[0])
+                }
+            }
+        }
+        dialog.show()
+    }
+
     private fun rescanLibraries() {
         MyDebug.LOG.debug("BookLibrary::rescanLibraries()")
         fab?.isEnabled = false
         doAsync {
             val nbrBooks = BookLibApplication.instance.getLibManager().getBookCount()
-//            uiThread {
-            progressBar?.max = nbrBooks
-            progressBar?.progress = 0
-            progressBar?.visibility = View.VISIBLE
-            progressBarContainer?.visibility = View.VISIBLE
+            uiThread {
+                progressBar?.max = nbrBooks
+                progressBar?.progress = 0
+                progressBar?.visibility = View.VISIBLE
+                progressBarContainer?.visibility = View.VISIBLE
+            }
+            BookLibApplication.instance.getLibManager()
+                .refreshLibraries(prgBrHandler, mHandler, mHandlerScanningNotification)
         }
-//            BookLibApplication.instance.getLibManager()
-//                .refreshLibraries(prgBrHandler, mHandler, mHandlerScanningNotification)
-//        }
     }
 
     private fun showSettings() {

@@ -47,6 +47,7 @@ adb -s 88c859cacec5cc73 shell setprop log.tag.BookLibApplication VERBOSE
 adb -s 88c859cacec5cc73 shell setprop debug.firebase.analytics.app uk.co.droidinactu.elibrary
 adb -s 88c859cacec5cc73 shell setprop log.tag.FA VERBOSE
 
+
 adb -s 88c859cacec5cc73 shell
 
 setprop log.tag.BookLibApplication VERBOSE
