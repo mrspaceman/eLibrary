@@ -27,9 +27,13 @@ import com.github.angads25.filepicker.model.DialogConfigs
 import com.github.angads25.filepicker.model.DialogProperties
 import com.github.angads25.filepicker.view.FilePickerDialog
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import org.jetbrains.anko.ctx
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import uk.co.droidinactu.ebooklib.MyDebug
+import uk.co.droidinactu.ebooklib.files.FileHolder
+import uk.co.droidinactu.ebooklib.files.FileUtils
+import uk.co.droidinactu.ebooklib.files.MimeTypes
 import uk.co.droidinactu.ebooklib.library.FileObserverService
 import uk.co.droidinactu.ebooklib.library.LibraryManager
 import uk.co.droidinactu.ebooklib.library.RecursiveFileObserver.Companion.INTENT_EBOOK_MODIFIED
@@ -157,6 +161,52 @@ class BookLibrary : AppCompatActivity() {
         mNotificationManager?.cancel(mNotificationIdDbCheck)
     }
 
+    //#endregion
+
+
+    //#region Open Book Handler
+    private val openBookHandler = @SuppressLint("HandlerLeak")
+    object : Handler() {
+        override fun handleMessage(msg: Message) {
+            val ebkFilename = (msg.obj as String).split(":").get(1)
+            val ebk = BookLibApplication.instance.getLibManager().getBookFromFullFilename(ebkFilename)
+            val ftypes = ebk?.filetypes
+            if (ftypes != null && ftypes.size > 1) {
+                showFileTypePickerDialog(ebk)
+            } else {
+                openBook(ebk, ftypes?.first().toString().toLowerCase())
+            }
+        }
+
+        private fun showFileTypePickerDialog(ebk: EBook) {
+            val dialog = Dialog(ctx)
+            dialog.setContentView(R.layout.filetype_picker_dialog)
+            dialog.setTitle("Pick an EBook Type to Open")
+
+            val radioGroup = dialog.findViewById<View>(R.id.filetype_picker_dialog_group) as RadioGroup
+            val filetypePickerButton = dialog.findViewById<View>(R.id.filetype_picker_dialog_btn) as Button
+            filetypePickerButton.setOnClickListener {
+                val selectedId = radioGroup.checkedRadioButtonId
+                val btnSelctd = dialog.findViewById<View>(selectedId) as RadioButton
+                val selectedFileType = btnSelctd.text.toString().toLowerCase()
+                openBook(ebk, selectedFileType)
+                dialog.hide()
+            }
+            dialog.show()
+        }
+
+        private fun openBook(ebk: EBook, selectedFileType: String) {
+            doAsync {
+                try {
+                    ebk!!.addTag(EBook.TAG_CURRENTLY_READING)
+                    BookLibApplication.instance.getLibManager().updateBook(ebk!!)
+                } finally {
+                }
+                MimeTypes.initInstance(ctx)
+                FileUtils.openFile(FileHolder(File(ebk!!.fullFileDirName + "." + selectedFileType), false), ctx)
+            }
+        }
+    }
     //#endregion
 
     // Defines a Handler object that's attached to the UI thread
@@ -350,7 +400,6 @@ class BookLibrary : AppCompatActivity() {
         updateLists()
     }
 
-
     private fun pickTag(tagToSet: Int) {
         MyDebug.LOG.debug("BookLibrary::pickTag($tagToSet) started")
         val ctx = this
@@ -431,7 +480,7 @@ class BookLibrary : AppCompatActivity() {
         doAsync {
             val bklist = BookLibApplication.instance.getLibManager()
                 .getBooksForTag(EBook.TAG_CURRENTLY_READING)
-            bookListAdaptorCurrReading = BookListItemAdaptor(this@BookLibrary, bklist)
+            bookListAdaptorCurrReading = BookListItemAdaptor(this@BookLibrary, bklist, openBookHandler)
             uiThread {
                 bookListCurrentReading?.adapter = bookListAdaptorCurrReading
                 setupShortcuts()
@@ -445,7 +494,7 @@ class BookLibrary : AppCompatActivity() {
             doAsync {
                 val bklist = BookLibApplication.instance.getLibManager()
                     .getBooksForTag(bookListTag1Title?.text.toString())
-                bookListAdaptor = BookListItemAdaptor(this@BookLibrary, bklist)
+                bookListAdaptor = BookListItemAdaptor(this@BookLibrary, bklist, openBookHandler)
                 uiThread {
                     bookList.adapter = bookListAdaptor
                 }

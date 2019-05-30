@@ -26,8 +26,12 @@ import com.github.angads25.filepicker.model.DialogProperties
 import com.github.angads25.filepicker.view.FilePickerDialog
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.support.v4.ctx
 import org.jetbrains.anko.uiThread
 import uk.co.droidinactu.ebooklib.MyDebug
+import uk.co.droidinactu.ebooklib.files.FileHolder
+import uk.co.droidinactu.ebooklib.files.FileUtils
+import uk.co.droidinactu.ebooklib.files.MimeTypes
 import uk.co.droidinactu.ebooklib.library.LibraryManager
 import uk.co.droidinactu.ebooklib.room.EBook
 import uk.co.droidinactu.elibrary.data.BookListViewModel
@@ -159,6 +163,50 @@ class BookListFragment : Fragment() {
 
     //#endregion
 
+    //#region Open Book Handler
+    private val openBookHandler = @SuppressLint("HandlerLeak")
+    object : Handler() {
+        override fun handleMessage(msg: Message) {
+            val ebkFilename = (msg.obj as String).split(":").get(1)
+            val ebk = BookLibApplication.instance.getLibManager().getBookFromFullFilename(ebkFilename)
+            val ftypes = ebk?.filetypes
+            if (ftypes != null && ftypes.size > 1) {
+                showFileTypePickerDialog(ebk)
+            } else {
+                openBook(ebk, ftypes?.first().toString().toLowerCase())
+            }
+        }
+
+        private fun showFileTypePickerDialog(ebk: EBook) {
+            val dialog = Dialog(ctx)
+            dialog.setContentView(R.layout.filetype_picker_dialog)
+            dialog.setTitle("Pick an EBook Type to Open")
+
+            val radioGroup = dialog.findViewById<View>(R.id.filetype_picker_dialog_group) as RadioGroup
+            val filetypePickerButton = dialog.findViewById<View>(R.id.filetype_picker_dialog_btn) as Button
+            filetypePickerButton.setOnClickListener {
+                val selectedId = radioGroup.checkedRadioButtonId
+                val btnSelctd = dialog.findViewById<View>(selectedId) as RadioButton
+                val selectedFileType = btnSelctd.text.toString().toLowerCase()
+                openBook(ebk, selectedFileType)
+                dialog.hide()
+            }
+            dialog.show()
+        }
+
+        private fun openBook(ebk: EBook, selectedFileType: String) {
+            doAsync {
+                try {
+                    ebk!!.addTag(EBook.TAG_CURRENTLY_READING)
+                    BookLibApplication.instance.getLibManager().updateBook(ebk!!)
+                } finally {
+                }
+                MimeTypes.initInstance(ctx)
+                FileUtils.openFile(FileHolder(File(ebk!!.fullFileDirName + "." + selectedFileType), false), ctx)
+            }
+        }
+    }
+    //#endregion
 
     // Defines a Handler object that's attached to the UI thread
     private val mHandler = object : Handler(Looper.getMainLooper()) {
@@ -226,6 +274,7 @@ class BookListFragment : Fragment() {
         progressBar = view.findViewById(R.id.frag_bk_list_progressbar)
         progressBarLabel = view.findViewById(R.id.frag_bk_list_progressbar_label)
         fab = view.findViewById(R.id.fab)
+        fab?.setOnClickListener { browseForLibrary() }
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -355,7 +404,8 @@ class BookListFragment : Fragment() {
         doAsync {
             val bklist = BookLibApplication.instance.getLibManager()
                 .getBooksForTag(EBook.TAG_CURRENTLY_READING)
-            bookListAdaptorCurrReading = BookListItemAdaptor(BookLibApplication.instance.applicationContext, bklist)
+            bookListAdaptorCurrReading =
+                BookListItemAdaptor(BookLibApplication.instance.applicationContext, bklist, openBookHandler)
             uiThread {
                 bookListCurrentReading?.adapter = bookListAdaptorCurrReading
             }
@@ -368,7 +418,7 @@ class BookListFragment : Fragment() {
             doAsync {
                 val bklist = BookLibApplication.instance.getLibManager()
                     .getBooksForTag(bookListTag1Title?.text.toString())
-                bookListAdaptor = BookListItemAdaptor(context.applicationContext, bklist)
+                bookListAdaptor = BookListItemAdaptor(context!!.applicationContext, bklist, openBookHandler)
                 uiThread {
                     bookList.adapter = bookListAdaptor
                 }
@@ -404,7 +454,6 @@ class BookListFragment : Fragment() {
         val settings = activity!!.getSharedPreferences("BookLibApplication", 0)
         bookListTag1Title?.text = settings.getString("bookListTag1Title", BookLibrary.NO_TAG_SELECTED)
     }
-
 
     companion object {
         /**

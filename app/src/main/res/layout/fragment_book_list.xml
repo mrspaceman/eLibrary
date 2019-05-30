@@ -17,6 +17,17 @@
         tools:context=".BookLibrary"
         tools:showIn="@layout/activity_main">
 
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="@dimen/fab_margin"
+            app:srcCompat="@android:drawable/ic_input_add" />
+
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/frag_bk_list_tags_list"
             android:layout_width="200dp"

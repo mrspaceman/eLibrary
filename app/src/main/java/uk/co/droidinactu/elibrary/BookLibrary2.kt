@@ -61,6 +61,7 @@ class BookLibrary2 : AppCompatActivity(), BookListFragment.OnBookActionListener 
         }
     }
 
+
     // Defines a Handler object that's attached to the UI thread
     private val mHandler = object : Handler(Looper.getMainLooper()) {
         /*
@@ -109,7 +110,7 @@ class BookLibrary2 : AppCompatActivity(), BookListFragment.OnBookActionListener 
         // Create a ViewModel the first time the system calls an activity's onCreate() method.
         // Re-created activities receive the same MyViewModel instance created by the first activity.
         model = ViewModelProviders.of(this).get(InfoBarViewModel::class.java)
-        model.getInfo().observe(this, Observer<LibraryInfo> { books ->
+        model.getInfo().observe(this, Observer<LibraryInfo> { _ ->
             updateInfoBar()
         })
     }
@@ -212,4 +213,5 @@ class BookLibrary2 : AppCompatActivity(), BookListFragment.OnBookActionListener 
             }
         }
     }
+
 }

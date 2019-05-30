@@ -17,6 +17,7 @@
     <string name="filetype_picker_dialog_mobi">MOBI</string>
     <string name="filetype_picker_dialog_text">TEXT</string>
     <string name="filetype_picker_dialog_btn">Done</string>
+    <string name="booktype_picker_dialog_btn">Done</string>
     <string name="action_refresh">Refresh</string>
     <string name="action_book_add_tag">Add Tag</string>
     <string name="action_book_delete">Delete</string>

@@ -6,22 +6,26 @@ import android.content.Intent
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.os.Handler
-import android.view.*
-import android.widget.*
-import androidx.fragment.app.DialogFragment
+import android.view.LayoutInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.PopupMenu
+import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
-import org.jetbrains.anko.doAsync
-import uk.co.droidinactu.ebooklib.files.FileHolder
-import uk.co.droidinactu.ebooklib.files.FileUtils
-import uk.co.droidinactu.ebooklib.files.MimeTypes
 import uk.co.droidinactu.ebooklib.room.EBook
-import java.io.File
 
 /**
  * An adapter for displaying a list of [uk.co.droidinactu.ebooklib.room.EBook] objects.
  * Created by aspela on 01/09/16.
  */
-class BookListItemAdaptor(private val ctx: Context, private val mBooks: MutableList<EBook>) :
+class BookListItemAdaptor(
+    private val ctx: Context,
+    private val mBooks: MutableList<EBook>,
+    private val openBookHandler: Handler
+) :
     RecyclerView.Adapter<BookListItemAdaptor.ViewHolder>() {
 
     private val NOTIFY_DELAY = 500
@@ -97,47 +101,8 @@ class BookListItemAdaptor(private val ctx: Context, private val mBooks: MutableL
                 popup.setOnMenuItemClickListener(this)
                 popup.show()
             } else {
-                val ftypes = ebk?.filetypes
-                if (ftypes != null && ftypes.size > 1) {
-                    showFileTypePickerDialog()
-                } else {
-                    openBook(ftypes?.first().toString().toLowerCase())
-                }
-            }
-        }
-
-        private fun showFileTypePickerDialog() {
-
-            val fm = getFragmentManager()
-            val editNameDialogFragment = EditNameDialogFragment.newInstance("Some Title")
-            editNameDialogFragment.show(fm, "fragment_edit_name")
-
-
-            val dialog = EBookFormatPickerDialog(ebk)
-            dialog.setContentView(R.layout.filetype_picker_dialog)
-            dialog.setTitle("Pick an EBook Type to Open")
-
-            val radioGroup = dialog.findViewById<View>(R.id.filetype_picker_dialog_group) as RadioGroup
-            val filetypePickerButton = dialog.findViewById<View>(R.id.filetype_picker_dialog_btn) as Button
-            filetypePickerButton.setOnClickListener {
-                val selectedId = radioGroup.checkedRadioButtonId
-                val btnSelctd = dialog.findViewById<View>(selectedId) as RadioButton
-                val selectedFileType = btnSelctd.text.toString().toLowerCase()
-                openBook(selectedFileType)
-                dialog.hide()
-            }
-            dialog.show()
-        }
-
-        private fun openBook(selectedFileType: String) {
-            doAsync {
-                try {
-                    ebk!!.addTag(EBook.TAG_CURRENTLY_READING)
-                    BookLibApplication.instance.getLibManager().updateBook(ebk!!)
-                } finally {
-                }
-                MimeTypes.initInstance(ctx)
-                FileUtils.openFile(FileHolder(File(ebk!!.fullFileDirName + "." + selectedFileType), false), ctx)
+                val completeMessage = openBookHandler.obtainMessage(61, "openbook:" + ebk!!.fullFileDirName)
+                completeMessage.sendToTarget()
             }
         }
 
@@ -159,42 +124,6 @@ class BookListItemAdaptor(private val ctx: Context, private val mBooks: MutableL
                 }
             }
             return true
-        }
-    }
-
-    class EBookFormatPickerDialogFragment : DialogFragment() {
-
-        lateinit var mEditText: EditText
-        lateinit var ebk: EBook
-
-        fun EBookFormatPickerDialogFragment() {
-            ebk = ebook
-            val frag = EditNameDialogFragment()
-            val args = new Bundle ()
-            args.putString("title", title)
-            frag.setArguments(args)
-            return frag
-        }
-
-        fun onCreateView(
-            inflater: LayoutInflater, container: ViewGroup,
-            savedInstanceState: Bundle
-        ): View {
-            return inflater.inflate(R.layout.filetype_picker_dialog, container)
-        }
-
-        fun onViewCreated(view: View, savedInstanceState: Bundle) {
-            super.onViewCreated(view, savedInstanceState);
-            // Get field from view
-            mEditText = (EditText) view . findViewById (R.id.txt_your_name);
-            // Fetch arguments from bundle and set title
-            String title = getArguments ().getString("title", "Enter Name");
-            getDialog().setTitle(title);
-            // Show soft keyboard automatically and request focus to field
-            mEditText.requestFocus();
-            getDialog().getWindow().setSoftInputMode(
-                WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE
-            );
         }
     }
 

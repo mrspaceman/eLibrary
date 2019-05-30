@@ -86,8 +86,8 @@ class BookSearchFragment : Fragment() {
                 val bklist = BookLibApplication.instance.getLibManager()
                     .searchBooksMatching(txtSearchText?.text.toString())
                 uiThread {
-                    bkListSearchAdaptor = BookListItemAdaptor(this@BookSearchFragment.context!!, bklist)
-                    bkListSearch?.adapter = bkListSearchAdaptor
+                    //                    bkListSearchAdaptor = BookListItemAdaptor(this@BookSearchFragment.context!!, bklist, openBookHandler)
+//                    bkListSearch?.adapter = bkListSearchAdaptor
                 }
             }
         }

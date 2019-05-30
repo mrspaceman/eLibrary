@@ -23,7 +23,6 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-
     <LinearLayout
         android:id="@+id/dashboard_toolbar"
         android:layout_width="match_parent"
