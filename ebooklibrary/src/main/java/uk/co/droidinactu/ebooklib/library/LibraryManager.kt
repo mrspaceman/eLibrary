@@ -47,14 +47,17 @@ class LibraryManager : Observable() {
         EBookRoomDatabase.getInstance(ctx)!!.close()
     }
 
+    //#region CheckDb
     fun checkDb(msgHndlr: Handler, scanNotificationHndlr: Handler) {
         MyDebug.LOG.debug("checkDb()")
         var completeMessage = scanNotificationHndlr.obtainMessage(64, "startdbcheck")
         completeMessage.sendToTarget()
         doAsync {
             runBlocking {
+                val job1 = GlobalScope.launch { checkDbRemoveSimpleTags() }
                 val job2 = GlobalScope.launch { checkDbRemoveMissingBooks() }
 
+                job1.join()
                 job2.join()
 
                 completeMessage = scanNotificationHndlr.obtainMessage(64, "stopdbcheck")
@@ -62,6 +65,36 @@ class LibraryManager : Observable() {
             }
         }
     }
+
+    private fun checkDbRemoveSimpleTags() {
+        MyDebug.LOG.debug("checkDbRemoveSimpleTags()")
+        val allTags = getTags()
+        for (tag in allTags) {
+            if (getBooksForTag(tag).size < 3) {
+                // remove tag from all books
+            }
+        }
+    }
+
+    private fun checkDbRemoveMissingBooks() {
+        MyDebug.LOG.debug("checkDbRemoveMissingBooks()")
+        val allBooks = getBooks()
+        for (ebk in allBooks) {
+            for (ft in ebk.filetypes) {
+                if (File(ebk.fullFileDirName + "." + ft).exists()) {
+                    // file exists so we leave it in the library
+                } else {
+                    MyDebug.LOG.error(
+                        LOG_TAG,
+                        "EBook file not found so remove from library [" + ebk.fullFileDirName + "]"
+                    )
+                    //FIXME : delete book author links
+                    //FIXME : delete book from db
+                }
+            }
+        }
+    }
+    //#endregion
 
     fun clear() {
         MyDebug.LOG.debug("clear()")
@@ -370,28 +403,6 @@ class LibraryManager : Observable() {
         }
     }
 
-
-    private fun checkDbRemoveMissingBooks() {
-        MyDebug.LOG.debug("checkDbRemoveMissingBooks()")
-        //      val completeMessage = scanNotificationHndlr.obtainMessage(64, "startdbcheck")
-        //      completeMessage.sendToTarget()
-
-        val allBooks = getBooks()
-        for (ebk in allBooks) {
-            for (ft in ebk.filetypes) {
-                if (File(ebk.fullFileDirName + "." + ft).exists()) {
-                    // file exists so we leave it in the library
-                } else {
-                    MyDebug.LOG.error(
-                        LOG_TAG,
-                        "EBook FileTreeNode Not Found so removed from library [" + ebk.fullFileDirName + "]"
-                    )
-                    //FIXME : delete book author links
-                    //FIXME : delete book from db
-                }
-            }
-        }
-    }
 
     //endregion
 

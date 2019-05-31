@@ -10,6 +10,7 @@
     android:layout_alignParentBottom="true">
 
     <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/toolbar_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:theme="@style/AppTheme.AppBarOverlay">
@@ -27,6 +28,7 @@
         android:id="@+id/dashboard_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/toolbar_layout"
         android:background="@color/primary"
         android:orientation="horizontal"
         android:padding="10dip">

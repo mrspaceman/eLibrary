@@ -95,7 +95,8 @@ class LibraryScanner {
             val prntDir = file.parent.substring(rootdir.length + 1)
             val prntDirPath: Path = Paths.get(prntDir)
             for (p in prntDirPath) {
-                ebk.addTag(p.toString())
+                var tagStr = p.toString().trim().replace("\u0027", "'")
+                ebk.addTag(tagStr)
             }
         } catch (oob: StringIndexOutOfBoundsException) {
             ebk.addTag(EBook.TAG_UNCLASSIFIED)

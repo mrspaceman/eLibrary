@@ -47,7 +47,7 @@ private const val ARG_PARAM2 = "param2"
  * create an instance of this fragment.
  *
  */
-class BookListFragment : Fragment() {
+class BookListFragment : DroidInActuFragment() {
     // #region fragment communication
     internal var callback: OnBookActionListener? = null
     private lateinit var model: BookListViewModel
@@ -68,7 +68,7 @@ class BookListFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
-
+    private var selectedTag = BookLibrary.NO_TAG_SELECTED
 
     /**
      *
@@ -90,9 +90,9 @@ class BookListFragment : Fragment() {
     private val tagSelectedHandler = @SuppressLint("HandlerLeak")
     object : Handler() {
         override fun handleMessage(msg: Message) {
-            val selectedTag = msg.obj as String
-            bookListTag1Title?.setText(selectedTag)
-            updateBookList()
+            selectedTag = msg.obj as String
+            savePreferences()
+            updateUI()
         }
     }
 
@@ -207,6 +207,7 @@ class BookListFragment : Fragment() {
         progressBar = view.findViewById(R.id.frag_bk_list_progressbar)
         progressBarLabel = view.findViewById(R.id.frag_bk_list_progressbar_label)
         fab = view.findViewById(R.id.fab)
+        updateUI()
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -242,7 +243,7 @@ class BookListFragment : Fragment() {
         // Re-created activities receive the same MyViewModel instance created by the first activity.
         model = ViewModelProviders.of(this).get(BookListViewModel::class.java)
         model.getBooks().observe(this, Observer<List<EBook>> { books ->
-            updateLists()
+            updateUI()
         })
     }
 
@@ -254,13 +255,18 @@ class BookListFragment : Fragment() {
             throw RuntimeException(context.toString() + " must implement OnFragmentInteractionListener")
         }
         loadPreferences()
-        updateLists()
+        updateUI()
     }
 
     override fun onDetach() {
         super.onDetach()
         callback = null
         savePreferences()
+    }
+
+    override fun updateUI() {
+        updateLists()
+        bookListTag1Title?.text = selectedTag
     }
 
     private fun pickTag(tagToSet: Int) {
@@ -283,13 +289,11 @@ class BookListFragment : Fragment() {
 
                 tagLstPickerList.onItemClickListener =
                     AdapterView.OnItemClickListener { parent, view, position, id ->
-                        val selectedFromList = tglist[position]
+                        selectedTag = tglist[position]
                         when (tagToSet) {
                             1 -> {
-                                bookListTag1Title?.text = selectedFromList
                                 savePreferences()
-                                updateBookList()
-                                updateTagList()
+                                updateUI()
                             }
                             2 -> {
                             }
@@ -316,10 +320,10 @@ class BookListFragment : Fragment() {
 
     private fun updateBookList() {
         MyDebug.LOG.debug("BookLibrary::updateBookList()")
-        if (bookListTag1Title?.text.toString().compareTo(BookLibrary.NO_TAG_SELECTED) != 0) {
+        if (selectedTag.compareTo(BookLibrary.NO_TAG_SELECTED) != 0) {
             doAsync {
                 val bklist = BookLibApplication.instance.getLibManager()
-                    .getBooksForTag(bookListTag1Title?.text.toString())
+                    .getBooksForTag(selectedTag.toString())
                 bookListAdaptor = BookListItemAdaptor(context!!.applicationContext, bklist, openBookHandler)
                 uiThread {
                     bookList.adapter = bookListAdaptor
@@ -348,14 +352,16 @@ class BookListFragment : Fragment() {
     private fun savePreferences() {
         val settings = activity!!.getSharedPreferences("BookLibApplication", 0)
         val editor = settings.edit()
-        editor.putString("bookListTag1Title", bookListTag1Title?.text.toString())
+        editor.putString("bookListTag1Title", selectedTag.toString())
         editor.apply()
     }
 
     private fun loadPreferences() {
         val settings = activity!!.getSharedPreferences("BookLibApplication", 0)
-        bookListTag1Title?.text = settings.getString("bookListTag1Title", BookLibrary.NO_TAG_SELECTED)
+        selectedTag = settings.getString("bookListTag1Title", BookLibrary.NO_TAG_SELECTED)
+        bookListTag1Title?.text = selectedTag
     }
+
 
     companion object {
         /**
@@ -376,4 +382,5 @@ class BookListFragment : Fragment() {
                 }
             }
     }
+
 }

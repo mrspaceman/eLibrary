@@ -21,7 +21,7 @@
         android:padding="10dip">
 
         <TextView
-            android:id="@+id/dashboard_library_info"
+            android:id="@+id/dashboard_library_info_old"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"

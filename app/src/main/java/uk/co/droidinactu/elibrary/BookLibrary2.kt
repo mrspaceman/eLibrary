@@ -37,7 +37,7 @@ import java.io.File
 
 class BookLibrary2 : AppCompatActivity(), BookListFragment.OnBookActionListener {
 
-    // #region fragment communication
+    //#region fragment communication
     override fun onBookOpen(ebk: EBook) {
         supportFragmentManager.beginTransaction()
             .replace(R.id.container, BookSearchFragment.newInstance("test1", "test2"))
@@ -53,7 +53,7 @@ class BookLibrary2 : AppCompatActivity(), BookListFragment.OnBookActionListener 
     override fun onBrowseForLibrary() {
         browseForLibrary()
     }
-    // #endregion
+    //#endregion
 
     //#region Library Scanning Notification
     private val mHandlerScanningNotification = @SuppressLint("HandlerLeak")
@@ -120,7 +120,9 @@ class BookLibrary2 : AppCompatActivity(), BookListFragment.OnBookActionListener 
 
     private var mNotificationManager: NotificationManager? = null
 
-    private lateinit var model: InfoBarViewModel
+    private var currentFragment: Fragment? = null
+
+    private lateinit var infoBarModel: InfoBarViewModel
     private var toolBarBookLibrary: Toolbar? = null
     private var progressBar: ProgressBar? = null
     private var progressBarLabel: TextView? = null
@@ -189,8 +191,8 @@ class BookLibrary2 : AppCompatActivity(), BookListFragment.OnBookActionListener 
 
         // Create a ViewModel the first time the system calls an activity's onCreate() method.
         // Re-created activities receive the same MyViewModel instance created by the first activity.
-        model = ViewModelProviders.of(this).get(InfoBarViewModel::class.java)
-        model.getInfo().observe(this, Observer<LibraryInfo> { _ ->
+        infoBarModel = ViewModelProviders.of(this).get(InfoBarViewModel::class.java)
+        infoBarModel.getInfo().observe(this, Observer<LibraryInfo> { _ ->
             updateInfoBar()
         })
     }
@@ -211,18 +213,6 @@ class BookLibrary2 : AppCompatActivity(), BookListFragment.OnBookActionListener 
         MyDebug.LOG.debug("onOptionsItemSelected()")
         // Handle item selection
         when (item.itemId) {
-            R.id.action_flutter -> {
-//                var flutterView = Flutter.createView(
-//                    this,
-//                    getLifecycle(),
-//                    "route1"
-//                )
-//                var layout = FrameLayout.LayoutParams(600, 800)
-//                layout.leftMargin = 100
-//                layout.topMargin = 200Ó
-//                addContentView(flutterView, layout)
-                return true
-            }
             R.id.action_search -> {
                 val i = Intent(this, BookLibSearchActivity::class.java)
                 val b = Bundle()
@@ -240,12 +230,12 @@ class BookLibrary2 : AppCompatActivity(), BookListFragment.OnBookActionListener 
                 return true
             }
             R.id.action_checkDb -> {
-//                doAsync {
-//                    BookLibApplication.instance.getLibManager().checkDb(
+                doAsync {
+                    //                    BookLibApplication.instance.getLibManager().checkDb(
 //                        mHandler,
 //                        mHandlerScanningNotification
 //                    )
-//                }
+                }
                 return true
             }
             R.id.action_clear_db -> {
@@ -313,10 +303,16 @@ class BookLibrary2 : AppCompatActivity(), BookListFragment.OnBookActionListener 
 //        startActivity(i)
     }
 
+    private fun updateUI() {
+        if (currentFragment != null && currentFragment is DroidInActuFragment) {
+            (currentFragment as DroidInActuFragment).updateUI()
+        }
+    }
+
     private fun updateInfoBar() {
         doAsync {
             val libInfo = findViewById<TextView>(R.id.dashboard_library_info)
-            val libInfoData = model.getInfo().value
+            val libInfoData = infoBarModel.getInfo().value
             if (libInfoData != null) {
                 val text = String.format(
                     getResources().getQuantityString(R.plurals.library_contains_x_books, libInfoData.nbrBooks),
