@@ -2,10 +2,7 @@ package uk.co.droidinactu.elibrary
 
 import android.annotation.SuppressLint
 import android.app.Dialog
-import android.app.NotificationManager
-import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -100,13 +97,18 @@ class BookListFragment : DroidInActuFragment() {
     private val openBookHandler = @SuppressLint("HandlerLeak")
     object : Handler() {
         override fun handleMessage(msg: Message) {
-            val ebkFilename = (msg.obj as String).split(":").get(1)
-            val ebk = BookLibApplication.instance.getLibManager().getBookFromFullFilename(ebkFilename)
-            val ftypes = ebk?.filetypes
-            if (ftypes != null && ftypes.size > 1) {
-                showFileTypePickerDialog(ebk)
-            } else {
-                openBook(ebk, ftypes?.first().toString().toLowerCase())
+            val msgObjStr = msg.obj as String
+            doAsync {
+                val ebkFilename = msgObjStr.split(":").get(1)
+                val ebk = BookLibApplication.instance.getLibManager().getBookFromFullFilename(ebkFilename)
+                val ftypes = ebk?.filetypes
+                uiThread {
+                    if (ftypes != null && ftypes.size > 1) {
+                        showFileTypePickerDialog(ebk)
+                    } else {
+                        openBook(ebk, ftypes?.first().toString().toLowerCase())
+                    }
+                }
             }
         }
 
@@ -161,16 +163,10 @@ class BookListFragment : DroidInActuFragment() {
         }
     }
 
-    private var mNotificationManager: NotificationManager? = null
-
-    private var libraryScanPndingIntnt: PendingIntent? = null
-    private var libraryScanAlarmIntent: Intent? = null
     private var bookListCurrentReading: RecyclerView? = null
     private lateinit var tagList: RecyclerView
     private lateinit var bookList: RecyclerView
-    private var libInfo: TextView? = null
     private var bookListTag1Title: Button? = null
-    private var bookListTag1IncludeSubTags: Boolean = false
     private var bookListAdaptorCurrReading: BookListItemAdaptor? = null
     private var bookListAdaptor: BookListItemAdaptor? = null
     private var tagListAdaptor: TagListItemAdaptor? = null
@@ -361,7 +357,6 @@ class BookListFragment : DroidInActuFragment() {
         selectedTag = settings.getString("bookListTag1Title", BookLibrary.NO_TAG_SELECTED)
         bookListTag1Title?.text = selectedTag
     }
-
 
     companion object {
         /**
